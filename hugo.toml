@@ -2,3 +2,12 @@ baseURL = 'https://www.fpl0.io'
 languageCode = 'en-us'
 title = 'fpl0'
 theme = "nostyleplease"
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = false
+    lineAnchors = ''
+    noClasses = true
+    tabWidth = 4
+    style = 'tokyonight-moon'
