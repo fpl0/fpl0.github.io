@@ -1,13 +1,13 @@
 +++
 date = '2026-01-13T00:00:00Z'
 draft = false
-title = 'Internationalizing Legacy Rails Apps with Automation and LLMs'
+title = 'Rails i18n at Scale: Automation, Tooling, and LLMs'
 toc = true
 +++
 
-If you've ever inherited a Rails codebase with thousands of hardcoded strings scattered across views, controllers, and models, you know the dread. Internationalization (i18n) on a legacy system feels like archaeological work — except the artifacts are buried in ERB templates and the dig site spans hundreds of files.
+Internationalizing a legacy Rails codebase with thousands of hardcoded strings scattered across views, controllers, and models feels like archaeological work — except the artifacts are buried in ERB templates and the dig site spans hundreds of files.
 
-I recently tackled this on a 10-year-old Rails monolith. Here's what I learned about using automation and LLMs to make the process less painful.
+The naive approach of manually grepping for strings and replacing them one by one doesn't scale. But with the right combination of tooling, automation, and LLMs, it becomes manageable.
 
 ## The Reality of Legacy i18n
 
@@ -21,8 +21,6 @@ Rails has excellent i18n support built in. The problem is that it only works if 
 ```
 
 Multiply this by a few thousand files, add some strings hidden in helpers, mailers, and JavaScript, and you've got yourself a project.
-
-The naive approach — manually grep for strings and replace them one by one — doesn't scale. You need automation.
 
 ## Essential Gems for the Job
 
@@ -100,7 +98,7 @@ Here's where it gets interesting. Manually finding hardcoded strings is tedious.
 
 ### Custom Rake Task for Detection
 
-I wrote a rake task that scans ERB files for likely hardcoded strings:
+A simple rake task can scan ERB files for likely hardcoded strings:
 
 ```ruby
 # lib/tasks/i18n_audit.rake
@@ -407,7 +405,7 @@ en:
 
 ## Strategies for Large Systems
 
-After doing this on a large codebase, here's my advice:
+When working on large codebases, these practices help keep the project on track:
 
 ### 1. Don't Boil the Ocean
 
@@ -514,8 +512,4 @@ Internationalizing a legacy Rails app is a marathon, not a sprint. But with the 
 
 The combination of traditional tooling and LLMs is powerful. The gems handle the mechanical work of tracking translations, while LLMs help with the creative work of naming keys and understanding context.
 
-Is it perfect? No. You'll still need human review, especially for nuanced translations. But you can turn a multi-month project into a few weeks of focused work.
-
-The codebase I worked on went from 0% to 85% internationalized in about three weeks. The remaining 15% is the long tail of edge cases that's genuinely easier to do by hand.
-
-If you're staring down a similar project, I hope this helps. The tools are better than ever, and the LLM-assisted workflow is a game changer.
+Human review is still essential, especially for nuanced translations. But this approach can turn a multi-month project into a few weeks of focused work. The bulk of the codebase gets internationalized quickly, leaving only the long tail of edge cases that are genuinely easier to handle manually.
