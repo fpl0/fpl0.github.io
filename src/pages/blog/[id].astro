@@ -59,8 +59,9 @@ const canonicalURL = new URL(`/blog/${post.slug}/`, Astro.site);
       <header class="post-header">
         <h1>{post.data.title}</h1>
         <div class="post-meta">
-          <FormattedDate date={displayDate} />
-          <span class="reading-time">{readingTime}</span>
+          <span class="date-time"
+            ><FormattedDate date={displayDate} /> · {readingTime}</span
+          >
           {
             post.data.tags.length > 0 && (
               <ul class="tags-list">

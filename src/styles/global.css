@@ -13,7 +13,7 @@
   --font-size-h3: clamp(1.1rem, 0.5vw + 1rem, 1.25rem);
 
   /* Body & Reading */
-  --font-size-body: 1.1875rem;
+  --font-size-body: clamp(1rem, 0.5vw + 0.95rem, 1.1875rem);
   --font-size-lead: 1.35rem;
 
   /* UI Scale (smaller sizes) */
