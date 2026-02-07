@@ -15,7 +15,7 @@ const blog = defineCollection({
       summary: z
         .string()
         .min(50, "Summary must be at least 50 characters")
-        .max(160, "Summary must be 160 characters or less for SEO"),
+        .max(360, "Summary must be 360 characters or less"),
       author: z.string().default("Filipe Lima"),
 
       image: z.string().optional(),
