@@ -116,24 +116,33 @@
   background-color: transparent;
 }
 
-/* Images and Media */
+/* Blockquotes */
+.content blockquote {
+  border-left: 2px solid var(--color-primary);
+  padding-left: 1.5rem;
+  margin: var(--space-8) 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+.content blockquote cite {
+  display: block;
+  margin-top: var(--space-2);
+  font-family: var(--font-mono-brand);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  font-style: normal;
+}
+
+/* Image caption styling - Explicit figure/figcaption */
 .content figure {
   margin: var(--space-10) 0;
   width: 100%;
 }
 
-/* Markdown-generated images (in p tags) */
-.content p > img {
-  margin: var(--space-10) 0 0 0;
-}
-
-/* Remove bottom margin from image paragraph - the caption provides spacing */
-.content p:has(> img) {
-  margin-bottom: 0;
-}
-
-/* Image caption styling (paragraph after image paragraph) - matches table caption */
-.content p:has(> img) + p {
+.content figcaption {
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   color: var(--color-muted);
@@ -144,7 +153,7 @@
   max-width: none;
 }
 
-.content p:has(> img) + p strong {
+.content figcaption strong {
   display: inline;
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
