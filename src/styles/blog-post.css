@@ -20,9 +20,8 @@
   margin-top: 0;
   margin-bottom: var(--space-4);
   font-size: var(--font-size-h1);
-  line-height: 1.1;
+  line-height: var(--line-height-tight);
   letter-spacing: -0.03em;
-  font-feature-settings: "ss02", "dlig";
 }
 
 .post-meta {

@@ -193,13 +193,13 @@ sup {
   font-weight: 600;
   color: var(--color-primary);
   margin-top: 1.25rem;
-  font-size: 0.95rem;
+  font-size: var(--font-size-sm);
 }
 
 .content dd {
   margin-left: 0;
   margin-bottom: 1.25rem;
   color: var(--color-muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
 }

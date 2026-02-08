@@ -9,10 +9,8 @@
   font-size: var(--font-size-body);
   color: var(--color-text);
   line-height: var(--line-height-relaxed); /* Use relaxed (1.6) instead of loose (1.7) */
-  font-feature-settings:
-    "kern" 1,
-    "liga" 1,
-    "onum" 1;
+  font-kerning: normal;
+  font-variant-numeric: oldstyle-nums proportional-nums;
   /* Optimize rendering for long posts - skip off-screen content */
   content-visibility: auto;
   contain-intrinsic-size: auto 500px;
@@ -28,7 +26,6 @@
 }
 
 .content h2 {
-  font-family: var(--font-serif);
   font-weight: 700;
   font-style: normal;
   margin-top: 4.5rem;
@@ -40,7 +37,6 @@
 }
 
 .content h3 {
-  font-family: var(--font-serif);
   font-weight: 600;
   font-style: normal;
   margin-top: var(--space-8);
@@ -140,7 +136,6 @@
 
 .content figcaption strong {
   display: inline;
-  font-family: var(--font-sans);
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -415,8 +410,8 @@ a.anchor-link {
   border-radius: 6px;
   padding: 0.25rem 0.5rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: var(--font-size-micro);
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-muted);

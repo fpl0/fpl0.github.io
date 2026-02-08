@@ -23,8 +23,8 @@
   top: var(--space-3);
   right: var(--space-12); /* Left of the copy button */
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: var(--font-size-micro);
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-text-muted);

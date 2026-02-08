@@ -91,6 +91,7 @@
   --font-size-xs: 0.875rem;
   --font-size-xxs: 0.8125rem;
   --font-size-label: 0.75rem;
+  --font-size-micro: 0.7rem;
 
   /* Line Heights */
   --line-height-tight: 1.1;
@@ -274,11 +275,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-feature-settings:
-    "rlig" 1,
-    "calt" 1,
-    "cv05" 1;
+  font-variant-ligatures: common-ligatures contextual;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "cv05" 1; /* Inter: disambiguated lowercase L */
 }
 
 @media (max-width: 600px) {
@@ -375,12 +374,12 @@ h3 {
 h1 {
   letter-spacing: -0.02em; /* Optically tightened for lighter weight feel */
   font-size: var(--font-size-h1);
-  line-height: 1.1;
+  line-height: var(--line-height-tight);
 }
 h2 {
   letter-spacing: -0.01em;
   font-size: var(--font-size-h2);
-  line-height: 1.2;
+  line-height: var(--line-height-snug);
 }
 h3 {
   letter-spacing: 0;
@@ -438,7 +437,7 @@ blockquote cite {
   font-family: var(--font-mono-brand);
   font-size: var(--font-size-xs);
   letter-spacing: 0.05em;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-primary);
   margin-top: 0.5rem;
   font-style: normal;
