@@ -4,7 +4,7 @@ My personal blog.
 
 ## Writer's Style Guide
 
-All content is managed in `src/content/blog/` using Markdown or MDX.
+All content is managed in `src/content/blog/`. Use `.md` for plain Markdown posts and `.mdx` when you need components (Figure, Table, LiteYouTube).
 
 ### Headings
 
@@ -37,25 +37,63 @@ def example():
     return 42
 ```
 ````
-Code blocks support line numbers, copy buttons, and hover highlighting.
+Code blocks support syntax highlighting, copy buttons, and language labels.
 
 ### Figures and Captions
 
-```markdown
-![Description](./image.png)
+Use the `<Figure>` component in `.mdx` files. The `label` prop renders as a styled heading automatically.
 
-**Figure 1:** Caption text here.
+```mdx
+import Figure from "../../../components/Figure.astro";
+
+<Figure
+  src="https://example.com/photo.jpg"
+  alt="Description of the image"
+  label="Figure 1:"
+  caption="Caption text here."
+/>
 ```
+
+| Prop | Required | Description |
+| :--- | :---: | :--- |
+| `src` | Yes | Image URL |
+| `alt` | Yes | Alt text for accessibility |
+| `label` | No | Styled label (e.g. "Figure 1:") |
+| `caption` | No | Caption text (supports HTML) |
 
 ### Tables
 
-```markdown
-| Parameter | Type | Description |
-| :--- | :--- | :--- |
-| `id` | String | Unique ID |
+Use the `<Table>` component in `.mdx` files. Wrap a standard Markdown table with the component.
 
-**Table 1:** Caption text here.
+```mdx
+import Table from "../../../components/Table.astro";
+
+<Table label="Table 1:" caption="Description of the data.">
+| Column A | Column B |
+| :--- | :--- |
+| foo | bar |
+</Table>
 ```
+
+| Prop | Required | Description |
+| :--- | :---: | :--- |
+| `label` | No | Styled label (e.g. "Table 1:") |
+| `caption` | No | Caption text (supports HTML) |
+
+### YouTube Videos
+
+Use the `<LiteYouTube>` component in `.mdx` files. The video thumbnail loads immediately; the iframe only initializes on click.
+
+```mdx
+import LiteYouTube from "../../../components/LiteYouTube.astro";
+
+<LiteYouTube videoid="dQw4w9WgXcQ" title="Video Title" />
+```
+
+| Prop | Required | Description |
+| :--- | :---: | :--- |
+| `videoid` | Yes | 11-character YouTube video ID |
+| `title` | Yes | Video title (shown as overlay and used for accessibility) |
 
 ### Task Lists
 
@@ -81,12 +119,6 @@ This is a claim[^1].
 Hidden content here...
 
 </details>
-```
-
-### YouTube Videos
-
-```markdown
-<lite-youtube videoid="dQw4w9WgXcQ" title="Video Title"></lite-youtube>
 ```
 
 ## Visual Identity
