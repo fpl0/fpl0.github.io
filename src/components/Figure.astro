@@ -2,13 +2,21 @@
 interface Props {
   src: string;
   alt: string;
+  label?: string;
   caption?: string;
 }
 
-const { src, alt, caption } = Astro.props;
+const { src, alt, label, caption } = Astro.props;
 ---
 
 <figure>
   <img src={src} alt={alt} />
-  {caption && <figcaption set:html={caption} />}
+  {
+    caption && (
+      <figcaption>
+        {label && <strong>{label}</strong>}
+        <span set:html={caption} />
+      </figcaption>
+    )
+  }
 </figure>
