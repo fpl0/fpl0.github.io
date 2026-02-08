@@ -1,0 +1,36 @@
+---
+/**
+ * PostNavigation - Prev/Next links between blog posts
+ *
+ * "Previous" = newer post (toward index 0 in date-sorted array)
+ * "Next" = older post (toward end of array)
+ */
+
+interface Props {
+  prevPost: { slug: string; title: string } | null;
+  nextPost: { slug: string; title: string } | null;
+}
+
+const { prevPost, nextPost } = Astro.props;
+---
+
+{(prevPost || nextPost) && (
+  <nav class="post-nav" aria-label="Post navigation">
+    {prevPost ? (
+      <a href={`/blog/${prevPost.slug}/`} class="post-nav-link post-nav-prev">
+        <span class="post-nav-label">Previous</span>
+        <span class="post-nav-title">← {prevPost.title}</span>
+      </a>
+    ) : (
+      <span />
+    )}
+    {nextPost ? (
+      <a href={`/blog/${nextPost.slug}/`} class="post-nav-link post-nav-next">
+        <span class="post-nav-label">Next</span>
+        <span class="post-nav-title">{nextPost.title} →</span>
+      </a>
+    ) : (
+      <span />
+    )}
+  </nav>
+)}

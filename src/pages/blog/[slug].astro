@@ -21,6 +21,7 @@ import TableWrapper from "../../components/TableWrapper.astro";
 import AnchorLinks from "../../components/AnchorLinks.astro";
 import MermaidDiagram from "../../components/MermaidDiagram.astro";
 import BlogPostSchema from "../../components/BlogPostSchema.astro";
+import PostNavigation from "../../components/PostNavigation.astro";
 import { getReadingTime } from "../../utils/readingTime";
 import "../../styles/blog-post.css";
 import "../../styles/table-of-contents.css";
@@ -28,17 +29,27 @@ import "../../styles/code-block.css";
 
 interface Props {
   post: CollectionEntry<"blog">;
+  prevPost: { slug: string; title: string } | null;
+  nextPost: { slug: string; title: string } | null;
 }
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post) => ({
+  const posts = await getCollection("blog", ({ data }) => !data.isDraft);
+  const sorted = posts.sort((a, b) => {
+    const dateDiff = b.data.date.valueOf() - a.data.date.valueOf();
+    return dateDiff !== 0 ? dateDiff : a.slug.localeCompare(b.slug);
+  });
+  return sorted.map((post, i) => ({
     params: { slug: post.slug },
-    props: { post },
+    props: {
+      post,
+      prevPost: i > 0 ? { slug: sorted[i - 1].slug, title: sorted[i - 1].data.title } : null,
+      nextPost: i < sorted.length - 1 ? { slug: sorted[i + 1].slug, title: sorted[i + 1].data.title } : null,
+    },
   }));
 }
 
-const { post } = Astro.props;
+const { post, prevPost, nextPost } = Astro.props;
 const { Content, headings } = await render(post);
 const readingTime = getReadingTime(post.body ?? "");
 const displayDate = post.data.publicationDate ?? post.data.createdDate;
@@ -76,7 +87,7 @@ const canonicalURL = new URL(`/blog/${post.slug}/`, Astro.site);
         <Content />
       </div>
       <footer class="post-endmatter">
-        <div class="end-mark">∎</div>
+        <PostNavigation prevPost={prevPost} nextPost={nextPost} />
         <a href="/" class="back-link">← home</a>
       </footer>
     </article>
