@@ -1,0 +1,51 @@
+---
+interface Props {
+  caption?: string;
+  label?: string;
+}
+
+const { caption, label } = Astro.props;
+---
+
+<figure class="table-figure">
+  <slot />
+  {
+    caption && (
+      <figcaption>
+        {label && <strong>{label}</strong>}
+        {caption}
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .table-figure {
+    margin: var(--space-10) 0;
+  }
+
+  .table-figure :global(.table-wrapper) {
+    margin: 0;
+  }
+
+  .table-figure figcaption {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-muted);
+    text-align: left;
+    margin-top: var(--space-3);
+    line-height: var(--line-height-relaxed);
+    max-width: none;
+  }
+
+  .table-figure figcaption strong {
+    display: inline;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary);
+    margin-right: 0.35em;
+    font-weight: 600;
+  }
+</style>

@@ -52,25 +52,3 @@
   border-bottom: none;
 }
 
-/* Table caption styling (paragraph after table wrapper) */
-.content .table-wrapper + p {
-  font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  color: var(--color-muted);
-  text-align: left;
-  margin-top: var(--space-3);
-  margin-bottom: var(--space-10);
-  line-height: var(--line-height-relaxed);
-  max-width: none;
-}
-
-.content .table-wrapper + p strong {
-  display: inline;
-  font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-primary);
-  margin-right: 0.35em;
-  font-weight: 600;
-}

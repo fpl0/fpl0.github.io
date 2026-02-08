@@ -8,6 +8,8 @@ summary: "A comprehensive showcase of every content element supported by this bl
 ---
 
 import LiteYouTube from "../../../components/LiteYouTube.astro";
+import Table from "../../../components/Table.astro";
+import Figure from "../../../components/Figure.astro";
 
 This post demonstrates every content element supported by this blog. Use it as a reference when writing your own posts.
 
@@ -66,22 +68,24 @@ Inline code like `npm install` or `git commit -m "message"` blends naturally wit
 
 Images are automatically optimized and styled:
 
-![A serene mountain landscape at sunset with dramatic orange and purple clouds](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop)
-
-**Figure 1:** Mountain landscapes remind us that the best views come after the hardest climbs. Photography by Samuel Ferrara.
+<Figure
+  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop"
+  alt="A serene mountain landscape at sunset with dramatic orange and purple clouds"
+  caption="<strong>Figure 1:</strong> Mountain landscapes remind us that the best views come after the hardest climbs. Photography by Samuel Ferrara."
+/>
 
 ## Data Presentation
 
 Tables are perfect for structured comparisons:
 
+<Table label="Table 1:" caption="Popular frontend frameworks compared by GitHub stars and relative learning difficulty.">
 | Framework | Language | Stars | Learning Curve |
 | :--- | :--- | ---: | :---: |
 | React | JavaScript | 220k | Moderate |
 | Vue | JavaScript | 207k | Gentle |
 | Svelte | JavaScript | 77k | Easy |
 | Angular | TypeScript | 95k | Steep |
-
-**Table 1:** Popular frontend frameworks compared by GitHub stars and relative learning difficulty.
+</Table>
 
 ## Interactive Elements
 
