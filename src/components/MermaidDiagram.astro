@@ -1,0 +1,51 @@
+---
+/**
+ * MermaidDiagram - Renders Mermaid diagrams from code blocks
+ *
+ * Detects ```mermaid code blocks in .content and renders them as SVG.
+ * Dynamically imports mermaid so there's zero cost on pages without diagrams.
+ * Respects current theme (dark/light).
+ */
+---
+
+<script>
+  import { onPageReady } from "../utils/lifecycle";
+
+  onPageReady(() => {
+    const blocks = document.querySelectorAll<HTMLElement>(
+      ".content pre code.language-mermaid",
+    );
+    if (blocks.length === 0) return;
+
+    const theme =
+      document.documentElement.getAttribute("data-theme") === "light"
+        ? "neutral"
+        : "dark";
+
+    import("mermaid").then(({ default: mermaid }) => {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme,
+        fontFamily: "var(--font-sans)",
+      });
+
+      blocks.forEach(async (block, i) => {
+        const pre = block.parentElement;
+        if (!pre) return;
+
+        const source = block.textContent ?? "";
+        const id = `mermaid-diagram-${i}`;
+
+        try {
+          const { svg } = await mermaid.render(id, source);
+          const wrapper = document.createElement("div");
+          wrapper.className = "mermaid-diagram";
+          wrapper.innerHTML = svg;
+          pre.replaceWith(wrapper);
+        } catch {
+          // Leave the code block as-is if rendering fails
+        }
+      });
+    });
+  });
+</script>

@@ -1,0 +1,97 @@
+/* ==========================================================================
+   PRINT STYLES
+   Clean, readable output for printing blog posts
+   ========================================================================== */
+
+@media print {
+  /* Hide interactive/navigation elements */
+  .theme-toggle,
+  .scroll-to-top,
+  .search-backdrop,
+  .toc-sidebar,
+  .page-header-nav,
+  .post-endmatter,
+  .skip-link,
+  .code-copy,
+  .code-lang,
+  .post-tags,
+  .home-nav {
+    display: none !important;
+  }
+
+  /* Reset page layout */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Clean typography */
+  .content {
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  .content h2,
+  .content h3 {
+    color: black !important;
+  }
+
+  .post-header h1 {
+    color: black !important;
+    font-size: 18pt;
+  }
+
+  .post-meta {
+    color: #555 !important;
+  }
+
+  /* Show URLs after external links */
+  .content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #555;
+    font-family: sans-serif;
+  }
+
+  /* Don't show URL for anchor links */
+  a.anchor-link::after {
+    content: none !important;
+  }
+
+  /* Prevent page breaks in awkward places */
+  .content pre,
+  .content img,
+  .content figure,
+  .content table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .content h2,
+  .content h3,
+  .content h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Code blocks for print */
+  .content pre {
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+    font-size: 9pt;
+    overflow-x: visible;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* Links */
+  a {
+    color: black !important;
+    text-decoration: underline;
+  }
+}

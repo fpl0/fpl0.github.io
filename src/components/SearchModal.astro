@@ -210,8 +210,13 @@ import "../styles/search-modal.css";
     backdrop?.classList.add("is-open");
     document.body.style.overflow = "hidden";
 
-    // Focus input after animation starts
-    requestAnimationFrame(() => input?.focus());
+    // Double rAF ensures the browser has painted visibility:visible before focusing
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        input?.focus();
+        input?.select();
+      }),
+    );
 
     // Show loading state if index not ready
     selectedIndex = 0;

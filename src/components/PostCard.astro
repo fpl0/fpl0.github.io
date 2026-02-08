@@ -25,5 +25,12 @@ const postUrl = `/blog/${post.slug}/`;
       {post.data.title}
     </a>
     <p class="post-summary">{post.data.summary}</p>
+    {post.data.tags.length > 0 && (
+      <div class="post-tags">
+        {post.data.tags.map((tag: string) => (
+          <a href={`/tags/${tag}/`} class="tag-link">{tag}</a>
+        ))}
+      </div>
+    )}
   </div>
 </li>

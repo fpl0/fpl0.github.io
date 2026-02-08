@@ -1,0 +1,31 @@
+/* ==========================================================================
+   TAG STYLES
+   Shared tag pill styles for PostCard and blog post pages
+   ========================================================================== */
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tag-link {
+  font-family: var(--font-mono-brand);
+  font-size: var(--font-size-label);
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.15em 0.6em;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tag-link:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: none;
+  text-decoration: none;
+}

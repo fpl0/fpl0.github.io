@@ -8,6 +8,7 @@
 @import "./prose.css";
 @import "./tables.css";
 @import "./footnotes.css";
+@import "./tags.css";
 
 /* --- Post Header --- */
 .post-header {
@@ -48,18 +49,3 @@
   margin-bottom: var(--space-8);
 }
 
-.post-endmatter .back-link {
-  display: inline-block;
-  font-family: var(--font-mono-brand);
-  font-size: var(--font-size-xxs);
-  letter-spacing: 0.04em;
-  color: var(--color-muted);
-  text-decoration: none;
-  border-bottom: none;
-  transition: color 0.2s ease;
-}
-
-.post-endmatter .back-link:hover {
-  color: var(--color-primary);
-  background: none;
-}

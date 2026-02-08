@@ -18,6 +18,8 @@ import TableOfContents from "../../components/TableOfContents.astro";
 import CodeCopyButton from "../../components/CodeCopyButton.astro";
 import ImageLightbox from "../../components/ImageLightbox.astro";
 import TableWrapper from "../../components/TableWrapper.astro";
+import AnchorLinks from "../../components/AnchorLinks.astro";
+import MermaidDiagram from "../../components/MermaidDiagram.astro";
 import BlogPostSchema from "../../components/BlogPostSchema.astro";
 import { getReadingTime } from "../../utils/readingTime";
 import "../../styles/blog-post.css";
@@ -61,6 +63,13 @@ const canonicalURL = new URL(`/blog/${post.slug}/`, Astro.site);
           <span class="date-time"
             ><FormattedDate date={displayDate} /> · {readingTime}</span
           >
+          {post.data.tags.length > 0 && (
+            <div class="post-tags">
+              {post.data.tags.map((tag: string) => (
+                <a href={`/tags/${tag}/`} class="tag-link">{tag}</a>
+              ))}
+            </div>
+          )}
         </div>
       </header>
       <div class="content">
@@ -76,31 +85,6 @@ const canonicalURL = new URL(`/blog/${post.slug}/`, Astro.site);
 
 <CodeCopyButton />
 <ImageLightbox />
-
 <TableWrapper />
-
-<script>
-  function initAnchorLinks(): void {
-    document
-      .querySelectorAll<HTMLHeadingElement>(
-        ".content h2[id], .content h3[id], .content h4[id]",
-      )
-      .forEach((header) => {
-        // Skip if already has anchor
-        if (header.querySelector(".anchor-link")) return;
-
-        const link = document.createElement("a");
-        link.className = "anchor-link";
-        link.href = `#${header.id}`;
-        link.textContent = "#";
-        link.setAttribute(
-          "aria-label",
-          `Link to section: ${header.textContent}`,
-        );
-        header.appendChild(link);
-      });
-  }
-
-  document.addEventListener("DOMContentLoaded", initAnchorLinks);
-  document.addEventListener("astro:page-load", initAnchorLinks);
-</script>
+<AnchorLinks />
+<MermaidDiagram />

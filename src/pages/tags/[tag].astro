@@ -1,0 +1,58 @@
+---
+/**
+ * Tag Detail Page - Shows posts filtered by tag
+ */
+
+import Layout from "../../layouts/Layout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import PostCard from "../../components/PostCard.astro";
+import { getCollection } from "astro:content";
+import "../../styles/home.css";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.isDraft);
+
+  const tagMap = new Map<string, typeof posts>();
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      const existing = tagMap.get(tag) ?? [];
+      existing.push(post);
+      tagMap.set(tag, existing);
+    }
+  }
+
+  return [...tagMap.entries()].map(([tag, posts]) => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<Layout title={`#${tag} | fpl0`} description={`Posts tagged "${tag}"`}>
+  <PageHeader backLink="/tags/" backText="← tags" />
+
+  <main id="main-content" class="home-main">
+    <h1 class="tag-page-title">#{tag}</h1>
+    <section class="archive">
+      <ul class="post-list">
+        {posts.map((post) => <PostCard post={post} />)}
+      </ul>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .tag-page-title {
+    font-family: var(--font-mono-brand);
+    font-size: var(--font-size-h2);
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: var(--space-10);
+    color: var(--color-primary);
+  }
+</style>

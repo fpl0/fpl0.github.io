@@ -116,24 +116,9 @@
   background-color: transparent;
 }
 
-/* Blockquotes */
+/* Blockquotes - only override margin; other styles inherited from global blockquote */
 .content blockquote {
-  border-left: 2px solid var(--color-primary);
-  padding-left: 1.5rem;
   margin: var(--space-8) 0;
-  font-family: var(--font-serif);
-  font-style: italic;
-  color: var(--color-muted);
-}
-
-.content blockquote cite {
-  display: block;
-  margin-top: var(--space-2);
-  font-family: var(--font-mono-brand);
-  font-size: var(--font-size-xs);
-  letter-spacing: 0.05em;
-  color: var(--color-primary);
-  font-style: normal;
 }
 
 /* Image caption styling - Explicit figure/figcaption */
@@ -359,4 +344,15 @@ a.anchor-link {
 .anchor-link:hover {
   color: var(--color-primary);
   background-color: transparent;
+}
+
+/* --- Mermaid Diagrams --- */
+.mermaid-diagram {
+  margin: var(--space-10) 0;
+  text-align: center;
+}
+
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
 }

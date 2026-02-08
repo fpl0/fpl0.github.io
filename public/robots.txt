@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fpl0.github.io/sitemap-index.xml

@@ -22,6 +22,7 @@
     "@fontsource/space-mono": "^5.2.9",
     "astro": "^5.17.1",
     "marked": "^17.0.1",
+    "mermaid": "^11.12.2",
     "remark-gfm": "^4.0.1",
     "sanitize-html": "^2.17.0",
     "typescript": "^5.9.3"

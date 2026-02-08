@@ -1,0 +1,32 @@
+---
+/**
+ * AnchorLinks - Adds "#" anchor links to content headings
+ *
+ * Appends clickable anchor links to h2/h3/h4 elements with IDs,
+ * enabling direct linking to sections.
+ */
+---
+
+<script>
+  import { onPageReady } from "../utils/lifecycle";
+
+  onPageReady(() => {
+    document
+      .querySelectorAll<HTMLHeadingElement>(
+        ".content h2[id], .content h3[id], .content h4[id]",
+      )
+      .forEach((header) => {
+        if (header.querySelector(".anchor-link")) return;
+
+        const link = document.createElement("a");
+        link.className = "anchor-link";
+        link.href = `#${header.id}`;
+        link.textContent = "#";
+        link.setAttribute(
+          "aria-label",
+          `Link to section: ${header.textContent}`,
+        );
+        header.appendChild(link);
+      });
+  });
+</script>
