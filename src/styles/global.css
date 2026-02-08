@@ -34,7 +34,16 @@
   line-gap-override: 0%;
 }
 
-/* Merriweather — Latin subset, regular */
+/* Merriweather — Latin subset, light (body text) */
+@font-face {
+  font-family: "Merriweather";
+  font-style: normal;
+  font-display: block;
+  font-weight: 300;
+  src: url("@fontsource/merriweather/files/merriweather-latin-300-normal.woff2") format("woff2");
+}
+
+/* Merriweather — Latin subset, regular (strong/emphasis in prose) */
 @font-face {
   font-family: "Merriweather";
   font-style: normal;
@@ -57,7 +66,7 @@
   font-family: "Merriweather Fallback";
   src: local("Georgia");
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 300 700;
   size-adjust: 113.82%;
   ascent-override: 86.45%;
   descent-override: 23.98%;
@@ -124,34 +133,34 @@
 
   /* ==========================================================================
      COLOR SYSTEM
-     Warm, dark theme with rich cream/gold accent
-     Built on HSL for harmonious relationships
+     Light theme (default) — warm paper-inspired palette
+     Carefully calibrated contrast ratios (WCAG AA+)
      ========================================================================== */
 
-  /* Background Layers (darkest to lighter) */
-  --color-bg: hsl(20, 15%, 8%);
-  --color-surface: hsl(20, 12%, 12%);
-  --color-surface-raised: hsl(20, 10%, 16%);
-  --color-highlight: hsl(35, 20%, 14%);
+  /* Background Layers - Warm paper tones */
+  --color-bg: hsl(45, 40%, 96%);
+  --color-surface: hsl(45, 30%, 92%);
+  --color-surface-raised: hsl(45, 25%, 88%);
+  --color-highlight: hsl(45, 45%, 90%);
 
-  /* Text Hierarchy (brightest to dimmer) */
-  --color-text: hsl(35, 12%, 87%);
-  --color-text-secondary: hsl(30, 8%, 68%);
-  --color-text-muted: hsl(25, 6%, 52%);
+  /* Text Hierarchy - Rich sepia-brown tones */
+  --color-text: hsl(25, 30%, 18%);
+  --color-text-secondary: hsl(25, 25%, 35%);
+  --color-text-muted: hsl(25, 20%, 38%);
 
-  /* Primary Accent (rich cream/gold) */
-  --color-primary: hsl(42, 52%, 76%);
-  --color-primary-dim: hsl(42, 35%, 58%);
+  /* Primary Accent - Rich amber/cognac */
+  --color-primary: hsl(28, 80%, 38%);
+  --color-primary-dim: hsl(28, 60%, 48%);
 
   /* Cool Accent (Teal for harmony) */
-  --color-accent-cool: hsl(180, 20%, 72%);
+  --color-accent-cool: hsl(180, 30%, 35%);
 
   /* Borders & Dividers */
-  --color-border: hsl(20, 10%, 18%);
-  --color-border-subtle: hsl(20, 8%, 14%);
+  --color-border: hsl(35, 25%, 82%);
+  --color-border-subtle: hsl(35, 20%, 88%);
 
   /* Shadows */
-  --shadow-color: rgba(10, 5, 0, 0.6);
+  --shadow-color: rgba(60, 40, 20, 0.12);
 
   /* Legacy aliases for backward compatibility */
   --color-secondary: var(--color-text-secondary);
@@ -180,41 +189,35 @@
 }
 
 /* ==========================================================================
-   LIGHT THEME
-   Sophisticated paper-inspired palette with warm undertones
-   
-   Design philosophy:
-   - Warm off-white backgrounds (not harsh pure white)
-   - Rich sepia-toned text for reduced eye strain
-   - Amber/gold accents for continuity with dark theme
-   - Carefully calibrated contrast ratios (WCAG AA+)
+   DARK THEME
+   Warm dark palette with rich cream/gold accent
    ========================================================================== */
 
-[data-theme="light"] {
-  /* Background Layers - Warm paper tones */
-  --color-bg: hsl(45, 40%, 96%); /* Warm cream paper */
-  --color-surface: hsl(45, 30%, 92%); /* Slightly darker cream */
-  --color-surface-raised: hsl(45, 25%, 88%);
-  --color-highlight: hsl(45, 45%, 90%);
+[data-theme="dark"] {
+  /* Background Layers (darkest to lighter) */
+  --color-bg: hsl(20, 15%, 8%);
+  --color-surface: hsl(20, 12%, 12%);
+  --color-surface-raised: hsl(20, 10%, 16%);
+  --color-highlight: hsl(35, 20%, 14%);
 
-  /* Text Hierarchy - Rich sepia-brown tones */
-  --color-text: hsl(25, 30%, 18%); /* Deep warm brown - 8.5:1 contrast */
-  --color-text-secondary: hsl(25, 25%, 35%); /* Enriched brown */
-  --color-text-muted: hsl(25, 20%, 38%); /* Enriched muted brown — 5.8:1 on bg, 4.7:1 on surface-raised */
+  /* Text Hierarchy (brightest to dimmer) */
+  --color-text: hsl(35, 12%, 87%);
+  --color-text-secondary: hsl(30, 8%, 68%);
+  --color-text-muted: hsl(25, 6%, 52%);
 
-  /* Primary Accent - Rich amber/cognac */
-  --color-primary: hsl(28, 80%, 38%); /* Deep amber - readable on both bg */
-  --color-primary-dim: hsl(28, 60%, 48%);
+  /* Primary Accent (rich cream/gold) */
+  --color-primary: hsl(42, 52%, 76%);
+  --color-primary-dim: hsl(42, 35%, 58%);
 
   /* Cool Accent (Teal for harmony) */
-  --color-accent-cool: hsl(180, 30%, 35%); /* Deep Teal */
-
-  /* Shadows */
-  --shadow-color: rgba(60, 40, 20, 0.12);
+  --color-accent-cool: hsl(180, 20%, 72%);
 
   /* Borders & Dividers */
-  --color-border: hsl(35, 25%, 82%);
-  --color-border-subtle: hsl(35, 20%, 88%);
+  --color-border: hsl(20, 10%, 18%);
+  --color-border-subtle: hsl(20, 8%, 14%);
+
+  /* Shadows */
+  --shadow-color: rgba(10, 5, 0, 0.6);
 }
 
 /* ==========================================================================
@@ -245,10 +248,15 @@
   background-color: transparent !important;
 }
 
-/* Light mode code block - warm cream tones matching page */
+/* Light mode code block & mermaid - warm cream tones matching page */
 [data-theme="light"] .content pre {
   background-color: hsl(40, 30%, 95%) !important; /* Warm cream */
   border: 1px solid hsl(35, 25%, 85%);
+}
+
+[data-theme="light"] .mermaid-container {
+  background: hsl(40, 30%, 95%);
+  border-color: hsl(35, 25%, 85%);
 }
 
 /* Remove any line highlighting/stripes */
@@ -273,10 +281,9 @@
   border-color: hsl(35, 25%, 80%);
 }
 
-/* Light theme selection */
-[data-theme="light"] ::selection {
-  background-color: hsl(35, 60%, 75%); /* Warm gold selection */
-  color: hsl(25, 40%, 15%);
+/* Dark theme: heavier serif weight — compensates for light-on-dark halation */
+[data-theme="dark"] .content {
+  font-weight: 400;
 }
 
 html {
@@ -313,6 +320,11 @@ body {
 }
 
 ::selection {
+  background-color: hsl(35, 60%, 75%);
+  color: hsl(25, 40%, 15%);
+}
+
+[data-theme="dark"] ::selection {
   background-color: var(--color-primary);
   color: var(--color-bg);
 }

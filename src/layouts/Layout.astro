@@ -36,7 +36,7 @@ const ogImage = image
 const twitterCardType = image ? "summary_large_image" : "summary";
 ---
 
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <!-- Theme init - runs before paint to prevent flash -->
     <script is:inline>
@@ -44,9 +44,9 @@ const twitterCardType = image ? "summary_large_image" : "summary";
         function getTheme() {
           var stored = localStorage.getItem("theme");
           if (stored) return stored;
-          return window.matchMedia("(prefers-color-scheme: light)").matches
-            ? "light"
-            : "dark";
+          return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
         }
 
         // Apply on initial load

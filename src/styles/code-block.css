@@ -13,10 +13,6 @@
   overflow: hidden; /* For border-radius */
 }
 
-.code-wrapper:hover .code-copy {
-  opacity: 1;
-}
-
 /* Language Label - Floating Top Left */
 .code-lang {
   position: absolute;
@@ -51,14 +47,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 20;
-  opacity: 0; /* Hidden by default until hover */
-}
-
-/* Always show on mobile/touch */
-@media (hover: none) {
-  .code-copy {
-    opacity: 1;
-  }
+  opacity: 1;
 }
 
 .code-copy:hover {

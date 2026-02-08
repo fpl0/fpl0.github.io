@@ -7,6 +7,7 @@
 .content {
   font-family: var(--font-serif);
   font-size: var(--font-size-body);
+  font-weight: 300;
   color: var(--color-text);
   line-height: var(--line-height-relaxed); /* Use relaxed (1.6) instead of loose (1.7) */
   font-kerning: normal;
@@ -417,18 +418,7 @@ a.anchor-link {
   letter-spacing: 0.08em;
   color: var(--color-muted);
   cursor: pointer;
-  opacity: 0;
   transition: all 0.2s ease;
-}
-
-.mermaid-container:hover .mermaid-toggle {
-  opacity: 1;
-}
-
-@media (hover: none) {
-  .mermaid-toggle {
-    opacity: 1;
-  }
 }
 
 .mermaid-toggle:hover {
