@@ -45,7 +45,7 @@
   width: 0.8em;
   height: 0.8em;
   transform: scale(0);
-  transition: 120ms transform ease-in-out;
+  transition: 0.2s transform ease-in-out;
   box-shadow: inset 1em 1em var(--color-bg);
   transform-origin: center;
   clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
@@ -144,7 +144,7 @@
 .content .footnote-backref {
   text-decoration: none;
   border: none;
-  margin-left: 0.35rem;
+  margin-left: 0.25rem;
   color: var(--color-primary);
   font-size: 0.85em;
   opacity: 0.6;

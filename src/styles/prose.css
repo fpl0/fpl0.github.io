@@ -356,7 +356,7 @@ a.anchor-link {
   padding: var(--space-5);
   padding-top: var(--space-8);
   text-align: center;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.2s ease;
 }
 
 .mermaid-rendered.is-swapping {

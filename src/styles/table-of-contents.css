@@ -102,8 +102,8 @@
 
 /* Hover States */
 .toc-link:hover {
-  color: var(--color-text);
-  border-left-color: var(--color-text-muted); /* Subtle feedback */
+  color: var(--color-primary);
+  border-left-color: var(--color-primary-dim);
   opacity: 1;
 }
 

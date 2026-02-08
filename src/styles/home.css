@@ -130,7 +130,7 @@
 .search-hint kbd {
   font-family: var(--font-mono);
   font-size: var(--font-size-label);
-  padding: 0.1rem 0.35rem;
+  padding: 0.25rem 0.5rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 4px;

@@ -162,6 +162,11 @@
   /* Shadows */
   --shadow-color: rgba(60, 40, 20, 0.12);
 
+  /* Overlays — warm-tinted dark backgrounds for modals/lightboxes */
+  --color-overlay: rgba(20, 12, 5, 0.6);
+  --color-overlay-heavy: rgba(20, 12, 5, 0.9);
+  --color-overlay-text: hsl(45, 40%, 96%);
+
   /* Legacy aliases for backward compatibility */
   --color-secondary: var(--color-text-secondary);
   --color-muted: var(--color-text-muted);

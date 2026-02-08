@@ -17,7 +17,7 @@
   text-decoration: none;
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  padding: 0.15em 0.6em;
+  padding: 0.25rem 0.5rem;
   transition:
     color 0.2s ease,
     border-color 0.2s ease;
