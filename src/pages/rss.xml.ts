@@ -1,15 +1,11 @@
 import rss from "@astrojs/rss";
-import { getCollection } from "astro:content";
 import type { APIContext } from "astro";
-import sanitizeHtml from "sanitize-html";
 import { marked } from "marked";
+import sanitizeHtml from "sanitize-html";
+import { getPublishedPosts } from "../utils/posts";
 
 export async function GET(context: APIContext) {
-  const posts = await getCollection("blog", ({ data }) => !data.isDraft);
-
-  const sortedPosts = posts.sort(
-    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-  );
+  const sortedPosts = await getPublishedPosts();
 
   // Render full content for each post
   const items = await Promise.all(
@@ -25,9 +21,8 @@ export async function GET(context: APIContext) {
           allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
         }),
         link: `/blog/${post.slug}/`,
-
       };
-    })
+    }),
   );
 
   return rss({

@@ -24,14 +24,10 @@ const blog = defineCollection({
       createdDate: z.coerce.date(),
       publicationDate: z.coerce.date().optional(),
     })
-    .refine(
-      (data) =>
-        !data.publicationDate || data.publicationDate >= data.createdDate,
-      {
-        message: "publicationDate must be on or after createdDate",
-        path: ["publicationDate"],
-      },
-    )
+    .refine((data) => !data.publicationDate || data.publicationDate >= data.createdDate, {
+      message: "publicationDate must be on or after createdDate",
+      path: ["publicationDate"],
+    })
     .transform((data) => ({
       ...data,
       date: data.publicationDate ?? data.createdDate,

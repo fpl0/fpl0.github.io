@@ -118,5 +118,5 @@
 
 /* Scrolled Active State for H3s */
 .toc-item--h3 .toc-link.is-active {
-   color: var(--color-primary);
+  color: var(--color-primary);
 }

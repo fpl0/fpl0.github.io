@@ -16,34 +16,6 @@
   align-items: baseline;
 }
 
-/* --- Logo & Brand Mark --- */
-
-.logo {
-  font-family: var(--font-mono-brand);
-  font-size: var(--font-size-h1);
-  font-weight: 400;
-  margin: 0;
-  letter-spacing: -0.04em;
-  line-height: var(--line-height-tight);
-  color: var(--color-text);
-  display: flex;
-  align-items: baseline;
-}
-
-.cursor {
-  display: inline-block;
-  color: var(--color-primary);
-  margin-left: 0.05em;
-  animation: blink 1s step-end infinite;
-  width: 0.6em;
-  text-align: center;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
 /* --- Bio Quote --- */
 
 .bio-quote {

@@ -11,11 +11,11 @@
 
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
-import SearchModal from "../components/SearchModal.astro";
-import ScrollToTop from "../components/ScrollToTop.astro";
-import ThemeToggle from "../components/ThemeToggle.astro";
 import Analytics from "../components/Analytics.astro";
 import FontPreload from "../components/FontPreload.astro";
+import ScrollToTop from "../components/ScrollToTop.astro";
+import SearchModal from "../components/SearchModal.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
 
 interface Props {
   title: string;
@@ -31,7 +31,9 @@ const {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const siteURL = Astro.site?.toString().replace(/\/$/, "") ?? "https://fpl0.github.io";
 const ogImage = image
-  ? image.startsWith("http") ? image : `${siteURL}${image.startsWith("/") ? "" : "/"}${image}`
+  ? image.startsWith("http")
+    ? image
+    : `${siteURL}${image.startsWith("/") ? "" : "/"}${image}`
   : `${siteURL}/favicon.svg`;
 const twitterCardType = image ? "summary_large_image" : "summary";
 ---

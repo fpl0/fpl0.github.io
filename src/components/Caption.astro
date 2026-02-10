@@ -1,0 +1,19 @@
+---
+/**
+ * Caption — Shared figcaption block for Figure and Table components.
+ * Renders an optional label (bold) and caption (supports inline HTML).
+ */
+interface Props {
+  label?: string;
+  caption?: string;
+}
+
+const { label, caption } = Astro.props;
+---
+
+{caption && (
+  <figcaption>
+    {label && <strong>{label}</strong>}
+    <span set:html={caption} />
+  </figcaption>
+)}

@@ -10,18 +10,19 @@
  * - Lazy YouTube embeds
  */
 
-import { getCollection, render, type CollectionEntry } from "astro:content";
-import FormattedDate from "../../components/FormattedDate.astro";
-import Layout from "../../layouts/Layout.astro";
-import PageHeader from "../../components/PageHeader.astro";
-import TableOfContents from "../../components/TableOfContents.astro";
-import CodeCopyButton from "../../components/CodeCopyButton.astro";
-import ImageLightbox from "../../components/ImageLightbox.astro";
-import TableWrapper from "../../components/TableWrapper.astro";
+import { type CollectionEntry, render } from "astro:content";
 import AnchorLinks from "../../components/AnchorLinks.astro";
-import MermaidDiagram from "../../components/MermaidDiagram.astro";
 import BlogPostSchema from "../../components/BlogPostSchema.astro";
+import CodeCopyButton from "../../components/CodeCopyButton.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import ImageLightbox from "../../components/ImageLightbox.astro";
+import MermaidDiagram from "../../components/MermaidDiagram.astro";
+import PageHeader from "../../components/PageHeader.astro";
 import PostNavigation from "../../components/PostNavigation.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
+import TableWrapper from "../../components/TableWrapper.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getPublishedPosts } from "../../utils/posts";
 import { getReadingTime } from "../../utils/readingTime";
 import "../../styles/blog-post.css";
 import "../../styles/table-of-contents.css";
@@ -34,17 +35,16 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => !data.isDraft);
-  const sorted = posts.sort((a, b) => {
-    const dateDiff = b.data.date.valueOf() - a.data.date.valueOf();
-    return dateDiff !== 0 ? dateDiff : a.slug.localeCompare(b.slug);
-  });
+  const sorted = await getPublishedPosts();
   return sorted.map((post, i) => ({
     params: { slug: post.slug },
     props: {
       post,
       prevPost: i > 0 ? { slug: sorted[i - 1].slug, title: sorted[i - 1].data.title } : null,
-      nextPost: i < sorted.length - 1 ? { slug: sorted[i + 1].slug, title: sorted[i + 1].data.title } : null,
+      nextPost:
+        i < sorted.length - 1
+          ? { slug: sorted[i + 1].slug, title: sorted[i + 1].data.title }
+          : null,
     },
   }));
 }

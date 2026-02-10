@@ -4,7 +4,7 @@ My personal blog.
 
 ## Writer's Style Guide
 
-All content is managed in `src/content/blog/` using `.mdx` files. MDX supports standard Markdown and lets you import components for figures, tables, videos, and more.
+All content is managed in `src/content/blog/` using `.md` or `.mdx` files. MDX supports standard Markdown and lets you import components for figures, tables, videos, and more.
 
 ### Headings
 
@@ -132,4 +132,8 @@ The design uses a warm, dark palette of walnut and cream to support long-form te
 | `bun install` | Install dependencies |
 | `bun run dev` | Start development server |
 | `bun run build` | Build for production to ./dist/ |
+| `bun run validate` | Type-check with astro check |
+| `bun run lint` | Lint and format check (Biome) |
+| `bun run format` | Auto-format code (Biome) |
+| `bun run check` | Full quality gate (validate + lint) |
 | `bun run preview` | Preview production build locally |

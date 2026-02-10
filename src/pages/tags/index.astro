@@ -3,12 +3,12 @@
  * Tag Index Page - Lists all tags with post counts
  */
 
-import Layout from "../../layouts/Layout.astro";
 import PageHeader from "../../components/PageHeader.astro";
-import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { getPublishedPosts } from "../../utils/posts";
 import "../../styles/tags.css";
 
-const posts = await getCollection("blog", ({ data }) => !data.isDraft);
+const posts = await getPublishedPosts();
 
 const tagCounts = new Map<string, number>();
 for (const post of posts) {
@@ -17,9 +17,7 @@ for (const post of posts) {
   }
 }
 
-const sortedTags = [...tagCounts.entries()].sort((a, b) =>
-  a[0].localeCompare(b[0]),
-);
+const sortedTags = [...tagCounts.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 ---
 
 <Layout title="Tags | fpl0" description="Browse all tags">

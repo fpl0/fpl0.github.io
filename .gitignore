@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# npm lockfile (Bun is the enforced package manager)
+package-lock.json

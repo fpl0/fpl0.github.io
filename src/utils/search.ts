@@ -20,11 +20,7 @@ export function fuzzyMatch(query: string, text: string): number {
   let score = 0;
   let consecutiveBonus = 0;
 
-  for (
-    let i = 0;
-    i < lowerText.length && queryIndex < lowerQuery.length;
-    i++
-  ) {
+  for (let i = 0; i < lowerText.length && queryIndex < lowerQuery.length; i++) {
     if (lowerText[i] === lowerQuery[queryIndex]) {
       score += 10 + consecutiveBonus;
       consecutiveBonus += 5;

@@ -1,4 +1,5 @@
 ---
+import Logo from "../components/Logo.astro";
 import Layout from "../layouts/Layout.astro";
 
 const title = "404 Not Found | fpl0";
@@ -6,8 +7,8 @@ const description = "The page you are looking for isn't here.";
 ---
 
 <Layout title={title} description={description}>
-  <main class="not-found-container">
-    <h1 class="logo">404<span class="cursor">_</span></h1>
+  <main id="main-content" class="not-found-container">
+    <Logo text="404" class="logo-404" />
     <p class="error-message">
       Use the cursor to navigate back to the known universe.
     </p>
@@ -26,37 +27,8 @@ const description = "The page you are looking for isn't here.";
     align-items: flex-start;
   }
 
-  .logo {
-    font-family: var(--font-mono-brand);
-    font-size: var(--font-size-h1);
-    font-weight: 400;
-    margin: 0 0 1.5rem 0;
-    line-height: var(--line-height-tight);
-    letter-spacing: -0.04em;
-    color: var(--color-text);
-    /* Prevent layout shift during font loading */
-    display: flex;
-    align-items: baseline;
-  }
-
-  .cursor {
-    display: inline-block;
-    color: var(--color-primary);
-    margin-left: 0.05em;
-    animation: blink 1s step-end infinite;
-    /* Fixed width prevents shift when font loads */
-    width: 0.6em;
-    text-align: center;
-  }
-
-  @keyframes blink {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
+  :global(.logo-404) {
+    margin-bottom: 1.5rem;
   }
 
   .error-message {

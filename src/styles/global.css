@@ -18,8 +18,10 @@
   font-style: normal;
   font-display: block;
   font-weight: 100 900;
-  src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2-variations");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
+    format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 /* Inter fallback — Arial with metrics adjusted to match Inter */
@@ -80,7 +82,8 @@
   font-display: block;
   font-weight: 400;
   src: url("@fontsource/space-mono/files/space-mono-latin-400-normal.woff2") format("woff2");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 /* JetBrains Mono — Latin subset (custom @font-face to use optional, not @fontsource swap) */
@@ -90,7 +93,8 @@
   font-display: block;
   font-weight: 400;
   src: url("@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2") format("woff2");
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 :root {
@@ -106,7 +110,7 @@
 
   /* Heading Scale - Minor Third (1.2) */
   /* H1: 27.65px -> 29.38px */
-  --font-size-h1: clamp(1.728rem, 0.20vw + 1.66rem, 1.836rem);
+  --font-size-h1: clamp(1.728rem, 0.2vw + 1.66rem, 1.836rem);
   /* H2: 23.04px -> 24.48px */
   --font-size-h2: clamp(1.44rem, 0.16vw + 1.39rem, 1.53rem);
   /* H3: 19.20px -> 20.40px */
@@ -182,15 +186,15 @@
      SPACING SCALE
      Consistent spacing tokens for margins, padding, and gaps
      ========================================================================== */
-  --space-1: 0.25rem;   /* 4px - micro spacing */
-  --space-2: 0.5rem;    /* 8px - strict grid unit */
-  --space-3: 0.75rem;   /* 12px */
-  --space-4: 1rem;      /* 16px */
-  --space-5: 1.25rem;   /* 20px */
-  --space-6: 1.5rem;    /* 24px */
-  --space-8: 2rem;      /* 32px */
-  --space-10: 2.5rem;   /* 40px */
-  --space-12: 3rem;     /* 48px */
+  --space-1: 0.25rem; /* 4px - micro spacing */
+  --space-2: 0.5rem; /* 8px - strict grid unit */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-5: 1.25rem; /* 20px */
+  --space-6: 1.5rem; /* 24px */
+  --space-8: 2rem; /* 32px */
+  --space-10: 2.5rem; /* 40px */
+  --space-12: 3rem; /* 48px */
 }
 
 /* ==========================================================================

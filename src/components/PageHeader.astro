@@ -64,18 +64,11 @@ const { backLink = "/", backText = "← home" } = Astro.props;
 </style>
 
 <script>
+  import { openSearch } from "../utils/search-trigger";
+
   function initPageSearchBtn(): void {
     const btn = document.getElementById("page-search-btn");
-    btn?.addEventListener("click", () => {
-      document.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          key: "k",
-          metaKey: true,
-          ctrlKey: true,
-          bubbles: true,
-        }),
-      );
-    });
+    btn?.addEventListener("click", () => openSearch());
   }
 
   document.addEventListener("astro:page-load", initPageSearchBtn);

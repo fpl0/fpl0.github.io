@@ -1,0 +1,50 @@
+---
+/**
+ * Logo — Reusable brand mark with the living cursor.
+ * Used on the home page and 404 page.
+ */
+interface Props {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className } = Astro.props;
+---
+
+<h1 class:list={["logo", className]}>
+  {text}<span class="cursor">_</span>
+</h1>
+
+<style>
+  .logo {
+    font-family: var(--font-mono-brand);
+    font-size: var(--font-size-h1);
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: -0.04em;
+    line-height: var(--line-height-tight);
+    color: var(--color-text);
+    display: flex;
+    align-items: baseline;
+  }
+
+  .cursor {
+    display: inline-block;
+    color: var(--color-primary);
+    margin-left: 0.05em;
+    animation: blink 1s step-end infinite;
+    width: 0.6em;
+    text-align: center;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor {
+      animation: none;
+    }
+  }
+</style>

@@ -5,22 +5,17 @@
 
 import Layout from "../layouts/Layout.astro";
 import "../styles/home.css";
+import Logo from "../components/Logo.astro";
 import PostCard from "../components/PostCard.astro";
-import { getCollection } from "astro:content";
+import { getPublishedPosts } from "../utils/posts";
 
-const posts = await getCollection("blog", ({ data }) => !data.isDraft);
-const sortedPosts = posts.sort((a, b) => {
-  // Primary: descending by date
-  const dateDiff = b.data.date.valueOf() - a.data.date.valueOf();
-  // Secondary: ascending by slug for stable ordering when dates match
-  return dateDiff !== 0 ? dateDiff : a.slug.localeCompare(b.slug);
-});
+const sortedPosts = await getPublishedPosts();
 ---
 
 <Layout title="Home | fpl0">
   <header class="home-header">
     <div class="home-bar">
-      <h1 class="logo">fpl0<span class="cursor">_</span></h1>
+      <Logo text="fpl0" />
       <nav class="home-nav">
         <a href="/about">about</a>
         <span class="separator">/</span>
@@ -59,18 +54,11 @@ const sortedPosts = posts.sort((a, b) => {
 </Layout>
 
 <script>
+  import { openSearch } from "../utils/search-trigger";
+
   function initSearchHint(): void {
     const hint = document.getElementById("search-hint");
-    hint?.addEventListener("click", () => {
-      document.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          key: "k",
-          metaKey: true,
-          ctrlKey: true,
-          bubbles: true,
-        }),
-      );
-    });
+    hint?.addEventListener("click", () => openSearch());
   }
 
   document.addEventListener("astro:page-load", initSearchHint);

@@ -13,8 +13,7 @@ interface Props {
   image?: string;
 }
 
-const { title, description, datePublished, dateModified, url, image } =
-  Astro.props;
+const { title, description, datePublished, dateModified, url, image } = Astro.props;
 
 const fallbackImage = "https://fpl0.github.io/favicon.svg";
 const schemaImage = image || fallbackImage;

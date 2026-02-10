@@ -23,6 +23,7 @@
 - **Astro 5.17+** with MDX, View Transitions (`ClientRouter`), static output
 - **TypeScript** / JavaScript (ESNext), strict mode
 - **Bun** runtime and package manager (strictly enforced)
+- **Biome** for linting and formatting (`bun run lint` / `bun run format`)
 - **Fonts**: `@fontsource` packages with `font-display: block` and metric-override fallbacks — no external font requests
 - **Integrations**: sitemap, MDX, remark-gfm, custom rehype-task-list-labels
 - **Syntax highlighting**: Shiki with CSS variables (`defaultColor: false`), dual themes (github-light-high-contrast / vesper)
@@ -35,13 +36,16 @@
 | Dev server | `bun run dev` |
 | Production build | `bun run build` (runs image optimization prebuild) |
 | Type checking | `bun run validate` (`astro check`) |
+| Lint + format check | `bun run lint` (Biome) |
+| Auto-format | `bun run format` (Biome) |
+| Full quality gate | `bun run check` (validate + lint) |
 | Preview build | `bun run preview` |
-| Run tests | `bun test` |
 
 ## Code Quality
 
 - **Clean & Concise**: Write minimal, efficient code.
-- **DRY**: Extract common logic and styles into reusable components or global CSS variables.
+- **DRY**: Extract common logic and styles into reusable components or global CSS variables. Use `getPublishedPosts()` from `src/utils/posts.ts` for all post fetching — never duplicate the filter/sort logic.
+- **Linting**: Biome enforces consistent style. Run `bun run format` before committing.
 - **CSS**: Keep it clean, organized, and specifically targeted. Prefer standard CSS features over heavy abstractions. Use global CSS variables from `src/styles/global.css` for colors, fonts, and spacing. Responsive design must work flawlessly on all devices.
 
 ---
@@ -149,20 +153,18 @@ Framework: Linear interpolation (`slope * vw + intercept`) anchored to strict pi
 
 #### The Logo / Brand Mark
 
-```css
-.logo {
-  font-family: var(--font-mono-brand);
-  font-size: 2.2rem;
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  display: flex;
-  align-items: baseline;
-}
+Use the `<Logo>` component (`src/components/Logo.astro`):
+
+```astro
+<Logo text="fpl0" />
+<Logo text="404" class="logo-404" />
 ```
+
+The Logo component encapsulates the brand mark with the living cursor animation. Pass `text` for the display text and optional `class` for layout overrides.
 
 #### The Living Cursor (`_`)
 
-The blinking underscore is the brand's signature:
+The blinking underscore is the brand's signature, built into the `<Logo>` component:
 
 ```css
 .cursor {
@@ -273,6 +275,14 @@ Every page uses `ClientRouter`. All client-side code must handle both initial lo
 - `date` is computed: `publicationDate ?? createdDate`
 - `publicationDate` must be >= `createdDate`
 
+### Shared Utilities
+
+- **`getPublishedPosts()`** (`src/utils/posts.ts`) — Single source of truth for fetching published posts. Filters out drafts and sorts by date descending with slug tiebreaker for stable ordering. Use this in every page that needs blog posts — never duplicate the filter/sort logic.
+- **`openSearch()`** (`src/utils/search-trigger.ts`) — Dispatches a synthetic Cmd+K event to trigger the search modal. Use in any button/element that should open search.
+- **`onPageReady()`** (`src/utils/lifecycle.ts`) — View Transition lifecycle manager with automatic AbortController cleanup.
+- **`getReadingTime()`** (`src/utils/readingTime.ts`) — Reading time calculator (200 WPM).
+- **`fuzzyMatch()`** (`src/utils/search.ts`) — Search scoring algorithm for the search modal.
+
 ### Component Conventions
 
 - All components are `.astro` files in `src/components/`
@@ -280,6 +290,8 @@ Every page uses `ClientRouter`. All client-side code must handle both initial lo
 - Layout always includes: SearchModal, ScrollToTop, ThemeToggle, Analytics, FontPreload
 - Theme flash prevention: inline script in Layout `<head>` reads localStorage before paint
 - SearchModal uses singleton pattern — module-level state persists across navigations
+- **`<Logo>`** — Reusable brand mark with cursor animation. Use for home page and error pages.
+- **`<Caption>`** — Shared figcaption for `<Figure>` and `<Table>` components.
 
 ### Styling
 
@@ -290,7 +302,7 @@ Every page uses `ClientRouter`. All client-side code must handle both initial lo
 
 - All CSS inlined at build time (`build.inlineStylesheets: "always"`)
 - Viewport-triggered link prefetching enabled
-- Images optimized to WebP via Sharp in prebuild
+- Images in `public/` optimized to WebP via `cwebp` in prebuild (requires `cwebp` installed); Astro Image service uses Sharp at build time
 - Analytics deferred until first interaction or 3s timeout
 - LiteYouTube defers ~800KB iframe until click
 - MermaidDiagram dynamically imports only when needed
@@ -307,7 +319,7 @@ Every page uses `ClientRouter`. All client-side code must handle both initial lo
 
 ```
 src/
-├── components/     21 Astro components
+├── components/     23 Astro components (includes Logo, Caption)
 ├── content/
 │   ├── config.ts   Zod schema
 │   └── blog/       Post directories (slug/index.md|mdx)
@@ -325,8 +337,11 @@ src/
 ├── plugins/        Custom rehype plugin
 ├── styles/         CSS design system + component styles
 └── utils/
-    ├── lifecycle.ts    onPageReady() — View Transition lifecycle
-    └── readingTime.ts  Reading time calculator (200 WPM)
+    ├── lifecycle.ts       onPageReady() — View Transition lifecycle
+    ├── posts.ts           getPublishedPosts() — Published post fetching
+    ├── readingTime.ts     Reading time calculator (200 WPM)
+    ├── search.ts          fuzzyMatch() — Search scoring algorithm
+    └── search-trigger.ts  openSearch() — Search modal trigger
 ```
 
 ## Common Pitfalls
@@ -338,3 +353,6 @@ src/
 - **Summary validation failing?** Must be 50–360 characters
 - **Styles not applying in dark mode?** Use CSS custom properties, never hardcoded colors
 - **Want to add a dependency?** Don't — use Web APIs and Bun built-ins first, ask the user if truly needed
+- **Need published posts?** Use `getPublishedPosts()` from `src/utils/posts.ts` — never duplicate the filter/sort
+- **Need to open search from a button?** Use `openSearch()` from `src/utils/search-trigger.ts`
+- **Need a figcaption?** Use the `<Caption>` component — never duplicate the label/caption pattern

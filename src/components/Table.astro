@@ -1,4 +1,6 @@
 ---
+import Caption from "./Caption.astro";
+
 interface Props {
   label?: string;
   caption?: string;
@@ -9,12 +11,5 @@ const { label, caption } = Astro.props;
 
 <figure>
   <slot />
-  {
-    caption && (
-      <figcaption>
-        {label && <strong>{label}</strong>}
-        <span set:html={caption} />
-      </figcaption>
-    )
-  }
+  <Caption label={label} caption={caption} />
 </figure>
