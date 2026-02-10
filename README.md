@@ -123,7 +123,7 @@ Hidden content here...
 
 ## Visual Identity
 
-The design uses a warm, dark palette of walnut and cream to support long-form technical reading. A classical serif handles the headings while a clean sans-serif covers the body text, all balanced on a Minor Third scale for a quiet, archival feel.
+The design uses a warm palette of walnut and cream to support long-form technical reading. A classical serif (Merriweather) handles the headings and article prose while a clean sans-serif (Inter) covers the UI elements and summaries, all balanced on a Minor Third scale for a quiet, archival feel.
 
 ## Commands
 

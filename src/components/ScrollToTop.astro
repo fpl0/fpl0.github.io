@@ -180,7 +180,8 @@
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight;
       const winHeight = window.innerHeight;
-      const scrollPercent = scrollTop / (docHeight - winHeight);
+      const scrollPercent =
+        docHeight > winHeight ? scrollTop / (docHeight - winHeight) : 0;
       const offset = circumference - Math.min(scrollPercent, 1) * circumference;
 
       circle.style.strokeDashoffset = offset.toString();

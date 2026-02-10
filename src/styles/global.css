@@ -171,6 +171,18 @@
   --color-overlay-heavy: rgba(20, 12, 5, 0.9);
   --color-overlay-text: hsl(45, 40%, 96%);
 
+  /* Code block colors — light mode warm cream tones */
+  --color-code-bg: hsl(40, 30%, 95%);
+  --color-code-border: hsl(35, 25%, 85%);
+  --color-code-header-bg: hsl(40, 25%, 92%);
+  --color-code-inline-bg: hsl(40, 30%, 90%);
+  --color-code-inline-text: hsl(25, 50%, 35%);
+  --color-code-inline-border: hsl(35, 25%, 80%);
+
+  /* Selection colors */
+  --color-selection-bg: hsl(35, 60%, 75%);
+  --color-selection-text: hsl(25, 40%, 15%);
+
   /* Legacy aliases for backward compatibility */
   --color-secondary: var(--color-text-secondary);
   --color-muted: var(--color-text-muted);
@@ -259,13 +271,13 @@
 
 /* Light mode code block & mermaid - warm cream tones matching page */
 [data-theme="light"] .content pre {
-  background-color: hsl(40, 30%, 95%) !important; /* Warm cream */
-  border: 1px solid hsl(35, 25%, 85%);
+  background-color: var(--color-code-bg) !important;
+  border: 1px solid var(--color-code-border);
 }
 
 [data-theme="light"] .mermaid-container {
-  background: hsl(40, 30%, 95%);
-  border-color: hsl(35, 25%, 85%);
+  background: var(--color-code-bg);
+  border-color: var(--color-code-border);
 }
 
 /* Remove any line highlighting/stripes */
@@ -275,8 +287,8 @@
 
 /* Code header - warm tones */
 [data-theme="light"] .code-header {
-  background: hsl(40, 25%, 92%);
-  border-color: hsl(35, 25%, 85%);
+  background: var(--color-code-header-bg);
+  border-color: var(--color-code-border);
 }
 
 [data-theme="light"] .code-header .code-lang {
@@ -285,9 +297,9 @@
 
 /* Inline code - warm cream background */
 [data-theme="light"] .content :not(pre) > code {
-  background-color: hsl(40, 30%, 90%);
-  color: hsl(25, 50%, 35%); /* Warm brown text */
-  border-color: hsl(35, 25%, 80%);
+  background-color: var(--color-code-inline-bg);
+  color: var(--color-code-inline-text);
+  border-color: var(--color-code-inline-border);
 }
 
 /* Dark theme: heavier serif weight — compensates for light-on-dark halation */
@@ -329,8 +341,8 @@ body {
 }
 
 ::selection {
-  background-color: hsl(35, 60%, 75%);
-  color: hsl(25, 40%, 15%);
+  background-color: var(--color-selection-bg);
+  color: var(--color-selection-text);
 }
 
 [data-theme="dark"] ::selection {

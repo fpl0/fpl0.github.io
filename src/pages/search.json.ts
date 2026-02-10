@@ -1,11 +1,11 @@
-import { getCollection } from "astro:content";
 import type { APIRoute } from "astro";
+import { getPublishedPosts } from "../utils/posts";
 
 // Ensure this is always pre-rendered at build time
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
-  const posts = await getCollection("blog", ({ data }) => !data.isDraft);
+  const posts = await getPublishedPosts();
 
   const searchIndex = posts.map((post) => ({
     title: post.data.title,

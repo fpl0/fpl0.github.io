@@ -103,7 +103,7 @@ Framework: Linear interpolation (`slope * vw + intercept`) anchored to strict pi
 /* Text — deep sepia-brown, NOT pure black */
 --color-text: hsl(25, 30%, 18%);
 --color-text-secondary: hsl(25, 25%, 35%);
---color-text-muted: hsl(25, 20%, 50%);
+--color-text-muted: hsl(25, 20%, 38%);
 /* Accents */
 --color-primary: hsl(28, 80%, 38%);        /* Deep Amber */
 --color-primary-dim: hsl(28, 60%, 48%);
@@ -139,7 +139,7 @@ Framework: Linear interpolation (`slope * vw + intercept`) anchored to strict pi
 ### Layout & Spacing
 
 - **Content max-width**: `72ch`
-- **Padding**: `4rem 1.5rem` (desktop), `1.5rem 0.75rem` (mobile < 600px)
+- **Padding**: `4rem 1.5rem` (desktop), `1.5rem 1rem` (mobile < 600px)
 - **Mobile breakpoint**: `600px`, TOC sidebar: `1440px+`
 - **Spacing**: strict 4px/8px grid — all spacing MUST be integer multiples of `0.25rem` (4px). Use `--space-1` through `--space-12` variables.
 
@@ -211,7 +211,7 @@ blockquote {
 blockquote cite {
   font-family: var(--font-mono-brand);
   font-size: var(--font-size-xs);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--color-primary);
   font-style: normal;
 }

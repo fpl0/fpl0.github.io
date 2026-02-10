@@ -53,6 +53,16 @@ async function fetchTweet(id: string): Promise<TweetData | null> {
 
 const tweet = await fetchTweet(id);
 
+// HTML-escape untrusted API text to prevent XSS before inserting as HTML
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // Extract relevant data safely — guard once, narrow types in frontmatter
 const hasTweet = !!(tweet?.user && tweet?.text);
 const user = tweet?.user as TweetUser;
@@ -96,7 +106,7 @@ const videoPoster = tweet?.video?.poster;
       </div>
 
       <div class="tweet-content">
-        <p set:html={text.replace(/\n/g, "<br/>")} />
+        <p set:html={escapeHtml(text).replace(/\n/g, "<br/>")} />
       </div>
 
       {photos.length > 0 && (
@@ -185,12 +195,12 @@ const videoPoster = tweet?.video?.poster;
   .tweet-name {
     font-weight: 700;
     color: var(--color-text);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
   }
 
   .tweet-handle {
     font-family: var(--font-mono-brand); /* Space Mono for metadata */
-    font-size: 0.85rem;
+    font-size: var(--font-size-xs);
     color: var(--color-muted);
   }
 
@@ -212,8 +222,8 @@ const videoPoster = tweet?.video?.poster;
   /* Content */
   .tweet-content {
     font-family: var(--font-serif); /* Merriweather for the content itself */
-    font-size: 1.15rem; /* Slightly larger for "lead" feel */
-    line-height: 1.5;
+    font-size: var(--font-size-lead);
+    line-height: var(--line-height-normal);
     color: var(--color-text);
     margin-bottom: 1rem;
     white-space: pre-wrap; /* Preserve whitespace */
@@ -221,6 +231,7 @@ const videoPoster = tweet?.video?.poster;
 
   /* Media Grid */
   .tweet-media {
+    position: relative;
     margin-top: 1rem;
     border-radius: 8px;
     overflow: hidden;
@@ -272,14 +283,14 @@ const videoPoster = tweet?.video?.poster;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(20, 12, 5, 0.2);
+    background: var(--color-overlay);
   }
 
   .play-button {
     background: none;
     border: none;
     color: var(--color-overlay-text);
-    font-size: 2rem;
+    font-size: var(--font-size-h1);
     cursor: pointer;
     padding: 0.5rem;
   }
@@ -293,7 +304,7 @@ const videoPoster = tweet?.video?.poster;
 
   .tweet-date {
     font-family: var(--font-mono-brand);
-    font-size: 0.85rem;
+    font-size: var(--font-size-xs);
     color: var(--color-muted);
     text-decoration: none;
     border-bottom: none;
@@ -307,5 +318,11 @@ const videoPoster = tweet?.video?.poster;
   /* Fallback */
   .tweet-fallback {
     /* Inherits standard blockquote styles if fetch fails */
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tweet-logo {
+      transition-duration: 0.01ms !important;
+    }
   }
 </style>

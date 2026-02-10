@@ -103,7 +103,7 @@
     };
   }
 
-  onPageReady(() => {
+  onPageReady((signal) => {
     const pres = document.querySelectorAll<HTMLPreElement>(
       '.content pre[data-language="mermaid"]',
     );
@@ -242,5 +242,7 @@
       attributes: true,
       attributeFilter: ["data-theme"],
     });
+
+    signal.addEventListener("abort", () => observer.disconnect());
   });
 </script>
