@@ -271,7 +271,7 @@ Every page uses `ClientRouter`. All client-side code must handle both initial lo
 Two collections share a common `publishableSchema` (title, summary, tags, dates, isDraft):
 
 - **Blog posts** in `src/content/blog/[slug]/index.md` or `.mdx` — extends the shared schema with `author` and `image` fields
-- **Apps** in `src/content/apps/[slug]/index.md` — metadata only (app code lives in `src/apps/[slug]/`, page in `src/pages/apps/[slug].astro`)
+- **Apps** in `src/content/apps/[slug]/` — metadata (`index.md`), app component (`App.astro`), and source code (`.ts` modules) all co-located. The page in `src/pages/apps/[slug].astro` is a thin routing stub that imports `AppShell` + the app component.
 - Schema in `src/content/config.ts` — Zod-validated with transforms
 - `isDraft: true` by default — set `isDraft: false` to publish
 - `summary` must be 50–360 characters
@@ -328,12 +328,11 @@ Two collections share a common `publishableSchema` (title, summary, tags, dates,
 
 ```
 src/
-├── apps/           App source code (one directory per app)
 ├── components/     25 Astro components (includes Logo, Caption, AppCard, AppShell)
 ├── content/
 │   ├── config.ts   Zod schema (shared publishableSchema for blog + apps)
 │   ├── blog/       Post directories (slug/index.md|mdx)
-│   └── apps/       App metadata directories (slug/index.md)
+│   └── apps/       App directories (slug/index.md + App.astro + .ts modules)
 ├── layouts/
 │   └── Layout.astro
 ├── pages/

@@ -137,17 +137,17 @@ Hidden content here...
 
 ## Apps
 
-Apps are standalone interactive pages hosted alongside the blog. Each app has:
+Apps are standalone interactive pages hosted alongside the blog. Everything for an app lives in one directory under `src/content/apps/[slug]/`:
 
-- **Metadata** in `src/content/apps/[slug]/index.md` — title, summary, tags, dates, isDraft
-- **Source code** in `src/apps/[slug]/` — TypeScript modules (simulation logic, rendering, controls)
-- **Page** in `src/pages/apps/[slug].astro` — uses the `<AppShell>` layout for a full-viewport experience
+- `index.md` — metadata (title, summary, tags, dates, isDraft)
+- `App.astro` — self-contained component (markup, scoped styles, client-side script)
+- `*.ts` — source modules (simulation logic, rendering, controls)
 
-Apps appear in the mixed chronological feed on the home page alongside blog posts, distinguished by an "app" label below the date. The `/apps/` listing page shows all published apps.
+A thin routing stub in `src/pages/apps/[slug].astro` wraps the app in `<AppShell>`. Apps appear in the mixed chronological feed on the home page alongside blog posts, distinguished by an "app" label below the date. The `/apps/` listing page shows all published apps.
 
 ### Creating a New App
 
-1. Create metadata: `src/content/apps/my-app/index.md`
+1. Create the app directory with metadata: `src/content/apps/my-app/index.md`
 
 ```yaml
 ---
@@ -159,23 +159,39 @@ tags: ["canvas", "interactive"]
 ---
 ```
 
-2. Write app code in `src/apps/my-app/`
-3. Create the page at `src/pages/apps/my-app.astro` using `<AppShell>`
+2. Create the app component: `src/content/apps/my-app/App.astro`
+
+```astro
+---
+// Self-contained: markup, styles, and script all here
+---
+
+<div id="my-app"><!-- App UI --></div>
+
+<style>
+  /* Scoped styles */
+</style>
+
+<script>
+  import { onPageReady } from "../../../utils/lifecycle";
+  // Client-side logic
+</script>
+```
+
+3. Create the thin page stub: `src/pages/apps/my-app.astro`
 
 ```astro
 ---
 import AppShell from "../../components/AppShell.astro";
+import App from "../../content/apps/my-app/App.astro";
 ---
 
-<AppShell
-  title="My App"
-  description="A short description."
->
-  <!-- App markup here -->
+<AppShell title="My App" description="A short description.">
+  <App />
 </AppShell>
 ```
 
-4. Set `isDraft: false` when ready to publish.
+4. Set `isDraft: false` in `index.md` when ready to publish.
 
 ## Visual Identity
 
