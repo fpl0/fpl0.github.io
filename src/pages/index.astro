@@ -1,48 +1,36 @@
 ---
 /**
- * Home Page - Blog post listing with search
+ * Home Page - Unified feed of blog posts and apps
  */
 
 import Layout from "../layouts/Layout.astro";
 import "../styles/home.css";
-import Logo from "../components/Logo.astro";
+import "../styles/apps.css";
+import AppCard from "../components/AppCard.astro";
+import PageHeader from "../components/PageHeader.astro";
 import PostCard from "../components/PostCard.astro";
-import { getPublishedPosts } from "../utils/posts";
+import { getFeedItems } from "../utils/feed";
 
-const sortedPosts = await getPublishedPosts();
+const feedItems = await getFeedItems();
 ---
 
 <Layout title="Home | fpl0">
-  <header class="home-header">
-    <div class="home-bar">
-      <Logo text="fpl0" />
-      <nav class="home-nav">
-        <a href="/about">about</a>
-        <span class="separator">/</span>
-        <a href="/tags/">tags</a>
-        <span class="separator">/</span>
-        <button
-          class="search-hint"
-          id="search-hint"
-          type="button"
-          aria-label="Search"
-          aria-controls="search-backdrop"
-        >
-          <span class="search-hint-text">search</span>
-          <kbd>⌘K</kbd>
-        </button>
-      </nav>
-    </div>
-    <blockquote class="bio-quote">
-      <p>"True delight is in the finding out rather than in the knowing."</p>
-      <cite>Isaac Asimov</cite>
-    </blockquote>
-  </header>
+  <PageHeader />
+  <blockquote class="bio-quote">
+    <p>"True delight is in the finding out rather than in the knowing."</p>
+    <cite>Isaac Asimov</cite>
+  </blockquote>
   <main id="main-content" class="home-main">
-    {sortedPosts.length > 0 ? (
+    {feedItems.length > 0 ? (
       <section class="archive">
         <ul class="post-list">
-          {sortedPosts.map((post) => <PostCard post={post} />)}
+          {feedItems.map((item) =>
+            item.type === "post" ? (
+              <PostCard post={item.entry} />
+            ) : (
+              <AppCard app={item.entry} />
+            )
+          )}
         </ul>
       </section>
     ) : (
@@ -52,14 +40,3 @@ const sortedPosts = await getPublishedPosts();
     )}
   </main>
 </Layout>
-
-<script>
-  import { openSearch } from "../utils/search-trigger";
-
-  function initSearchHint(): void {
-    const hint = document.getElementById("search-hint");
-    hint?.addEventListener("click", () => openSearch());
-  }
-
-  document.addEventListener("astro:page-load", initSearchHint);
-</script>

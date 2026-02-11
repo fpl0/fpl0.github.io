@@ -1,5 +1,5 @@
 ---
-import Logo from "../components/Logo.astro";
+import PageHeader from "../components/PageHeader.astro";
 import Layout from "../layouts/Layout.astro";
 
 const title = "404 Not Found | fpl0";
@@ -7,38 +7,41 @@ const description = "The page you are looking for isn't here.";
 ---
 
 <Layout title={title} description={description}>
-  <main id="main-content" class="not-found-container">
-    <Logo text="404" class="logo-404" />
-    <p class="error-message">
-      Use the cursor to navigate back to the known universe.
-    </p>
+  <PageHeader />
 
-    <div class="action-area">
-      <a href="/" class="back-link"> Return Home </a>
-    </div>
+  <main id="main-content" class="not-found-container">
+    <h1 class="not-found-code">404</h1>
+    <p class="not-found-message">
+      Nothing here. The page you requested does not exist.
+    </p>
   </main>
 </Layout>
 
 <style>
   .not-found-container {
-    padding-top: 8rem;
+    padding-top: 4rem;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
   }
 
-  :global(.logo-404) {
-    margin-bottom: 1.5rem;
+  .not-found-code {
+    font-family: var(--font-mono-brand);
+    font-size: clamp(4rem, 8vw, 6rem);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: var(--line-height-tight);
+    color: var(--color-text);
+    margin: 0 0 var(--space-4) 0;
   }
 
-  .error-message {
-    font-family: var(--font-serif);
-    font-size: var(--font-size-lead);
-    color: var(--color-text-secondary);
+  .not-found-message {
+    font-family: var(--font-mono-brand);
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.02em;
+    color: var(--color-text-muted);
     line-height: var(--line-height-relaxed);
-    margin-bottom: 3rem;
-    font-style: italic;
+    margin: 0;
     max-width: 40ch;
   }
-
 </style>

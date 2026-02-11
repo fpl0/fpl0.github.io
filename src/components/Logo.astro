@@ -1,19 +1,24 @@
 ---
 /**
  * Logo — Reusable brand mark with the living cursor.
- * Used on the home page and 404 page.
+ * Used in the site-wide nav bar, home page, and 404 page.
+ *
+ * The `as` prop controls the rendered HTML element:
+ * - "h1" (default) for page-level headings (404 page)
+ * - "span" for inline contexts (nav bar brand link)
  */
 interface Props {
   text: string;
+  as?: "h1" | "span";
   class?: string;
 }
 
-const { text, class: className } = Astro.props;
+const { text, as: Tag = "h1", class: className } = Astro.props;
 ---
 
-<h1 class:list={["logo", className]}>
+<Tag class:list={["logo", className]}>
   {text}<span class="cursor">_</span>
-</h1>
+</Tag>
 
 <style>
   .logo {

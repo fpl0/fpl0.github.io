@@ -1,0 +1,37 @@
+---
+/**
+ * AppCard - App preview component for feed listings
+ *
+ * Distinguished from PostCard by a subtle surface card treatment —
+ * like a terminal window embedded in the feed. The card texture
+ * itself signals "this is something different" without needing
+ * labels or icons.
+ */
+
+import type { CollectionEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+
+interface Props {
+  app: CollectionEntry<"apps">;
+}
+
+const { app } = Astro.props;
+const appUrl = `/apps/${app.slug}/`;
+---
+
+<li class="post-item">
+	<FormattedDate date={app.data.date} className="post-date app-date" />
+	<div class="post-content">
+		<a href={appUrl} class="post-title" data-astro-prefetch="hover">
+			{app.data.title}
+		</a>
+		<p class="post-summary">{app.data.summary}</p>
+		{app.data.tags.length > 0 && (
+			<div class="post-tags">
+				{app.data.tags.map((tag: string) => (
+					<a href={`/tags/${tag}/`} class="tag-link">{tag}</a>
+				))}
+			</div>
+		)}
+	</div>
+</li>

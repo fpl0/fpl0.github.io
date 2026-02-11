@@ -1,0 +1,33 @@
+---
+/**
+ * Apps Index Page - Lists all published apps
+ */
+
+import AppCard from "../../components/AppCard.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getPublishedApps } from "../../utils/apps";
+import "../../styles/home.css";
+import "../../styles/apps.css";
+
+const apps = await getPublishedApps();
+---
+
+<Layout title="Apps | fpl0" description="Interactive apps and experiments">
+  <PageHeader />
+
+  <main id="main-content" class="apps-main">
+    <h1 class="apps-title">Apps</h1>
+    {apps.length > 0 ? (
+      <section class="archive">
+        <ul class="post-list">
+          {apps.map((app) => <AppCard app={app} />)}
+        </ul>
+      </section>
+    ) : (
+      <section class="empty-state">
+        <p class="empty-greeting">No apps yet.</p>
+      </section>
+    )}
+  </main>
+</Layout>

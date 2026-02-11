@@ -5,24 +5,13 @@
    "The Ledger" — elegant editorial index
    ========================================================================== */
 
-.home-header {
-  margin-bottom: 4rem;
-  padding-bottom: 0;
-}
-
-.home-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
 /* --- Bio Quote --- */
 
 .bio-quote {
-  margin: var(--space-6) 0 0 0;
+  margin: 0 0 var(--space-12) 0;
   max-width: 100%;
-  border-left: none;
-  padding-left: 0;
+  border-left: 2px solid var(--color-border);
+  padding-left: var(--space-6);
 }
 
 .bio-quote p {
@@ -48,65 +37,6 @@
 
 .bio-quote cite::before {
   content: "— ";
-}
-
-/* --- Navigation --- */
-
-.home-nav {
-  display: flex;
-  gap: var(--space-3);
-  align-items: center;
-  font-family: var(--font-mono-brand);
-  font-size: var(--font-size-xxs);
-  letter-spacing: 0.04em;
-  color: var(--color-muted);
-}
-
-.home-nav a {
-  color: var(--color-muted);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.home-nav a:hover {
-  color: var(--color-primary);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.separator {
-  color: var(--color-border);
-}
-
-/* --- Search Hint Button --- */
-
-.search-hint {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: transparent;
-  border: none;
-  padding: 0;
-  font-family: var(--font-mono-brand);
-  font-size: var(--font-size-xxs);
-  letter-spacing: 0.04em;
-  color: var(--color-muted);
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.search-hint:hover {
-  color: var(--color-primary);
-}
-
-.search-hint kbd {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-label);
-  padding: 0.25rem 0.5rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  color: var(--color-muted);
 }
 
 /* ==========================================================================
@@ -143,7 +73,7 @@
 /* Each post: CSS Grid with date column + content column */
 .post-item {
   display: grid;
-  grid-template-columns: 8rem 1fr;
+  grid-template-columns: 9rem 1fr;
   gap: var(--space-4);
   align-items: baseline;
 }

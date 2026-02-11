@@ -1,0 +1,172 @@
+/* ==========================================================================
+   APP SHELL
+   Minimal standalone layout for full-viewport client-side apps.
+   Provides only a back link and theme toggle — apps control everything else.
+   ========================================================================== */
+
+.app-shell-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 3rem;
+  padding: 0 1.25rem;
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.app-shell-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono-brand);
+  font-size: var(--font-size-xxs);
+  letter-spacing: 0.04em;
+}
+
+.app-shell-link {
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.app-shell-link:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+  background: none;
+}
+
+.app-shell-sep {
+  color: var(--color-border);
+}
+
+.app-shell-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono-brand);
+  font-size: var(--font-size-xxs);
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+  transition: color 0.2s ease;
+}
+
+.app-shell-title:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+  background: none;
+}
+
+.app-shell-title-back {
+  display: none;
+  margin-right: 0.3em;
+}
+
+/* --- Search hint button --- */
+
+.app-shell-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: var(--font-mono-brand);
+  font-size: var(--font-size-xxs);
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.app-shell-search:hover {
+  color: var(--color-primary);
+}
+
+.app-shell-search-icon {
+  display: none;
+  width: 16px;
+  height: 16px;
+}
+
+.app-shell-search-kbd {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-label);
+  padding: 0.15rem 0.4rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-muted);
+}
+
+/* --- Right group: search hint + theme toggle --- */
+
+.app-shell-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.app-shell-content {
+  position: fixed;
+  top: 3rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+/* --- Mobile adjustments --- */
+
+@media (max-width: 600px) {
+  .app-shell-bar {
+    padding: 0 1rem;
+  }
+
+  .app-shell-nav {
+    display: none;
+  }
+
+  .app-shell-title {
+    position: static;
+    transform: none;
+    max-width: 60%;
+  }
+
+  .app-shell-title-back {
+    display: inline;
+  }
+
+  .app-shell-search-text,
+  .app-shell-search-kbd {
+    display: none;
+  }
+
+  .app-shell-search-icon {
+    display: block;
+  }
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell-bar,
+  .app-shell-link,
+  .app-shell-search {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,46 +1,68 @@
 ---
 /**
- * Tag Detail Page - Shows posts filtered by tag
+ * Tag Detail Page - Shows posts and apps filtered by tag
  */
 
+import AppCard from "../../components/AppCard.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import PostCard from "../../components/PostCard.astro";
 import Layout from "../../layouts/Layout.astro";
+import { getPublishedApps } from "../../utils/apps";
+import type { FeedItem } from "../../utils/feed";
 import { getPublishedPosts } from "../../utils/posts";
 import "../../styles/home.css";
+import "../../styles/apps.css";
 
 export async function getStaticPaths() {
-  const posts = await getPublishedPosts();
+  const [posts, apps] = await Promise.all([getPublishedPosts(), getPublishedApps()]);
 
-  const tagMap = new Map<string, typeof posts>();
+  const tagMap = new Map<string, FeedItem[]>();
+
   for (const post of posts) {
     for (const tag of post.data.tags) {
       const existing = tagMap.get(tag) ?? [];
-      existing.push(post);
+      existing.push({ type: "post", entry: post });
       tagMap.set(tag, existing);
     }
   }
 
-  return [...tagMap.entries()].map(([tag, tagPosts]) => ({
+  for (const app of apps) {
+    for (const tag of app.data.tags) {
+      const existing = tagMap.get(tag) ?? [];
+      existing.push({ type: "app", entry: app });
+      tagMap.set(tag, existing);
+    }
+  }
+
+  return [...tagMap.entries()].map(([tag, items]) => ({
     params: { tag },
     props: {
       tag,
-      posts: tagPosts,
+      items: items.sort((a, b) => {
+        const dateDiff = b.entry.data.date.valueOf() - a.entry.data.date.valueOf();
+        return dateDiff !== 0 ? dateDiff : a.entry.slug.localeCompare(b.entry.slug);
+      }),
     },
   }));
 }
 
-const { tag, posts } = Astro.props;
+const { tag, items } = Astro.props;
 ---
 
-<Layout title={`#${tag} | fpl0`} description={`Posts tagged "${tag}"`}>
-  <PageHeader backLink="/tags/" backText="← tags" />
+<Layout title={`#${tag} | fpl0`} description={`Posts and apps tagged "${tag}"`}>
+  <PageHeader />
 
   <main id="main-content" class="home-main">
     <h1 class="tag-page-title">#{tag}</h1>
     <section class="archive">
       <ul class="post-list">
-        {posts.map((post) => <PostCard post={post} />)}
+        {items.map((item: FeedItem) =>
+          item.type === "post" ? (
+            <PostCard post={item.entry} />
+          ) : (
+            <AppCard app={item.entry} />
+          )
+        )}
       </ul>
     </section>
   </main>

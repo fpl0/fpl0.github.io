@@ -1,0 +1,149 @@
+---
+/**
+ * AppShell - Minimal standalone layout for full-viewport apps
+ *
+ * Unlike the blog Layout, this provides only:
+ * - Theme flash prevention
+ * - Font preloading
+ * - View Transitions (ClientRouter)
+ * - A thin top bar with back link to /apps/ + search hint
+ * - Theme toggle + SearchModal (Cmd+K)
+ * - Full-viewport content area via <slot />
+ *
+ * No ScrollToTop or Analytics — apps are standalone.
+ */
+
+import "../styles/global.css";
+import "../styles/app-shell.css";
+import { ClientRouter } from "astro:transitions";
+import FontPreload from "./FontPreload.astro";
+import SearchModal from "./SearchModal.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "An interactive app on fpl0's blog." } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const siteURL = Astro.site?.toString().replace(/\/$/, "") ?? "https://fpl0.github.io";
+---
+
+<html lang="en" data-theme="light">
+	<head>
+		<!-- Theme init - runs before paint to prevent flash -->
+		<script is:inline>
+			(function () {
+				function getTheme() {
+					var stored = localStorage.getItem("theme");
+					if (stored) return stored;
+					return window.matchMedia("(prefers-color-scheme: dark)").matches
+						? "dark"
+						: "light";
+				}
+				document.documentElement.setAttribute("data-theme", getTheme());
+				document.addEventListener("astro:before-swap", function (e) {
+					e.newDocument.documentElement.setAttribute("data-theme", getTheme());
+				});
+			})();
+		</script>
+		<FontPreload />
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+		/>
+		<meta name="generator" content={Astro.generator} />
+
+		<!-- SEO -->
+		<title>{title} | fpl0</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalURL} />
+		<meta name="author" content="Filipe Lima" />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:site_name" content="fpl0" />
+		<meta property="og:image" content={`${siteURL}/favicon.svg`} />
+
+		<!-- Icons -->
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+
+		<!-- View Transitions -->
+		<ClientRouter />
+	</head>
+	<body class="app-shell-body">
+		<header class="app-shell-bar">
+			<nav class="app-shell-nav" aria-label="App navigation">
+				<a href="/" class="app-shell-link" data-astro-prefetch="hover">fpl0</a>
+				<span class="app-shell-sep">/</span>
+				<a href="/apps/" class="app-shell-link" data-astro-prefetch="hover">apps</a>
+			</nav>
+			<a href="/apps/" class="app-shell-title" data-astro-prefetch="hover">
+				<span class="app-shell-title-back" aria-hidden="true">&larr;</span>
+				{title}
+			</a>
+			<div class="app-shell-right">
+				<button
+					class="app-shell-search"
+					id="app-shell-search"
+					type="button"
+					aria-label="Search"
+					aria-controls="search-backdrop"
+				>
+					<svg class="app-shell-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<circle cx="11" cy="11" r="8"></circle>
+						<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+					</svg>
+					<span class="app-shell-search-text">search</span>
+					<kbd class="app-shell-search-kbd">⌘K</kbd>
+				</button>
+				<ThemeToggle />
+			</div>
+		</header>
+		<SearchModal />
+		<main class="app-shell-content" id="main-content">
+			<slot />
+		</main>
+	</body>
+</html>
+
+<style>
+	/* Override blog body constraints — apps need full viewport */
+	.app-shell-body {
+		max-width: none;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		height: 100vh;
+	}
+
+	/* Place theme toggle inline within the bar instead of floating */
+	.app-shell-right :global(.theme-toggle) {
+		position: static;
+		width: 32px;
+		height: 32px;
+	}
+
+	.app-shell-right :global(.theme-toggle .icon) {
+		width: 16px;
+		height: 16px;
+	}
+</style>
+
+<script>
+	import { openSearch } from "../utils/search-trigger";
+
+	function initAppShellSearch(): void {
+		const btn = document.getElementById("app-shell-search");
+		btn?.addEventListener("click", () => openSearch());
+	}
+
+	document.addEventListener("astro:page-load", initAppShellSearch);
+</script>

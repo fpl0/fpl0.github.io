@@ -1,18 +1,24 @@
 ---
 /**
- * Tag Index Page - Lists all tags with post counts
+ * Tag Index Page - Lists all tags with counts from posts and apps
  */
 
 import PageHeader from "../../components/PageHeader.astro";
 import Layout from "../../layouts/Layout.astro";
+import { getPublishedApps } from "../../utils/apps";
 import { getPublishedPosts } from "../../utils/posts";
 import "../../styles/tags.css";
 
-const posts = await getPublishedPosts();
+const [posts, apps] = await Promise.all([getPublishedPosts(), getPublishedApps()]);
 
 const tagCounts = new Map<string, number>();
 for (const post of posts) {
   for (const tag of post.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+for (const app of apps) {
+  for (const tag of app.data.tags) {
     tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
   }
 }
