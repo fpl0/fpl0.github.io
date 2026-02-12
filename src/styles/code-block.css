@@ -6,7 +6,7 @@
 .code-wrapper {
   position: relative;
   margin: var(--space-8) 0;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   background: var(--color-surface);
   /* Ensure border is on the wrapper, not pre, for clean edges */
   border: 1px solid var(--color-border);
@@ -26,8 +26,8 @@
   color: var(--color-text-muted);
   user-select: none;
   pointer-events: none;
-  z-index: 10;
-  transition: color 0.2s ease;
+  z-index: var(--z-float);
+  transition: color var(--duration-normal) var(--ease-out);
 }
 
 /* Copy Button - Floating Top Right */
@@ -42,11 +42,11 @@
   justify-content: center;
   background: var(--color-surface); /* solid bg to hide code behind */
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   color: var(--color-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 20;
+  transition: all var(--duration-normal) var(--ease-out);
+  z-index: var(--z-dropdown);
   opacity: 1;
 }
 
@@ -63,8 +63,8 @@
   height: 16px;
   position: absolute;
   transition:
-    transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    opacity 0.2s ease;
+    transform var(--duration-slow) var(--ease-spring),
+    opacity var(--duration-normal) var(--ease-out);
 }
 
 .icon-copy {

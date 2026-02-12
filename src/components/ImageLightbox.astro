@@ -25,7 +25,7 @@
     inset: 0;
     background: var(--color-overlay-heavy);
     backdrop-filter: blur(8px);
-    z-index: 1000;
+    z-index: var(--z-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -33,8 +33,8 @@
     opacity: 0;
     visibility: hidden;
     transition:
-      opacity 0.3s ease,
-      visibility 0.3s ease;
+      opacity var(--duration-slow) var(--ease-out),
+      visibility var(--duration-slow) var(--ease-out);
     cursor: zoom-out;
   }
 
@@ -47,10 +47,10 @@
     max-width: 90vw;
     max-height: 90vh;
     object-fit: contain;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     box-shadow: 0 25px 50px -12px var(--shadow-color);
     transform: scale(0.95);
-    transition: transform 0.3s ease;
+    transition: transform var(--duration-slow) var(--ease-out);
   }
 
   .lightbox.is-open .lightbox-img {
@@ -68,12 +68,12 @@
     justify-content: center;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     color: var(--color-muted);
     cursor: pointer;
     transition:
-      color 0.2s ease,
-      border-color 0.2s ease;
+      color var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out);
   }
 
   .lightbox-close:hover {
@@ -89,7 +89,7 @@
   /* Make content images zoomable */
   :global(.content img) {
     cursor: zoom-in;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--duration-normal) var(--ease-out);
   }
 
   :global(.content img:hover) {

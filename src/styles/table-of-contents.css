@@ -62,7 +62,7 @@
   text-decoration: none;
   margin-left: -1px;
   border-left: 2px solid transparent;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 /* ==========================================================================

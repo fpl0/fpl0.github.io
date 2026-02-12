@@ -149,7 +149,7 @@
 
   /* Text Hierarchy - Rich sepia-brown tones */
   --color-text: hsl(25, 30%, 18%);
-  --color-text-secondary: hsl(25, 25%, 35%);
+  --color-text-secondary: hsl(25, 25%, 28%);
   --color-text-muted: hsl(25, 20%, 38%);
 
   /* Primary Accent - Rich amber/cognac */
@@ -187,8 +187,7 @@
   --color-selection-bg: hsl(35, 60%, 75%);
   --color-selection-text: hsl(25, 40%, 15%);
 
-  /* Legacy aliases for backward compatibility */
-  --color-secondary: var(--color-text-secondary);
+  /* Legacy alias */
   --color-muted: var(--color-text-muted);
 
   /* Typography Stacks — custom fonts with metric-adjusted system fallbacks */
@@ -211,6 +210,43 @@
   --space-8: 2rem; /* 32px */
   --space-10: 2.5rem; /* 40px */
   --space-12: 3rem; /* 48px */
+
+  /* ==========================================================================
+     BORDER RADIUS SCALE
+     ========================================================================== */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 999px;
+  --radius-round: 50%;
+
+  /* ==========================================================================
+     Z-INDEX SCALE
+     ========================================================================== */
+  --z-base: 1;
+  --z-float: 10;
+  --z-dropdown: 20;
+  --z-sticky: 50;
+  --z-fixed: 100;
+  --z-overlay: 1000;
+  --z-modal: 1010;
+  --z-toast: 9000;
+
+  /* ==========================================================================
+     TRANSITION TOKENS
+     ========================================================================== */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --duration-fast: 0.15s;
+  --duration-normal: 0.2s;
+  --duration-slow: 0.3s;
+
+  /* ==========================================================================
+     CONTENT WIDTH TOKENS
+     ========================================================================== */
+  --content-width: 72ch;
+  --content-width-narrow: 60ch;
 }
 
 /* ==========================================================================
@@ -227,7 +263,7 @@
 
   /* Text Hierarchy (brightest to dimmer) */
   --color-text: hsl(35, 12%, 87%);
-  --color-text-secondary: hsl(30, 8%, 68%);
+  --color-text-secondary: hsl(30, 10%, 60%);
   --color-text-muted: hsl(25, 6%, 52%);
 
   /* Primary Accent (rich cream/gold) */
@@ -247,6 +283,14 @@
 
   /* Shadows */
   --shadow-color: rgba(10, 5, 0, 0.6);
+
+  /* Code block colors — dark mode distinct tones */
+  --color-code-bg: hsl(20, 10%, 11%);
+  --color-code-border: hsl(20, 8%, 16%);
+  --color-code-header-bg: hsl(20, 8%, 14%);
+  --color-code-inline-bg: hsl(20, 10%, 14%);
+  --color-code-inline-text: hsl(180, 20%, 72%);
+  --color-code-inline-border: hsl(20, 8%, 18%);
 }
 
 /* ==========================================================================
@@ -310,9 +354,26 @@
   border-color: var(--color-code-inline-border);
 }
 
-/* Dark theme: heavier serif weight — compensates for light-on-dark halation */
-[data-theme="dark"] .content {
-  font-weight: 400;
+/* Dark mode code block & mermaid — distinct background from page */
+[data-theme="dark"] .content pre {
+  background-color: var(--color-code-bg) !important;
+  border: 1px solid var(--color-code-border);
+}
+
+[data-theme="dark"] .mermaid-container {
+  background: var(--color-code-bg);
+  border-color: var(--color-code-border);
+}
+
+[data-theme="dark"] .code-header {
+  background: var(--color-code-header-bg);
+  border-color: var(--color-code-border);
+}
+
+[data-theme="dark"] .content :not(pre) > code {
+  background-color: var(--color-code-inline-bg);
+  color: var(--color-code-inline-text);
+  border-color: var(--color-code-inline-border);
 }
 
 html {
@@ -326,7 +387,7 @@ body {
   line-height: var(--line-height-relaxed);
   background-color: var(--color-bg);
   color: var(--color-text);
-  max-width: 72ch; /* Increased from 68ch for better horizontal use */
+  max-width: var(--content-width);
   margin: 0 auto;
   padding: 4rem 1.5rem;
   -webkit-font-smoothing: antialiased;
@@ -392,9 +453,9 @@ body {
   font-weight: 600;
   font-size: var(--font-size-sm);
   text-decoration: none;
-  border-radius: 0 0 8px 8px;
-  z-index: 9999;
-  transition: top 0.2s ease;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  z-index: var(--z-toast);
+  transition: top var(--duration-normal) var(--ease-out);
 }
 
 .skip-link:focus {
@@ -446,7 +507,7 @@ a {
   text-decoration-color: var(--color-muted);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 a:hover {
@@ -464,7 +525,7 @@ a:hover {
   color: var(--color-muted);
   text-decoration: none;
   border-bottom: none;
-  transition: color 0.2s ease;
+  transition: color var(--duration-normal) var(--ease-out);
 }
 
 .back-link:hover {
@@ -507,8 +568,11 @@ blockquote cite {
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+    transition-property:
+      color, background-color, border-color, outline-color, text-decoration-color, fill, stroke,
+      opacity, box-shadow, visibility !important;
+    transition-duration: 0.2s !important;
   }
 
   /* Disable view transitions */

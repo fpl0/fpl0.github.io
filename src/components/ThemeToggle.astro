@@ -62,15 +62,15 @@
     justify-content: center;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     color: var(--color-muted);
     cursor: pointer;
-    z-index: 100;
+    z-index: var(--z-fixed);
     opacity: 0.5;
     transition:
-      color 0.2s ease,
-      border-color 0.2s ease,
-      opacity 0.2s ease;
+      color var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out),
+      opacity var(--duration-normal) var(--ease-out);
   }
 
   .theme-toggle:hover {
@@ -84,8 +84,8 @@
     height: 20px;
     position: absolute;
     transition:
-      opacity 0.3s ease,
-      transform 0.3s ease;
+      opacity var(--duration-slow) var(--ease-out),
+      transform var(--duration-slow) var(--ease-out);
   }
 
   /* Dark theme (default): show sun icon */

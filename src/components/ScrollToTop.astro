@@ -58,19 +58,19 @@
     justify-content: center;
     background: var(--color-surface);
     border: none; /* Border replaced by the ring */
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     color: var(--color-muted);
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
     transition:
-      opacity 0.3s ease,
-      visibility 0.3s ease,
-      transform 0.3s ease,
-      color 0.2s ease,
-      box-shadow 0.2s ease;
-    z-index: 100;
+      opacity var(--duration-slow) var(--ease-out),
+      visibility var(--duration-slow) var(--ease-out),
+      transform var(--duration-slow) var(--ease-out),
+      color var(--duration-normal) var(--ease-out),
+      box-shadow var(--duration-normal) var(--ease-out);
+    z-index: var(--z-fixed);
     box-shadow: 0 2px 12px var(--shadow-color);
     padding: 0;
   }
@@ -102,7 +102,7 @@
     height: 20px;
     position: relative;
     z-index: 2;
-    transition: transform 0.2s ease;
+    transition: transform var(--duration-normal) var(--ease-out);
   }
 
   .scroll-to-top:hover {
@@ -114,15 +114,7 @@
     transform: translateY(-2px);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-to-top,
-    .progress-ring__circle,
-    .arrow-icon {
-      transition-duration: 0.01ms !important;
-    }
-  }
-
-  @media (max-width: 768px) {
+  @media (max-width: 600px) {
     .scroll-to-top {
       bottom: 1.5rem;
       right: 1.5rem;

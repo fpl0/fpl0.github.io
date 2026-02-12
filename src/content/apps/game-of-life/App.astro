@@ -95,12 +95,12 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--color-border);
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     box-shadow: 0 4px 24px var(--shadow-color);
-    z-index: 60;
+    z-index: var(--z-sticky);
     transition:
-      background 0.2s ease,
-      border-color 0.2s ease;
+      background var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out);
   }
 
   .gol-controls-left,
@@ -125,13 +125,13 @@
     height: 36px;
     background: transparent;
     border: 1px solid var(--color-border);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     color: var(--color-text-secondary);
     cursor: pointer;
     transition:
-      color 0.2s ease,
-      border-color 0.2s ease,
-      background 0.2s ease;
+      color var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out),
+      background var(--duration-normal) var(--ease-out);
   }
 
   .gol-btn:hover {
@@ -195,7 +195,7 @@
     appearance: none;
     -webkit-appearance: none;
     background: var(--color-border);
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
     outline: none;
     cursor: pointer;
   }
@@ -206,9 +206,9 @@
     width: 14px;
     height: 14px;
     background: var(--color-text-secondary);
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background var(--duration-normal) var(--ease-out);
   }
 
   .gol-speed::-moz-range-thumb {
@@ -216,9 +216,9 @@
     height: 14px;
     background: var(--color-text-secondary);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background var(--duration-normal) var(--ease-out);
   }
 
   .gol-speed:hover::-webkit-slider-thumb {
@@ -262,16 +262,6 @@
     }
   }
 
-  /* --- Reduced motion --- */
-
-  @media (prefers-reduced-motion: reduce) {
-    .gol-controls,
-    .gol-btn,
-    .gol-speed::-webkit-slider-thumb,
-    .gol-speed::-moz-range-thumb {
-      transition-duration: 0.01ms !important;
-    }
-  }
 </style>
 
 <script>

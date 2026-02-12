@@ -6,7 +6,7 @@
 .content .table-wrapper {
   overflow-x: auto;
   margin: var(--space-10) 0 0 0;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -19,7 +19,7 @@
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   font-variant-numeric: tabular-nums;
 }

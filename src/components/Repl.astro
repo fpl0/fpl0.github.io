@@ -85,7 +85,7 @@ const { message = "Nothing here yet." } = Astro.props;
   .repl {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
     max-width: 100%;
     font-family: var(--font-mono);
@@ -107,7 +107,7 @@ const { message = "Nothing here yet." } = Astro.props;
   .repl-dot {
     width: 8px;
     height: 8px;
-    border-radius: 50%;
+    border-radius: var(--radius-round);
     background: var(--color-border);
   }
 
@@ -231,16 +231,9 @@ const { message = "Nothing here yet." } = Astro.props;
 
   .repl-output::-webkit-scrollbar-thumb {
     background: var(--color-border);
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
   }
 
-  /* --- Reduced motion --- */
-
-  @media (prefers-reduced-motion: reduce) {
-    .repl-output {
-      scroll-behavior: auto;
-    }
-  }
 </style>
 
 <script>

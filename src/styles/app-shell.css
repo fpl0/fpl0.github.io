@@ -9,7 +9,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 50;
+  z-index: var(--z-sticky);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,8 +20,8 @@
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border-subtle);
   transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
+    background var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out);
 }
 
 .app-shell-nav {
@@ -36,7 +36,7 @@
 .app-shell-link {
   color: var(--color-muted);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--duration-normal) var(--ease-out);
 }
 
 .app-shell-link:hover {
@@ -62,7 +62,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 50%;
-  transition: color 0.2s ease;
+  transition: color var(--duration-normal) var(--ease-out);
 }
 
 .app-shell-title:hover {
@@ -90,7 +90,7 @@
   letter-spacing: 0.04em;
   color: var(--color-muted);
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color var(--duration-normal) var(--ease-out);
 }
 
 .app-shell-search:hover {
@@ -109,7 +109,7 @@
   padding: 0.15rem 0.4rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   color: var(--color-muted);
 }
 
@@ -158,15 +158,5 @@
 
   .app-shell-search-icon {
     display: block;
-  }
-}
-
-/* --- Reduced motion --- */
-
-@media (prefers-reduced-motion: reduce) {
-  .app-shell-bar,
-  .app-shell-link,
-  .app-shell-search {
-    transition-duration: 0.01ms !important;
   }
 }

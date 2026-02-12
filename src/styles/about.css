@@ -19,11 +19,11 @@
 .bio-text {
   font-family: var(--font-serif); /* Match blog content font */
   font-size: var(--font-size-body);
-  font-weight: 300; /* Match .content — light in light mode */
+  font-weight: 400;
   line-height: var(--line-height-relaxed);
   color: var(--color-text);
   margin-bottom: var(--space-6);
-  max-width: 72ch;
+  max-width: var(--content-width);
 }
 
 .bio-text strong {
@@ -53,16 +53,11 @@
   font-size: var(--font-size-base);
   color: var(--color-text);
   border-bottom: 1px solid var(--color-muted);
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
   text-decoration: none;
 }
 
 .connect-link:hover {
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
-}
-
-/* Dark theme: heavier serif weight — compensates for halation (matches .content) */
-[data-theme="dark"] .bio-text {
-  font-weight: 400;
 }

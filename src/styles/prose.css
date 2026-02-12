@@ -7,7 +7,7 @@
 .content {
   font-family: var(--font-serif);
   font-size: var(--font-size-body);
-  font-weight: 300;
+  font-weight: 400;
   color: var(--color-text);
   line-height: var(--line-height-relaxed); /* Use relaxed (1.6) instead of loose (1.7) */
   font-kerning: normal;
@@ -21,7 +21,7 @@
 /* Spacing and Elements */
 .content p {
   margin-bottom: 1.5em; /* Reduced from 1.75em */
-  max-width: 72ch; /* Increased from 65ch */
+  max-width: var(--content-width);
   text-wrap: pretty;
   hyphens: auto;
   hanging-punctuation: first last;
@@ -52,7 +52,6 @@
 .content ul,
 .content ol {
   margin-bottom: 1.5em;
-  max-width: 68ch; /* Increased proportional to p */
 }
 
 .content li {
@@ -78,12 +77,8 @@
 /* Ordered lists - native numbers */
 .content ol {
   list-style: decimal;
-  list-style-position: inside;
-  padding-left: 0;
-}
-
-.content ol li {
-  padding-left: 0;
+  list-style-position: outside;
+  padding-left: 1.5em;
 }
 
 .content ol li::before {
@@ -105,7 +100,7 @@
   text-underline-offset: 0.2em;
   color: var(--color-text);
   border-bottom: none;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .content a:hover {
@@ -149,7 +144,7 @@
 .content img {
   width: 100%;
   height: auto;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   display: block;
   box-sizing: border-box;
@@ -159,7 +154,7 @@
   width: 100%;
   height: auto;
   aspect-ratio: 16 / 9;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   margin: var(--space-8) 0;
   display: block;
@@ -169,7 +164,7 @@
 /* Code blocks - !important needed to override Shiki's inline styles */
 .content pre {
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: var(--space-6);
   overflow-x: auto;
   margin: var(--space-10) 0;
@@ -186,7 +181,7 @@
   background-color: var(--color-surface);
   color: var(--color-accent-cool);
   padding: 0.2em 0.4em;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-size: 0.85em;
   border: 1px solid var(--color-border);
 }
@@ -194,7 +189,7 @@
 /* --- Details/Collapsibles --- */
 .content details {
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: var(--space-5);
   margin: var(--space-10) 0;
   background-color: var(--color-surface);
@@ -231,7 +226,7 @@
   float: right;
   font-weight: bold;
   color: var(--color-muted);
-  transition: transform 0.2s ease;
+  transition: transform var(--duration-normal) var(--ease-out);
 }
 
 .content summary:hover {
@@ -320,8 +315,8 @@
   opacity: 0;
   color: var(--color-muted);
   transition:
-    opacity 0.2s ease,
-    color 0.2s ease;
+    opacity var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out);
   font-size: 0.8em;
   user-select: none;
 }
@@ -347,7 +342,7 @@ a.anchor-link {
   position: relative;
   margin: var(--space-8) 0;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--color-surface);
 }
@@ -356,7 +351,7 @@ a.anchor-link {
   padding: var(--space-5);
   padding-top: var(--space-8);
   text-align: center;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--duration-normal) var(--ease-out);
 }
 
 .mermaid-rendered.is-swapping {
@@ -406,10 +401,10 @@ a.anchor-link {
   position: absolute;
   top: var(--space-2);
   right: var(--space-2);
-  z-index: 10;
+  z-index: var(--z-float);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: 0.25rem 0.5rem;
   font-family: var(--font-mono);
   font-size: var(--font-size-micro);
@@ -418,7 +413,7 @@ a.anchor-link {
   letter-spacing: 0.08em;
   color: var(--color-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .mermaid-toggle:hover {

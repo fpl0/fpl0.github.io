@@ -54,6 +54,16 @@
 
 This is the **single source of truth** for visual identity. Every UI element, component, and page MUST adhere to these specifications. Do not deviate. Do not improvise.
 
+### Recent Refinements (2026-02-12)
+
+The design system underwent a comprehensive token-based refinement to ensure consistency and maintainability:
+
+1. **Token Scales**: Added border-radius (6 tokens), z-index (8 tokens), transition easing/duration (5 tokens), and content-width (2 tokens) to eliminate hardcoded values
+2. **Color Hierarchy**: Improved perceptual distinction between `--color-text-secondary` and `--color-text-muted` in both themes
+3. **Dark Mode Code Blocks**: Added 6 dedicated code tokens to create visual distinction from page background
+4. **Typography**: Standardized Merriweather to `font-weight: 400` in both themes; fixed ordered list alignment with `list-style-position: outside`
+5. **Reduced Motion**: Replaced blanket animation/transition disabling with targeted approach that preserves color/opacity transitions while disabling motion
+
 ### Typography
 
 #### Font Stacks (Use ONLY These)
@@ -90,6 +100,14 @@ Framework: Linear interpolation (`slope * vw + intercept`) anchored to strict pi
 | `--line-height-relaxed` | 1.6 | Body default (Strict Density) |
 | `--line-height-loose` | 1.7 | Long-form prose |
 
+#### Font Weights
+
+Merriweather (serif) uses `font-weight: 400` in both light and dark modes for improved readability. The previous approach (300 in light, 400 in dark) created inconsistent rendering. Body prose (`.content`) and bio text both use 400 uniformly.
+
+#### List Typography
+
+Ordered lists use `list-style-position: outside` with `padding-left: 1.5em` to align wrapped text under the first line of text, not under the list number. This creates proper typographic hierarchy and readability for multi-line list items.
+
 ### Color System (HSL-Based, Warm Palette)
 
 #### Light Mode (default — "The Parchment")
@@ -102,7 +120,7 @@ Framework: Linear interpolation (`slope * vw + intercept`) anchored to strict pi
 --color-highlight: hsl(45, 45%, 90%);
 /* Text — deep sepia-brown, NOT pure black */
 --color-text: hsl(25, 30%, 18%);
---color-text-secondary: hsl(25, 25%, 35%);
+--color-text-secondary: hsl(25, 25%, 28%);  /* Perceptually distinct from muted */
 --color-text-muted: hsl(25, 20%, 38%);
 /* Accents */
 --color-primary: hsl(28, 80%, 38%);        /* Deep Amber */
@@ -112,6 +130,13 @@ Framework: Linear interpolation (`slope * vw + intercept`) anchored to strict pi
 --color-border: hsl(35, 25%, 82%);
 --color-border-subtle: hsl(35, 20%, 88%);
 --shadow-color: rgba(60, 40, 20, 0.12);
+/* Code Blocks (light mode) */
+--color-code-bg: hsl(40, 30%, 95%);
+--color-code-border: hsl(35, 25%, 85%);
+--color-code-header-bg: hsl(40, 25%, 92%);
+--color-code-inline-bg: hsl(40, 30%, 90%);
+--color-code-inline-text: hsl(25, 50%, 35%);
+--color-code-inline-border: hsl(35, 25%, 80%);
 ```
 
 #### Dark Mode (`[data-theme="dark"]` — "The Archive")
@@ -124,7 +149,7 @@ Framework: Linear interpolation (`slope * vw + intercept`) anchored to strict pi
 --color-highlight: hsl(35, 20%, 14%);
 /* Text — warm off-white, NOT pure white */
 --color-text: hsl(35, 12%, 87%);
---color-text-secondary: hsl(30, 8%, 68%);
+--color-text-secondary: hsl(30, 10%, 60%);  /* Perceptually distinct from muted */
 --color-text-muted: hsl(25, 6%, 52%);
 /* Accents */
 --color-primary: hsl(42, 52%, 76%);        /* Gold / Cream */
@@ -134,14 +159,45 @@ Framework: Linear interpolation (`slope * vw + intercept`) anchored to strict pi
 --color-border: hsl(20, 10%, 18%);
 --color-border-subtle: hsl(20, 8%, 14%);
 --shadow-color: rgba(10, 5, 0, 0.6);
+/* Code Blocks (dark mode — distinct from page bg) */
+--color-code-bg: hsl(20, 10%, 11%);
+--color-code-border: hsl(20, 8%, 16%);
+--color-code-header-bg: hsl(20, 8%, 14%);
+--color-code-inline-bg: hsl(20, 10%, 14%);
+--color-code-inline-text: hsl(180, 20%, 72%);
+--color-code-inline-border: hsl(20, 8%, 18%);
 ```
 
 ### Layout & Spacing
 
-- **Content max-width**: `72ch`
+- **Content max-width**: `var(--content-width)` (72ch), narrow variant: `var(--content-width-narrow)` (60ch)
 - **Padding**: `4rem 1.5rem` (desktop), `1.5rem 1rem` (mobile < 600px)
 - **Mobile breakpoint**: `600px`, TOC sidebar: `1440px+`
 - **Spacing**: strict 4px/8px grid — all spacing MUST be integer multiples of `0.25rem` (4px). Use `--space-1` through `--space-12` variables.
+
+#### Border Radius Scale
+
+Use token variables for all border-radius values:
+
+- `--radius-sm: 4px` — Small elements (checkboxes, small buttons, inline code)
+- `--radius-md: 6px` — Medium elements (buttons, input fields, tables)
+- `--radius-lg: 8px` — Large elements (code blocks, cards, modals)
+- `--radius-xl: 12px` — Extra large elements (major containers, tweet cards)
+- `--radius-full: 999px` — Pill-shaped elements (tags)
+- `--radius-round: 50%` — Circular elements (avatars, toggle buttons)
+
+#### Z-Index Scale
+
+Use token variables for all z-index layering:
+
+- `--z-base: 1` — Base layer (slight elevation)
+- `--z-float: 10` — Floating UI (code language labels, toggle buttons)
+- `--z-dropdown: 20` — Dropdown menus (copy buttons)
+- `--z-sticky: 50` — Sticky positioned elements (app shell bar)
+- `--z-fixed: 100` — Fixed positioned elements (scroll-to-top, theme toggle)
+- `--z-overlay: 1000` — Overlays (lightbox backdrop, search backdrop)
+- `--z-modal: 1010` — Modals (search modal)
+- `--z-toast: 9000` — Toast notifications (skip-link)
 
 #### Margin Patterns
 
@@ -190,7 +246,7 @@ a {
   text-decoration-color: var(--color-muted);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 a:hover {
   color: var(--color-primary);
@@ -219,34 +275,62 @@ blockquote cite {
 
 #### Code Blocks
 
-- **Background**: `var(--color-surface)` (wrapper has `border: 1px solid var(--color-border)`)
+- **Background**: `var(--color-code-bg)` in both themes (distinct from page background)
+- **Border**: `1px solid var(--color-code-border)`
 - **Font**: `var(--font-mono)`, `font-size: var(--font-size-xxs)`
-- **Border-radius**: `8px` on wrapper, `6px` on buttons
-- **Inline code**: `background: var(--color-surface)`, `color: var(--color-accent-cool)`
+- **Border-radius**: `var(--radius-lg)` on wrapper, `var(--radius-md)` on buttons
+- **Inline code**: `background: var(--color-code-inline-bg)`, `color: var(--color-code-inline-text)`, `border: 1px solid var(--color-code-inline-border)`
 
 #### Buttons / Interactive Elements
 
 - **Border**: `1px solid var(--color-border)`
 - **Hover**: `background: var(--color-highlight)`, `color: var(--color-primary)`
-- **Transition**: `all 0.2s ease`
-- **Border-radius**: `4px` – `6px` depending on context
+- **Transition**: Use token variables — `transition: all var(--duration-normal) var(--ease-out)`
+- **Border-radius**: Use scale tokens (`var(--radius-sm)` through `var(--radius-xl)`)
 
 ### Animation & Motion
 
+#### Transition Tokens
+
+Use token variables for consistent timing and easing:
+
 ```css
-/* Standard transition */
-transition: all 0.2s ease;
-/* OR for smoother feel */
-transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Easing functions */
+--ease-out: cubic-bezier(0.16, 1, 0.3, 1);     /* Standard smooth easing */
+--ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);  /* Spring/bounce effect */
+
+/* Durations */
+--duration-fast: 0.15s;    /* Quick interactions */
+--duration-normal: 0.2s;   /* Standard transitions */
+--duration-slow: 0.3s;     /* Deliberate animations (modals, overlays) */
+
+/* Standard usage */
+transition: all var(--duration-normal) var(--ease-out);
+transition: color var(--duration-normal) var(--ease-out);
 
 /* View Transitions */
-animation-duration: 0.2s;
+animation-duration: var(--duration-normal);
 animation-timing-function: ease-out;
+```
 
-/* Reduced motion — ALWAYS include */
+#### Reduced Motion
+
+The global reduced-motion handler preserves non-motion transitions (color, opacity) while disabling animations and transforms. **DO NOT add per-component `@media (prefers-reduced-motion: reduce)` blocks** — the global handler covers all cases except component-specific animation logic (e.g., Logo cursor blink).
+
+```css
+/* Global handler in global.css — do not duplicate elsewhere */
 @media (prefers-reduced-motion: reduce) {
-  animation-duration: 0.01ms !important;
-  transition-duration: 0.01ms !important;
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-property: color, background-color, border-color, outline-color,
+      text-decoration-color, fill, stroke, opacity, box-shadow, visibility !important;
+    transition-duration: 0.2s !important;
+  }
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation: none !important;
+  }
 }
 ```
 

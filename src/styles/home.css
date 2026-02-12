@@ -10,7 +10,7 @@
 .bio-quote {
   margin: 0 0 var(--space-12) 0;
   max-width: 100%;
-  border-left: 2px solid var(--color-border);
+  border-left: 2px solid var(--color-primary);
   padding-left: var(--space-6);
 }
 
@@ -84,7 +84,7 @@
   line-height: var(--line-height-snug);
   color: var(--color-text);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color var(--duration-normal) var(--ease-out);
 }
 
 .post-title:hover {
@@ -100,7 +100,7 @@
   color: var(--color-muted);
   font-family: var(--font-sans);
   line-height: var(--line-height-relaxed);
-  max-width: 60ch;
+  max-width: var(--content-width-narrow);
 }
 
 /* --- Mobile: stack vertically --- */
