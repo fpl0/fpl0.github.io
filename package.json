@@ -15,7 +15,8 @@
     "0:new-post": "bun run scripts/new-post.ts",
     "0:list": "bun run scripts/list-content.ts",
     "0:publish": "bun run scripts/publish.ts",
-    "0:delete": "bun run scripts/delete.ts"
+    "0:delete": "bun run scripts/delete.ts",
+    "0:unpublish": "bun run scripts/unpublish.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
