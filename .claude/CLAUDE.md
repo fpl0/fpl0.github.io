@@ -40,6 +40,11 @@
 | Auto-format | `bun run format` (Biome) |
 | Full quality gate | `bun run check` (validate + lint) |
 | Preview build | `bun run preview` |
+| Scaffold a blog post | `bun run new:post` |
+| Scaffold an app | `bun run new:app` |
+| List all content | `bun run list` (`--drafts` / `--published`) |
+| Publish by slug | `bun run publish <slug>` |
+| Delete by slug | `bun run delete <slug>` |
 
 ## Code Quality
 
@@ -412,6 +417,13 @@ Two collections share a common `publishableSchema` (title, summary, tags, dates,
 ## File Structure
 
 ```
+scripts/
+├── base.ts          Shared paths, helpers, frontmatter parser
+├── new-post.ts      Scaffold blog post (bun run new:post)
+├── new-app.ts       Scaffold app (bun run new:app)
+├── list-content.ts  List content (bun run list)
+├── publish.ts       Publish by slug (bun run publish <slug>)
+└── delete.ts        Delete by slug (bun run delete <slug>)
 src/
 ├── components/     25 Astro components (includes Logo, Caption, AppCard, AppShell)
 ├── content/

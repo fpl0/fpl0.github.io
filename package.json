@@ -10,7 +10,12 @@
     "lint": "biome check .",
     "format": "biome check --write .",
     "check": "bun run validate && bun run lint",
-    "astro": "astro"
+    "astro": "astro",
+    "new:app": "bun run scripts/new-app.ts",
+    "new:post": "bun run scripts/new-post.ts",
+    "list": "bun run scripts/list-content.ts",
+    "publish": "bun run scripts/publish.ts",
+    "delete": "bun run scripts/delete.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
