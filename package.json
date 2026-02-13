@@ -4,8 +4,6 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "optimize-images": "find public/images -type f \\( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' \\) -exec sh -c 'cwebp -q 80 \"$1\" -o \"${1%.*}.webp\" && rm \"$1\"' _ {} \\;",
-    "prebuild": "bun run optimize-images || true",
     "build": "astro build",
     "preview": "astro preview",
     "validate": "astro check",
