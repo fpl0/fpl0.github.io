@@ -20,32 +20,6 @@
   margin-top: var(--space-1);
 }
 
-/* --- App title: plain text on desktop, link on mobile --- */
-
-.app-title {
-  pointer-events: none;
-  cursor: default;
-}
-
-.app-title:hover {
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-@media (max-width: 600px) {
-  .app-title {
-    pointer-events: auto;
-    cursor: pointer;
-  }
-
-  .app-title:hover {
-    color: var(--color-primary);
-    text-decoration: underline;
-    text-decoration-color: var(--color-primary);
-    text-underline-offset: 3px;
-  }
-}
-
 /* --- Apps listing page --- */
 
 .apps-main {

@@ -62,11 +62,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 50%;
+  pointer-events: none;
+  cursor: default;
   transition: color var(--duration-normal) var(--ease-out);
 }
 
 .app-shell-title:hover {
-  color: var(--color-primary);
+  color: var(--color-text-secondary);
   text-decoration: none;
   background: none;
 }
@@ -145,6 +147,12 @@
     position: static;
     transform: none;
     max-width: 60%;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .app-shell-title:hover {
+    color: var(--color-primary);
   }
 
   .app-shell-title-back {

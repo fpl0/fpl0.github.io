@@ -155,12 +155,11 @@ import Logo from "./Logo.astro";
 </style>
 
 <script>
+  import { onPageReady } from "../utils/lifecycle";
   import { openSearch } from "../utils/search-trigger";
 
-  function initSiteNavSearch(): void {
+  onPageReady((signal) => {
     const btn = document.getElementById("site-nav-search");
-    btn?.addEventListener("click", () => openSearch());
-  }
-
-  document.addEventListener("astro:page-load", initSiteNavSearch);
+    btn?.addEventListener("click", () => openSearch(), { signal });
+  });
 </script>

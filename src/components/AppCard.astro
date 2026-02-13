@@ -22,7 +22,7 @@ const appUrl = `/apps/${app.slug}/`;
 <li class="post-item">
 	<FormattedDate date={app.data.date} className="post-date app-date" />
 	<div class="post-content">
-		<a href={appUrl} class="post-title app-title" data-astro-prefetch="hover">
+		<a href={appUrl} class="post-title" data-astro-prefetch="hover">
 			{app.data.title}
 		</a>
 		<p class="post-summary">{app.data.summary}</p>
