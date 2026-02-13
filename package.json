@@ -11,8 +11,8 @@
     "format": "biome check --write .",
     "check": "bun run validate && bun run lint",
     "astro": "astro",
-    "0:new:app": "bun run scripts/new-app.ts",
-    "0:new:post": "bun run scripts/new-post.ts",
+    "0:new-app": "bun run scripts/new-app.ts",
+    "0:new-post": "bun run scripts/new-post.ts",
     "0:list": "bun run scripts/list-content.ts",
     "0:publish": "bun run scripts/publish.ts",
     "0:delete": "bun run scripts/delete.ts"
