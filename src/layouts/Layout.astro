@@ -13,7 +13,6 @@ import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import Analytics from "../components/Analytics.astro";
 import FontPreload from "../components/FontPreload.astro";
-import PublishingIndicator from "../components/PublishingIndicator.astro";
 import ScrollToTop from "../components/ScrollToTop.astro";
 import SearchModal from "../components/SearchModal.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
@@ -64,7 +63,7 @@ const twitterCardType = image ? "summary_large_image" : "summary";
     <FontPreload />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://i.ytimg.com https://pbs.twimg.com https://abs.twimg.com; font-src 'self'; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://api.github.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com https://i.ytimg.com https://pbs.twimg.com https://abs.twimg.com; font-src 'self'; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'" />
     <meta name="generator" content={Astro.generator} />
 
     <!-- SEO -->
@@ -112,7 +111,6 @@ const twitterCardType = image ? "summary_large_image" : "summary";
     <SearchModal />
     <ScrollToTop />
     <ThemeToggle />
-    <PublishingIndicator />
     <slot />
   </body>
 </html>
