@@ -75,8 +75,8 @@
   font-weight: 500;
   color: var(--color-text-secondary);
   line-height: var(--line-height-subhead);
-  padding: var(--space-1) 0 var(--space-1) var(--space-4); /* 4px 0 4px 16px */
-  margin-top: var(--space-3); /* 12px */
+  padding: 2px 0 2px var(--space-4); /* token-exempt */
+  margin-top: var(--space-2); /* 8px */
 }
 
 /* H3: The Details (Receded) */
@@ -85,7 +85,7 @@
   font-weight: 400;
   color: var(--color-text-muted);
   line-height: var(--line-height-subhead);
-  padding: var(--space-1) 0 var(--space-1) var(--space-6); /* 4px 0 4px 24px */
+  padding: 2px 0 2px var(--space-6); /* token-exempt */
   opacity: 0.8; /* Recede visually */
 }
 
