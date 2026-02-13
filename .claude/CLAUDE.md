@@ -52,8 +52,8 @@
 
 - **Clean & Concise**: Write minimal, efficient code.
 - **DRY**: Extract common logic and styles into reusable components or global CSS variables. Use `getPublishedPosts()` from `src/utils/posts.ts` for post fetching and `getPublishedApps()` from `src/utils/apps.ts` for app fetching — never duplicate the filter/sort logic. Use `getFeedItems()` from `src/utils/feed.ts` for the mixed chronological feed.
-- **Pre-commit gate**: ALWAYS run `bun run check` before committing. CI does not run checks — it only builds and deploys. Type errors and lint issues must be caught locally.
-- **Linting**: Biome enforces consistent style. Run `bun run format` before committing.
+- **Pre-commit hook**: A git pre-commit hook runs `bun run check` automatically. CI does not run checks — it only builds and deploys.
+- **Linting**: Biome enforces consistent style. Run `bun run format` to auto-fix.
 - **CSS**: Keep it clean, organized, and specifically targeted. Prefer standard CSS features over heavy abstractions. Use global CSS variables from `src/styles/global.css` for colors, fonts, and spacing. Responsive design must work flawlessly on all devices.
 
 ---
