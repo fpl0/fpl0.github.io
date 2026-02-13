@@ -40,11 +40,11 @@
 | Auto-format | `bun run format` (Biome) |
 | Full quality gate | `bun run check` (validate + lint) |
 | Preview build | `bun run preview` |
-| Scaffold a blog post | `bun run new:post` |
-| Scaffold an app | `bun run new:app` |
-| List all content | `bun run list` (`--drafts` / `--published`) |
-| Publish by slug | `bun run publish <slug>` |
-| Delete by slug | `bun run delete <slug>` |
+| Scaffold a blog post | `bun run 0:new:post` |
+| Scaffold an app | `bun run 0:new:app` |
+| List all content | `bun run 0:list` (`--drafts` / `--published`) |
+| Publish by slug | `bun run 0:publish <slug>` |
+| Delete by slug | `bun run 0:delete <slug>` |
 
 ## Code Quality
 
@@ -419,11 +419,11 @@ Two collections share a common `publishableSchema` (title, summary, tags, dates,
 ```
 scripts/
 ├── base.ts          Shared paths, helpers, frontmatter parser
-├── new-post.ts      Scaffold blog post (bun run new:post)
-├── new-app.ts       Scaffold app (bun run new:app)
-├── list-content.ts  List content (bun run list)
-├── publish.ts       Publish by slug (bun run publish <slug>)
-└── delete.ts        Delete by slug (bun run delete <slug>)
+├── new-post.ts      Scaffold blog post (bun run 0:new:post)
+├── new-app.ts       Scaffold app (bun run 0:new:app)
+├── list-content.ts  List content (bun run 0:list)
+├── publish.ts       Publish by slug (bun run 0:publish <slug>)
+└── delete.ts        Delete by slug (bun run 0:delete <slug>)
 src/
 ├── components/     25 Astro components (includes Logo, Caption, AppCard, AppShell)
 ├── content/

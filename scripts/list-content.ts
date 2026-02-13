@@ -2,9 +2,9 @@
  * List all content (blog posts and apps).
  *
  * Usage:
- *   bun run list              — show all content
- *   bun run list -- --drafts  — only drafts
- *   bun run list -- --published — only published
+ *   bun run 0:list              — show all content
+ *   bun run 0:list -- --drafts  — only drafts
+ *   bun run 0:list -- --published — only published
  */
 
 import { readdirSync, statSync } from "node:fs";

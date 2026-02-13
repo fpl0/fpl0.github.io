@@ -147,7 +147,7 @@ A thin routing stub in `src/pages/apps/[slug].astro` wraps the app in `<AppShell
 
 ### Creating a New App
 
-The fastest way is `bun run new:app`, which prompts for title, slug, summary, and tags, then generates all three files below. To do it manually:
+The fastest way is `bun run 0:new:app`, which prompts for title, slug, summary, and tags, then generates all three files below. To do it manually:
 
 1. Create the app directory with metadata: `src/content/apps/my-app/index.md`
 
@@ -211,8 +211,8 @@ The design uses a warm palette of walnut and cream to support long-form technica
 | `bun run format` | Auto-format code (Biome) |
 | `bun run check` | Full quality gate (validate + lint) |
 | `bun run preview` | Preview production build locally |
-| `bun run new:post` | Scaffold a new blog post |
-| `bun run new:app` | Scaffold a new app |
-| `bun run list` | List all content (`--drafts` / `--published`) |
-| `bun run publish <slug>` | Publish a post or app (sets isDraft: false, commits, pushes) |
-| `bun run delete <slug>` | Delete a post or app (with confirmation, commits, pushes) |
+| `bun run 0:new:post` | Scaffold a new blog post |
+| `bun run 0:new:app` | Scaffold a new app |
+| `bun run 0:list` | List all content (`--drafts` / `--published`) |
+| `bun run 0:publish <slug>` | Publish a post or app (sets isDraft: false, commits, pushes) |
+| `bun run 0:delete <slug>` | Delete a post or app (with confirmation, commits, pushes) |

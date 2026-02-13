@@ -2,7 +2,7 @@
  * Scaffold a new app.
  *
  * Usage:
- *   bun run new:app
+ *   bun run 0:new:app
  *
  * Creates:
  *   - src/content/apps/<slug>/index.md

@@ -2,7 +2,7 @@
  * Delete a content entry (blog post or app).
  *
  * Usage:
- *   bun run delete <slug>
+ *   bun run 0:delete <slug>
  *
  * Removes all files for the given slug, then commits and pushes.
  */
@@ -44,7 +44,7 @@ function findTarget(slug: string): DeleteTarget | null {
 const slug = process.argv[2];
 
 if (!slug) {
-  console.error("\nUsage: bun run delete <slug>\n");
+  console.error("\nUsage: bun run 0:delete <slug>\n");
   printAvailableSlugs();
   process.exit(1);
 }

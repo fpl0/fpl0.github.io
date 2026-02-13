@@ -2,7 +2,7 @@
  * Publish a content entry (blog post or app).
  *
  * Usage:
- *   bun run publish <slug>
+ *   bun run 0:publish <slug>
  *
  * Sets isDraft to false, sets publicationDate to today (if not already set),
  * then commits and pushes.
@@ -65,7 +65,7 @@ function publish(filePath: string): {
 const slug = process.argv[2];
 
 if (!slug) {
-  console.error("\nUsage: bun run publish <slug>\n");
+  console.error("\nUsage: bun run 0:publish <slug>\n");
   printAvailableSlugs();
   process.exit(1);
 }

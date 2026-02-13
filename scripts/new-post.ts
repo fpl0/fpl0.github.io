@@ -2,7 +2,7 @@
  * Scaffold a new blog post.
  *
  * Usage:
- *   bun run new:post
+ *   bun run 0:new:post
  *
  * Creates:
  *   - src/content/blog/<slug>/index.mdx
