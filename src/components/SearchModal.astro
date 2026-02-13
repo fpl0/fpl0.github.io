@@ -9,9 +9,12 @@
  * - Debounced search for performance
  */
 import "../styles/search-modal.css";
+
+// Build-time cache buster so browsers fetch fresh search data after each deploy
+const searchCacheBuster = Date.now().toString(36);
 ---
 
-<div class="search-backdrop" id="search-backdrop">
+<div class="search-backdrop" id="search-backdrop" data-v={searchCacheBuster}>
   <div class="search-modal" role="dialog" aria-modal="true" aria-label="Search">
     <div class="search-input-wrapper">
       <svg
@@ -330,7 +333,8 @@ import "../styles/search-modal.css";
           FETCH_TIMEOUT_MS,
         );
 
-        const response = await fetch("/search.json", {
+        const v = document.getElementById("search-backdrop")?.dataset.v ?? "";
+        const response = await fetch(`/search.json?v=${v}`, {
           signal: fetchAbortController.signal,
         });
         clearTimeout(timeoutId);
