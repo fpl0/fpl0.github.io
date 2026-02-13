@@ -1,0 +1,39 @@
+---
+/**
+ * App Page - Dynamic route for individual apps
+ *
+ * Loads the co-located App.astro component from each app's content directory
+ * and wraps it in the AppShell layout. Metadata (title, description) comes
+ * from the content collection frontmatter.
+ */
+
+import type { CollectionEntry } from "astro:content";
+import AppShell from "../../layouts/AppShell.astro";
+import { getPublishedApps } from "../../utils/apps";
+
+interface Props {
+  app: CollectionEntry<"apps">;
+}
+
+const appModules = import.meta.glob<{ default: astroHTML.JSX.Element }>(
+  "../../content/apps/*/App.astro",
+  { eager: true },
+);
+
+export async function getStaticPaths() {
+  const published = await getPublishedApps();
+  return published.map((app) => ({
+    params: { slug: app.slug },
+    props: { app },
+  }));
+}
+
+const { app } = Astro.props;
+const mod = appModules[`../../content/apps/${app.slug}/App.astro`];
+if (!mod) throw new Error(`Missing App.astro for app "${app.slug}"`);
+const AppComponent = mod.default;
+---
+
+<AppShell title={app.data.title} description={app.data.summary}>
+  <AppComponent />
+</AppShell>
