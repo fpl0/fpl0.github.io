@@ -36,7 +36,7 @@
 
 /* --- Post End Matter --- */
 .post-endmatter {
-  margin-top: 4rem;
+  margin-top: var(--space-16);
   padding-top: var(--space-8);
   text-align: center;
 }

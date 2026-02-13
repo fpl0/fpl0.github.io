@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: space-between;
   height: 3rem;
-  padding: 0 1.25rem;
+  padding: 0 var(--space-5);
   background: color-mix(in srgb, var(--color-bg) 80%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -104,7 +104,7 @@
 .app-shell-search-kbd {
   font-family: var(--font-mono);
   font-size: var(--font-size-label);
-  padding: 0.15rem 0.4rem;
+  padding: var(--space-1) var(--space-2);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -121,7 +121,7 @@
 
 .app-shell-content {
   position: fixed;
-  top: 3rem;
+  top: var(--space-12);
   left: 0;
   right: 0;
   bottom: 0;
@@ -132,7 +132,7 @@
 
 @media (max-width: 600px) {
   .app-shell-bar {
-    padding: 0 1rem;
+    padding: 0 var(--space-4);
   }
 
   .app-shell-nav {

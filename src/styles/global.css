@@ -210,6 +210,7 @@
   --space-8: 2rem; /* 32px */
   --space-10: 2.5rem; /* 40px */
   --space-12: 3rem; /* 48px */
+  --space-16: 4rem; /* 64px — page-level vertical padding */
 
   /* ==========================================================================
      BORDER RADIUS SCALE
@@ -389,7 +390,7 @@ body {
   color: var(--color-text);
   max-width: var(--content-width);
   margin: 0 auto;
-  padding: 4rem 1.5rem;
+  padding: var(--space-16) var(--space-6);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -400,7 +401,7 @@ body {
 
 @media (max-width: 600px) {
   body {
-    padding: 1.5rem 1rem;
+    padding: var(--space-6) var(--space-4);
     overflow-x: hidden;
   }
 
@@ -431,7 +432,7 @@ body {
   top: -100%;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0.75rem 1.5rem;
+  padding: var(--space-3) var(--space-6);
   background: var(--color-primary);
   color: var(--color-bg);
   font-weight: 600;
@@ -464,8 +465,8 @@ h3 {
   font-family: var(--font-serif);
   font-weight: 700;
   line-height: var(--line-height-tight);
-  margin-top: 3rem;
-  margin-bottom: 1rem;
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-4);
   text-wrap: balance;
 }
 
@@ -502,7 +503,7 @@ a:hover {
 
 .back-link {
   display: inline-block;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8);
   font-size: var(--font-size-xxs);
   font-family: var(--font-mono-brand);
   letter-spacing: 0.04em;

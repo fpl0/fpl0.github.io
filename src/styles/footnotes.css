@@ -144,7 +144,7 @@
 .content .footnote-backref {
   text-decoration: none;
   border: none;
-  margin-left: 0.25rem;
+  margin-left: var(--space-1);
   color: var(--color-primary);
   font-size: 0.85em;
   opacity: 0.6;
@@ -192,13 +192,13 @@ sup {
   font-family: var(--font-sans);
   font-weight: 600;
   color: var(--color-primary);
-  margin-top: 1.25rem;
+  margin-top: var(--space-5);
   font-size: var(--font-size-sm);
 }
 
 .content dd {
   margin-left: 0;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-5);
   color: var(--color-muted);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-relaxed);

@@ -116,6 +116,6 @@
   .content pre {
     padding: var(--space-4);
     padding-top: var(--space-10);
-    font-size: 0.8rem;
+    font-size: var(--font-size-xxs);
   }
 }

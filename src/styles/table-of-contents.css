@@ -23,7 +23,7 @@
     /* Hide scrollbar completely - "Invisible Scroll" */
     scrollbar-width: none;
     -ms-overflow-style: none;
-    transition: opacity 0.4s ease;
+    transition: opacity var(--duration-slow) var(--ease-out);
     opacity: 0.35; /* Default: nearly invisible until hovered */
   }
 

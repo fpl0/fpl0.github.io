@@ -17,6 +17,7 @@
 13. **Consistency**: All styles (colors, links, animations) must be uniform across the entire site.
 14. **Strict Aesthetics**: Every new UI/UX implementation must follow the overall aesthetics (colors, typography, measurements).
 15. **Modularity**: Break down complex UI into smaller, focused Astro components.
+16. **NEVER hardcode design token values.** Use `var(--color-*)` for colors, `var(--font-*)` for font families, `var(--font-size-*)` for font sizes, `var(--space-*)` for spacing, `var(--z-*)` for z-index, `var(--radius-*)` for border-radius, `var(--duration-*)` / `var(--ease-*)` for transitions. No raw `hsl()`, `rgb()`, hex colors, font names, `rem`/`px` sizes, or `cubic-bezier()`. Run `bun run lint:design` to catch violations. Add `/* token-exempt */` only for third-party brand colors or truly unique values.
 
 ## Stack
 
@@ -38,7 +39,8 @@
 | Type checking | `bun run validate` (`astro check`) |
 | Lint + format check | `bun run lint` (Biome) |
 | Auto-format | `bun run format` (Biome) |
-| Full quality gate | `bun run check` (validate + lint) |
+| Token lint | `bun run lint:design` (design token checker) |
+| Full quality gate | `bun run check` (validate + lint + lint:design) |
 | Preview build | `bun run preview` |
 | Scaffold a blog post | `bun run 0:new:post` |
 | Scaffold an app | `bun run 0:new:app` |
@@ -469,3 +471,4 @@ src/
 - **Need a figcaption?** Use the `<Caption>` component — never duplicate the label/caption pattern
 - **Need published apps?** Use `getPublishedApps()` from `src/utils/apps.ts`
 - **Need a mixed feed?** Use `getFeedItems()` from `src/utils/feed.ts`
+- **Hardcoded color/font/spacing/z-index/radius/duration?** Use design tokens — `bun run lint:design` will catch it. Exempt with `/* token-exempt */`

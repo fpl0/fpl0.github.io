@@ -26,7 +26,7 @@
 
 .content th {
   text-align: left;
-  padding: 0.75rem 1rem;
+  padding: var(--space-3) var(--space-4);
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text);
@@ -38,7 +38,7 @@
 }
 
 .content td {
-  padding: 0.75rem 1rem;
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
   vertical-align: top;
   color: var(--color-muted);
