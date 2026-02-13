@@ -74,22 +74,25 @@
   font-weight: bold;
 }
 
-/* Ordered lists - native numbers */
+/* Ordered lists - counter-based for reliable font styling */
 .content ol {
-  list-style: decimal;
-  list-style-position: outside;
+  list-style: none;
   padding-left: 1.5em;
+  counter-reset: ol-counter;
 }
 
-.content ol li::before {
-  content: none;
+.content ol > li {
+  counter-increment: ol-counter;
 }
 
-.content ol li::marker {
+.content ol > li::before {
+  content: counter(ol-counter) ".";
   color: var(--color-primary);
   font-family: var(--font-mono-brand);
   font-size: 0.9em;
   font-variant-numeric: tabular-nums;
+  position: absolute;
+  left: -1.25em;
 }
 
 /* Links inside content */
@@ -275,7 +278,8 @@
 }
 
 .content details ol {
-  list-style: decimal;
+  list-style: none;
+  counter-reset: details-ol-counter;
 }
 
 .content details li {
@@ -290,10 +294,19 @@
   display: none;
 }
 
-.content details ol li::marker {
+.content details ol > li {
+  counter-increment: details-ol-counter;
+  position: relative;
+  padding-left: 1.25em;
+}
+
+.content details ol > li::before {
+  content: counter(details-ol-counter) ".";
   color: var(--color-muted);
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
+  position: absolute;
+  left: 0;
 }
 
 /* Smooth fade in for content */
