@@ -95,7 +95,7 @@
 
 .code-copy:focus-visible {
   outline: var(--space-0-5) solid var(--color-primary);
-  outline-offset: 2px;
+  outline-offset: var(--space-0-5);
   background: var(--color-highlight);
   color: var(--color-primary);
 }

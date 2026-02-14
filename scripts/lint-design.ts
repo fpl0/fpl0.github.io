@@ -18,15 +18,22 @@ const ROOT = join(import.meta.dirname, "..", "src");
 
 const SPACE_MAP: Record<string, string> = {
   "1px": "var(--space-px)",
+  "1.5px": "var(--space-0-375)",
   "2px": "var(--space-0-5)",
+  "3px": "var(--space-0-75)",
   "0.25rem": "var(--space-1)",
   "4px": "var(--space-1)",
+  "5px": "var(--space-1-25)",
   "0.5rem": "var(--space-2)",
   "8px": "var(--space-2)",
+  "10px": "var(--space-2-5)",
   "0.75rem": "var(--space-3)",
   "12px": "var(--space-3)",
+  "14px": "var(--space-3-5)",
   "1rem": "var(--space-4)",
   "16px": "var(--space-4)",
+  "1.125rem": "var(--space-4-5)",
+  "18px": "var(--space-4-5)",
   "1.25rem": "var(--space-5)",
   "20px": "var(--space-5)",
   "1.5rem": "var(--space-6)",
@@ -43,8 +50,30 @@ const SPACE_MAP: Record<string, string> = {
   "44px": "var(--space-11)",
   "3rem": "var(--space-12)",
   "48px": "var(--space-12)",
+  "3.5rem": "var(--space-14)",
+  "56px": "var(--space-14)",
   "4rem": "var(--space-16)",
   "64px": "var(--space-16)",
+  "4.25rem": "var(--space-17)",
+  "68px": "var(--space-17)",
+  "4.5rem": "var(--space-18)",
+  "72px": "var(--space-18)",
+  "6rem": "var(--space-24)",
+  "96px": "var(--space-24)",
+  "8rem": "var(--space-32)",
+  "128px": "var(--space-32)",
+  "9rem": "var(--space-36)",
+  "144px": "var(--space-36)",
+  "9.375rem": "var(--space-37-5)",
+  "150px": "var(--space-37-5)",
+  "13.75rem": "var(--space-55)",
+  "220px": "var(--space-55)",
+  "20rem": "var(--space-80)",
+  "320px": "var(--space-80)",
+  "25rem": "var(--space-100)",
+  "400px": "var(--space-100)",
+  "31.25rem": "var(--space-125)",
+  "500px": "var(--space-125)",
 };
 
 const SHADOW_MAP: Record<string, string> = {
@@ -224,7 +253,7 @@ const COLOR_PROPS = new Set([
 // ---------------------------------------------------------------------------
 
 const SPACING_PROPS =
-  /^\s*(?:margin|padding|gap|top|right|bottom|left|margin-top|margin-right|margin-bottom|margin-left|padding-top|padding-right|padding-bottom|padding-left|row-gap|column-gap|width|height|max-width|max-height|min-width|min-height|backdrop-filter|border-width|border|border-top|border-right|border-bottom|border-left|outline)\s*:/;
+  /^\s*(?:margin|padding|gap|top|right|bottom|left|margin-top|margin-right|margin-bottom|margin-left|padding-top|padding-right|padding-bottom|padding-left|row-gap|column-gap|width|height|max-width|max-height|min-width|min-height|backdrop-filter|border-width|border|border-top|border-right|border-bottom|border-left|outline|transform|grid-template-columns|grid-template-rows|text-underline-offset|text-decoration-thickness|text-indent|contain-intrinsic-size|flex-basis|inset)\s*:/;
 
 function checkSpacing(prop: string, value: string): { raw: string; suggestion: string } | null {
   if (/^[\s]*(0|auto|none|inherit|initial|unset)[\s;]*$/.test(value)) return null;

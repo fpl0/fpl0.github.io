@@ -15,7 +15,7 @@
   overflow-wrap: break-word;
   /* Optimize rendering for long posts - skip off-screen content */
   content-visibility: auto;
-  contain-intrinsic-size: auto 500px;
+  contain-intrinsic-size: auto var(--space-125);
 }
 
 /* Spacing and Elements */
@@ -88,7 +88,7 @@
 .content a {
   text-decoration: underline;
   text-decoration-color: var(--color-muted);
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: var(--space-px);
   text-underline-offset: 0.2em;
   color: var(--color-text);
   border-bottom: none;
@@ -302,7 +302,7 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(calc(var(--space-1-25) * -1));
   }
   to {
     opacity: 1;

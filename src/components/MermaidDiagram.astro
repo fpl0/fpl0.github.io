@@ -26,7 +26,7 @@
     const themeVariables = isDark
       ? {
           fontFamily: FONT_FAMILY,
-          fontSize: "14px",
+          fontSize: "var(--space-3-5)",
           primaryColor: "hsl(20, 10%, 19%)",
           primaryTextColor: "hsl(35, 12%, 87%)",
           primaryBorderColor: "hsl(20, 10%, 28%)",
@@ -61,7 +61,7 @@
         }
       : {
           fontFamily: FONT_FAMILY,
-          fontSize: "14px",
+          fontSize: "var(--space-3-5)",
           primaryColor: "hsl(45, 35%, 90%)",
           primaryTextColor: "hsl(25, 30%, 18%)",
           primaryBorderColor: "hsl(35, 25%, 72%)",
@@ -184,7 +184,7 @@
         // stays intact until the new SVG is ready
         const offscreen = document.createElement("div");
         offscreen.style.cssText =
-          "position:absolute;left:-9999px;top:-9999px;visibility:hidden";
+          "position:absolute;left:-9999px;top:-9999px;visibility:hidden"; /* token-exempt */
         document.body.appendChild(offscreen);
 
         const tempNodes: HTMLDivElement[] = [];

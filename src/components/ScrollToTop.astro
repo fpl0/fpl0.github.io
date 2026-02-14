@@ -63,7 +63,7 @@
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(10px);
+    transform: translateY(var(--space-2-5));
     transition:
       opacity var(--duration-slow) var(--ease-out),
       visibility var(--duration-slow) var(--ease-out),
@@ -111,7 +111,7 @@
   }
 
   .scroll-to-top:hover .arrow-icon {
-    transform: translateY(-2px);
+    transform: translateY(calc(var(--space-0-5) * -1));
   }
 
   @media (max-width: 600px) {
@@ -135,8 +135,8 @@
     }
 
     .arrow-icon {
-      width: 18px;
-      height: 18px;
+      width: var(--space-4-5);
+      height: var(--space-4-5);
     }
   }
 </style>

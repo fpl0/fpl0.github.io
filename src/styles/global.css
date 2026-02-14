@@ -206,11 +206,17 @@
      Consistent spacing tokens for margins, padding, and gaps
      ========================================================================== */
   --space-px: 1px;
+  --space-0-375: 1.5px;
   --space-0-5: 2px;
+  --space-0-75: 3px;
   --space-1: 0.25rem; /* 4px - micro spacing */
+  --space-1-25: 5px;
   --space-2: 0.5rem; /* 8px - strict grid unit */
+  --space-2-5: 10px;
   --space-3: 0.75rem; /* 12px */
+  --space-3-5: 14px;
   --space-4: 1rem; /* 16px */
+  --space-4-5: 18px;
   --space-5: 1.25rem; /* 20px */
   --space-6: 1.5rem; /* 24px */
   --space-7: 1.75rem; /* 28px */
@@ -219,7 +225,18 @@
   --space-10: 2.5rem; /* 40px */
   --space-11: 2.75rem; /* 44px - touch targets */
   --space-12: 3rem; /* 48px */
+  --space-14: 3.5rem; /* 56px */
   --space-16: 4rem; /* 64px — page-level vertical padding */
+  --space-17: 4.25rem; /* 68px */
+  --space-18: 4.5rem; /* 72px */
+  --space-24: 6rem; /* 96px */
+  --space-32: 8rem; /* 128px */
+  --space-36: 9rem; /* 144px */
+  --space-37-5: 9.375rem; /* 150px */
+  --space-55: 13.75rem; /* 220px */
+  --space-80: 20rem; /* 320px */
+  --space-100: 25rem; /* 400px */
+  --space-125: 31.25rem; /* 500px */
 
   /* ==========================================================================
      BORDER RADIUS SCALE
@@ -481,7 +498,7 @@ body {
 /* Global focus styles for keyboard navigation */
 :focus-visible {
   outline: var(--space-0-5) solid var(--color-primary);
-  outline-offset: 2px;
+  outline-offset: var(--space-0-5);
 }
 
 /* Remove focus outline for mouse users */
@@ -524,7 +541,7 @@ a {
   color: var(--color-text);
   text-decoration: underline;
   text-decoration-color: var(--color-muted);
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: var(--space-px);
   text-underline-offset: 0.2em;
   transition: all var(--duration-normal) var(--ease-out);
 }

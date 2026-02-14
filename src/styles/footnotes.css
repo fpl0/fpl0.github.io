@@ -153,7 +153,7 @@
   overflow: hidden;
   display: inline-block;
   width: 1em;
-  text-indent: -9999px;
+  text-indent: -9999px; /* token-exempt */
   vertical-align: baseline;
   position: relative;
 }

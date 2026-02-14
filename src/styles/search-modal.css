@@ -22,7 +22,7 @@
   position: fixed;
   top: 20%;
   left: 50%;
-  transform: translateX(-50%) translateY(-10px);
+  transform: translateX(-50%) translateY(calc(var(--space-2-5) * -1));
   width: 90%;
   max-width: 560px;
   background: var(--color-surface);
@@ -94,7 +94,7 @@
 .search-results {
   /* Aligned to approx 8 grid units * 10 or similar? 
      Let's use a fixed height that fits the rhythm. 320px is 40 * 8px, perfect. */
-  max-height: 320px;
+  max-height: var(--space-80);
   overflow-y: auto;
   padding: var(--space-2); /* 8px */
 }
@@ -171,7 +171,7 @@
   font-size: var(--font-size-micro);
   color: var(--color-text-muted);
   background: var(--color-bg);
-  padding: 0.1rem 0.4rem;
+  padding: var(--space-px) var(--space-1);
   border-radius: var(--radius-sm);
   border: var(--space-px) solid var(--color-border-subtle);
   white-space: nowrap;
@@ -180,7 +180,7 @@
 /* Focus styles for keyboard navigation */
 .search-result:focus-visible {
   outline: var(--space-0-5) solid var(--color-primary);
-  outline-offset: 2px;
+  outline-offset: var(--space-0-5);
   background-color: var(--color-highlight);
 }
 

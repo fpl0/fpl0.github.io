@@ -57,7 +57,7 @@
 /* Each post: CSS Grid with date column + content column */
 .post-item {
   display: grid;
-  grid-template-columns: 9rem 1fr;
+  grid-template-columns: var(--space-36) 1fr;
   gap: var(--space-4);
   align-items: baseline;
 }
@@ -91,7 +91,7 @@
   color: var(--color-primary);
   text-decoration: underline;
   text-decoration-color: var(--color-primary);
-  text-underline-offset: 3px;
+  text-underline-offset: var(--space-0-75);
 }
 
 .post-summary {

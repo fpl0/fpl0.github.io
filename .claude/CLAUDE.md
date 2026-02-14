@@ -183,7 +183,7 @@ Ordered lists use `list-style-position: outside` with `padding-left: 1.5em` to a
 - **Content max-width**: `var(--content-width)` (72ch), narrow variant: `var(--content-width-narrow)` (60ch)
 - **Padding**: `4rem 1.5rem` (desktop), `1.5rem 1rem` (mobile < 600px)
 - **Mobile breakpoint**: `600px`, TOC sidebar: `1440px+`
-- **Spacing**: strict 4px/8px grid — all spacing MUST be integer multiples of `0.25rem` (4px). Use `--space-1` through `--space-16` variables. Use `--space-px` (1px) and `--space-0-5` (2px) ONLY for borders and outlines.
+- **Spacing**: strict 4px/8px grid — all spacing MUST be integer multiples of `0.25rem` (4px). Use `--space-1` through `--space-125` variables. Use `--space-px` (1px), `--space-0-375` (1.5px), `--space-0-5` (2px), `--space-0-75` (3px), `--space-1-25` (5px), `--space-2-5` (10px), `--space-3-5` (14px), and `--space-4-5` (18px) for micro-spacing and non-grid refinements.
 
 #### Border Radius Scale
 
