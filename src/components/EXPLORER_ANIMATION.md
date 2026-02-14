@@ -1,6 +1,6 @@
 # Explorer Animation — Design Document
 
-A decorative Canvas 2D animation at the bottom of the home page. A stickman walks rightward while a procedurally generated world unveils ahead: mountains, clouds, birds, stars, and rare surprises (shooting stars, hot air balloons, sky whales, UFOs). Thematically tied to the Asimov quote above it: *"True delight is in the finding out rather than in the knowing."*
+A decorative Canvas 2D animation at the bottom of the home page. A stickman walks rightward while a procedurally generated world unveils ahead: mountains, clouds, birds, stars, and rare surprises (shooting stars, hot air balloons, sky whales, UFOs, jellyfish). Thematically tied to the Asimov quote above it: *"True delight is in the finding out rather than in the knowing."*
 
 ---
 
@@ -85,7 +85,8 @@ Benefits:
 | **Meteor** | 0.05 | tail: 25–80px, head scales with tail | Gradient trail (primary to transparent) + glowing head (size scales with tail length), `--color-primary` | Diagonal trajectory at 200–350 px/s; `life` decreases, culled at 0 |
 | **Balloon** | 0.35 | 8–20px | Ellipse envelope in `--color-primary` + basket lines/rect in `--color-text-muted` | Drift (4–12 px/s) + wind + lateral sway |
 | **UFO** | 0.6 | scale: 0.6–1.4x | Ellipse body + dome arc in `--color-primary`; optional tractor beam (all dimensions scale with size) | Vertical hover oscillation |
-| **Whale** | 0.55 | 40–95px | 12-curve bezier humpback silhouette (solid fill) + pectoral fin + ventral grooves, `--color-text-muted` | Vertical bob only (scrolls via parallax, no own velocity) |
+| **Whale** | 0.55 | 40–95px | 12-curve bezier humpback silhouette (solid fill) + pectoral fin + ventral grooves, `--color-text-muted` | Vertical bob + animated tail wag (flukes sway via `sin(bobPhase * 1.6)`, displacement ramps 25%→100% from peduncle to fluke tips) |
+| **Jellyfish** | 0.4 | bell: 6–16px | Half-ellipse bell dome + rim stroke in `--color-primary`, 3–5 wavy tentacles in `--color-text-muted` | Drift (2–6 px/s) + wind; bell pulses (contracts/expands), tentacles sway with per-tentacle phase offsets |
 | **Grass Tuft** | 1.0 | blade height: 3–11px | 2–3 short angled strokes, `--color-text-muted` | Static position; blades respond to wind |
 | **Pebble** | 1.0 | radius: 0.8–3.5px | Tiny filled circles, `--color-text-muted` | Static |
 
@@ -103,6 +104,7 @@ Prevents unbounded memory growth. Separate limits for desktop and mobile:
 | Meteor | 2 | 1 |
 | Balloon | 2 | 1 |
 | Whale | 1 | 1 |
+| Jellyfish | 2 | 1 |
 | Grass Tuft | 20 | 12 |
 | Pebble | 10 | 6 |
 
@@ -132,6 +134,7 @@ After the initial scene, rare entities appear as the stickman walks further:
 |----------|--------|
 | ~0.8x viewport | Meteor |
 | ~2.2x viewport | Balloon (additional) |
+| ~2.5x viewport | Jellyfish |
 | ~3x viewport | UFO |
 | ~3.8x viewport | Whale |
 
@@ -139,7 +142,7 @@ Mobile uses a 1.5x spawn interval multiplier.
 
 ### Mountains
 
-Mountains spawn as **clusters** (3–5 peaks). Peak heights follow a center-weighted distribution: peaks near the cluster center are taller (55–165px) than edge peaks. Within a cluster, peaks are sorted tallest-first so shorter mountains draw in front, creating depth. Each peak stores randomized quadratic Bezier control point offsets for natural-looking ridgelines.
+Mountains spawn as **clusters** (3–5 peaks). Peak heights follow a center-weighted distribution: peaks near the cluster center are taller (55–165px) than edge peaks, capped to 85% of ground Y so peaks stay within the visible canvas on smaller screens. Within a cluster, peaks are sorted tallest-first so shorter mountains draw in front, creating depth. Each peak stores randomized quadratic Bezier control point offsets for natural-looking ridgelines.
 
 ### Birds
 
@@ -162,6 +165,7 @@ This creates non-repeating oscillation. Applied at different intensities:
 | Clouds | `wind * 2` added to drift speed |
 | Balloons | `wind * 3` added to drift + `wind * 2` sway offset |
 | Birds | `wind * 5` added to velocity |
+| Jellyfish | `wind * 2` added to drift + `wind * 1.5` tentacle sway |
 | Grass tufts | `wind * 0.3` added to blade angles |
 
 Creates a unified atmospheric feel across all entities.
@@ -227,7 +231,7 @@ Back to front, organized into layers:
 
 1. Clear canvas with `--color-bg`
 2. **Deep sky**: stars, meteors
-3. **Mid sky**: clouds, whales, balloons
+3. **Mid sky**: clouds, whales, jellyfish, balloons
 4. **Terrain**: mountains, ground line, pebbles, grass tufts
 5. **Foreground sky**: birds, UFOs
 6. **Protagonist**: stickman (always on top)
@@ -242,8 +246,8 @@ Six CSS custom properties cached at init, refreshed on theme change:
 |-----------|-------------|-------|
 | `bg` | `--color-bg` | Canvas clear |
 | `text` | `--color-text` | Stickman |
-| `textMuted` | `--color-text-muted` | Stars, clouds, birds, whales, mountain strokes, grass tufts, pebbles, balloon baskets |
-| `primary` | `--color-primary` | Meteors (gradient trail + glow), balloon envelopes, UFOs |
+| `textMuted` | `--color-text-muted` | Stars, clouds, birds, whales, mountain strokes, grass tufts, pebbles, balloon baskets, jellyfish tentacles |
+| `primary` | `--color-primary` | Meteors (gradient trail + glow), balloon envelopes, UFOs, jellyfish bell |
 | `border` | `--color-border` | Ground line, mountain fill |
 | `surface` | `--color-surface` | Whale ventral grooves |
 
@@ -272,7 +276,7 @@ The whale is a 12-curve bezier humpback silhouette drawn as a continuous closed 
 
 Plus a pectoral fin (2-curve bezier) and 3 ventral grooves (quadratic curves).
 
-Solid fill with `--color-text-muted` at 0.7 alpha. No face (no eye, no mouth). Moves via parallax only (velocity = 0, like UFOs), with a gentle vertical bob.
+Solid fill with `--color-text-muted` at 0.7 alpha. No face (no eye, no mouth). Moves via parallax only (velocity = 0), with a gentle vertical bob and animated tail wag. The tail wag uses `sin(bobPhase * 1.6)` — slightly faster than the body bob — with displacement ramping from 25% at the peduncle to 100% at the fluke tips, fading back to 0% at the belly.
 
 ---
 
@@ -317,7 +321,7 @@ Toggling reduced motion at runtime resets the scene and re-populates.
 | Breakpoint | Canvas height | Margins |
 |------------|--------------|---------|
 | Desktop (>600px) | 220px | `margin-top: var(--space-12)` |
-| Mobile (<=600px) | 150px | `margin-top: var(--space-8)`, `padding-top: var(--space-6)` |
+| Mobile (<=600px) | 150px | `margin-top: var(--space-8)` |
 
 The canvas fills 100% container width. DPR-aware sizing ensures crisp rendering on Retina displays. On resize, the engine receives updated dimensions and recalculates `baseGroundY`.
 
