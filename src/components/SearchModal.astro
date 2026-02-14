@@ -212,6 +212,7 @@ const searchCacheBuster = Date.now().toString(36);
 
     previousActiveElement = document.activeElement;
     backdrop?.classList.add("is-open");
+    document.documentElement.classList.add("is-searching");
     document.body.style.overflow = "hidden";
 
     // Double rAF ensures the browser has painted visibility:visible before focusing
@@ -255,6 +256,7 @@ const searchCacheBuster = Date.now().toString(36);
     }
 
     backdrop?.classList.remove("is-open");
+    document.documentElement.classList.remove("is-searching");
     if (input) input.value = "";
     results = [];
     selectedIndex = 0;

@@ -466,6 +466,20 @@ p {
   widows: 3;
 }
 
+/* Soft Focus Interaction Decay */
+html.is-searching body > *:not(.search-backdrop) {
+  filter: blur(var(--space-px)) grayscale(0.2);
+  opacity: var(--opacity-recede);
+  pointer-events: none;
+  user-select: none;
+}
+
+body > * {
+  transition:
+    filter var(--duration-slow) var(--ease-out),
+    opacity var(--duration-slow) var(--ease-out);
+}
+
 @media (max-width: 600px) {
   /* @breakpoint-mobile */
   body {
@@ -574,6 +588,8 @@ a {
   text-decoration-thickness: var(--space-px);
   text-underline-offset: 0.2em;
   transition: all var(--duration-out) var(--ease-out);
+  /* Ensure transform doesn't clip expanded hit-box */
+  display: inline-block;
 }
 
 a:hover {
@@ -581,6 +597,7 @@ a:hover {
   text-decoration-color: var(--color-primary);
   background-color: transparent;
   transition-duration: var(--duration-in);
+  transform: translateY(calc(var(--space-px) * -1));
 }
 
 .back-link {
