@@ -4,7 +4,6 @@
  */
 
 import PageHeader from "../../components/PageHeader.astro";
-import Repl from "../../components/Repl.astro";
 import Layout from "../../layouts/Layout.astro";
 import { getPublishedApps } from "../../utils/apps";
 import { getPublishedPosts } from "../../utils/posts";
@@ -42,7 +41,7 @@ const sortedTags = [...tagCounts.entries()].sort((a, b) => a[0].localeCompare(b[
         ))}
       </div>
     ) : (
-      <Repl message="No tags yet." />
+      <p class="empty-state">No tags yet.</p>
     )}
   </main>
 </Layout>
