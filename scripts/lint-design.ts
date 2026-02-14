@@ -499,7 +499,7 @@ function checkMediaQuery(
     if (re.test(line)) {
       const comment = `/* @breakpoint-${token.replace("var(--breakpoint-", "").replace(")", "")} */`;
       // If it has the required comment on the same line or next line, it's allowed
-      if (line.includes(comment) || (nextLine && nextLine.includes(comment))) {
+      if (line.includes(comment) || nextLine?.includes(comment)) {
         return null;
       }
       return {
