@@ -106,6 +106,7 @@
 /* --- Mobile: stack vertically --- */
 
 @media (max-width: 600px) {
+  /* @breakpoint-mobile */
   .post-item {
     grid-template-columns: 1fr;
     gap: var(--space-1);

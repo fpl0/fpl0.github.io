@@ -231,7 +231,7 @@
 
   /* --- Mobile --- */
 
-  @media (max-width: 600px) {
+  @media (max-width: 600px) { /* @breakpoint-mobile */
     .gol-controls {
       bottom: var(--space-4);
       gap: var(--space-2);
@@ -266,6 +266,7 @@
 
 <script>
   import { onPageReady } from "../../../utils/lifecycle";
+  import { BREAKPOINT_MOBILE } from "../../../utils/breakpoints";
   import { createGrid, step, clear, randomize } from "./simulation";
   import { createRenderer } from "./renderer";
   import { attachDrawControls } from "./controls";
@@ -293,7 +294,7 @@
     const container = canvas.parentElement;
     if (!container) return;
     const rect = container.getBoundingClientRect();
-    const isMobile = rect.width < 600;
+    const isMobile = rect.width <= BREAKPOINT_MOBILE;
     const cellPx = isMobile ? TARGET_CELL_MOBILE : TARGET_CELL_DESKTOP;
     const gridW = Math.max(10, Math.floor(rect.width / cellPx));
     const gridH = Math.max(10, Math.floor(rect.height / cellPx));

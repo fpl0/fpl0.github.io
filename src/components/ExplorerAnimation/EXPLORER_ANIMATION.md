@@ -25,11 +25,11 @@ No awareness of DOM events, requestAnimationFrame, observers, or View Transition
 Thin orchestration layer. Uses `onPageReady()` from the shared lifecycle utility for View Transition compatibility. Manages:
 
 - **DPR-aware canvas sizing**
-- **IntersectionObserver** (threshold 0.1) — pauses the RAF loop when the canvas scrolls out of view
+- **IntersectionObserver** (threshold 0.1) — **stops the RAF loop entirely** when the canvas scrolls out of view (no callbacks scheduled), restarts it with a fresh `lastTime` when visibility resumes
 - **MutationObserver** on `document.documentElement[data-theme]` — triggers `onThemeChange()` + redraw on theme toggle
 - **Resize listener** — re-sizes canvas buffer and notifies engine
 - **Reduced-motion media query listener** — toggles between animated and static modes
-- **RAF loop** — delta-time based, only updates/draws when visible
+- **RAF loop** — delta-time based, fully paused when off-screen (zero CPU cost)
 - **Cleanup** — all observers disconnected and RAF cancelled on AbortSignal
 
 All event listeners receive the lifecycle `signal` for automatic cleanup during View Transition navigations.
@@ -60,29 +60,30 @@ This is critical — without it, low-parallax entities (stars at 0.1, whales at 
 
 ## Entity System
 
-### Per-Type Entity Pools
+### Per-Type Entity Arrays with Object Pooling
 
-Instead of a single polymorphic array, each entity type has its own pool:
+Instead of a single polymorphic array, each entity type has its own plain `T[]` array plus a parallel **free list** for object recycling:
 
 ```ts
-interface Pool<T> { items: T[]; count: number; }
+const stars: ReturnType<typeof createStar>[] = [];
+// ...
+const freeLists: Record<SpawnType, any[]> = { star: [], ... };
 ```
 
 Benefits:
-- **O(1) count checks**: `pool.count` instead of iterating the full array with `countType()`
-- **O(1) removal**: Swap-and-pop (`poolSwapRemove`) instead of `Array.splice()` which shifts elements
-- **Zero type filtering in draw loops**: Each draw function iterates only its own pool
-- **No per-frame allocations**: Pools reuse array slots
+- **O(1) removal**: Swap-and-pop instead of `Array.splice()` which shifts elements
+- **Zero type filtering in draw loops**: Each draw function iterates only its own array
+- **Object pooling**: Culled entities are pushed to the free list instead of being GC'd. `createX()` functions check the free list first (`freeLists[type].pop()`), reinitialize all fields, and return the recycled object — eliminating all GC pressure from entity lifecycle during steady-state animation
 
 ### Entity catalog
 
 | Entity | Parallax | Size range | Visual | Motion |
 |--------|----------|------------|--------|--------|
 | **Star** | 0.1 | 0.5–3.3px (power-law) | Filled circle, `--color-text-muted` | Twinkle: per-star speed [0.8, 2.5] via `sin(time * speed + offset)` |
-| **Cloud** | 0.15 | r: 6–18px | 5 overlapping circles, per-cloud opacity (0.15–0.25), `--color-text-muted` | Drift: per-cloud speed (1–4 px/s) + wind influence |
-| **Mountain** | 0.2 | h: 55–165px, w: 25–65px | Quadratic Bezier curves with randomized control points, `--color-border` fill + `--color-text-muted` stroke | Static; spawned in clusters of 3–5, sorted tallest-first for depth |
+| **Cloud** | 0.15 | r: 6–18px | Cached `Path2D` of 5 overlapping circles, per-cloud opacity (0.15–0.25), `--color-text-muted` | Drift: per-cloud speed (1–4 px/s) + wind influence |
+| **Mountain** | 0.2 | h: 55–165px, w: 25–65px | Cached `Path2D` with quadratic Bezier curves and randomized control points, `--color-border` fill + `--color-text-muted` stroke | Static; spawned in clusters of 3–5, sorted tallest-first for depth |
 | **Bird** | 0.5 | wingspan: 5–16px | V-shaped wing stroke (width scales with wingspan) with asymmetric flap, `--color-text-muted` | Own velocity (10–20 px/s) + wind + flapping; 30% chance of V-formation groups |
-| **Meteor** | 0.05 | tail: 25–80px, head scales with tail | Gradient trail (primary to transparent) + glowing head (size scales with tail length), `--color-primary` | Diagonal trajectory at 200–350 px/s; `life` decreases, culled at 0 |
+| **Meteor** | 0.05 | tail: 25–80px, head scales with tail | Dual-stroke alpha-faded tail (full-length at 0.4x alpha + half-length at 0.8x alpha) + glowing head, `--color-primary` | Diagonal trajectory at 200–350 px/s; `life` decreases, culled at 0 |
 | **Balloon** | 0.35 | 8–20px | Ellipse envelope in `--color-primary` + basket lines/rect in `--color-text-muted` | Drift (4–12 px/s) + wind + lateral sway |
 | **UFO** | 0.6 | scale: 0.6–1.4x | Ellipse body + dome arc in `--color-primary`; optional tractor beam (all dimensions scale with size) | Vertical hover oscillation |
 | **Whale** | 0.55 | 40–95px | 12-curve bezier humpback silhouette (solid fill) + pectoral fin + ventral grooves, `--color-text-muted` | Vertical bob + animated tail wag (flukes sway via `sin(bobPhase * 1.6)`, displacement ramps 25%→100% from peduncle to fluke tips) |
@@ -320,8 +321,8 @@ Toggling reduced motion at runtime resets the scene and re-populates.
 
 | Breakpoint | Canvas height | Margins |
 |------------|--------------|---------|
-| Desktop (>600px) | 220px | `margin-top: var(--space-12)` |
-| Mobile (<=600px) | 150px | `margin-top: var(--space-8)` |
+| Desktop (>var(--breakpoint-mobile)) | 220px | `margin-top: var(--space-12)` |
+| Mobile (<=var(--breakpoint-mobile)) | 150px | `margin-top: var(--space-8)` |
 
 The canvas fills 100% container width. DPR-aware sizing ensures crisp rendering on Retina displays. On resize, the engine receives updated dimensions and recalculates `baseGroundY`.
 

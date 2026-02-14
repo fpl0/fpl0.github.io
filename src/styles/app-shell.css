@@ -131,6 +131,7 @@
 /* --- Mobile adjustments --- */
 
 @media (max-width: 600px) {
+  /* @breakpoint-mobile */
   .app-shell-bar {
     padding: 0 var(--space-4);
   }

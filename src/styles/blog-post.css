@@ -89,6 +89,7 @@
 }
 
 @media (max-width: 600px) {
+  /* @breakpoint-mobile */
   .post-nav {
     grid-template-columns: 1fr;
   }

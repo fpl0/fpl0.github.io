@@ -243,6 +243,7 @@
 
 /* Responsive: smaller screens */
 @media (max-width: 600px) {
+  /* @breakpoint-mobile */
   .search-modal {
     top: 5%;
     width: 95%;

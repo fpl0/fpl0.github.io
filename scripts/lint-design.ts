@@ -78,6 +78,10 @@ const SPACE_MAP: Record<string, string> = {
   "560px": "var(--space-140)",
 };
 
+const BREAKPOINT_MAP: Record<string, string> = {
+  "600px": "var(--breakpoint-mobile)",
+};
+
 const SHADOW_MAP: Record<string, string> = {
   "0 1px 2px 0 var(--shadow-color)": "var(--shadow-sm)",
   "0 4px 6px -1px var(--shadow-color)": "var(--shadow-md)",
@@ -483,6 +487,30 @@ function checkLetterSpacing(value: string): { raw: string; suggestion: string } 
   return null;
 }
 
+function checkMediaQuery(
+  line: string,
+  nextLine?: string,
+): { raw: string; suggestion: string } | null {
+  if (!line.includes("@media")) return null;
+  // Search for standalone token-matching values
+  for (const [lit, token] of Object.entries(BREAKPOINT_MAP)) {
+    const escaped = lit.replace(".", "\\.");
+    const re = new RegExp(`\\b${escaped}\\b`);
+    if (re.test(line)) {
+      const comment = `/* @breakpoint-${token.replace("var(--breakpoint-", "").replace(")", "")} */`;
+      // If it has the required comment on the same line or next line, it's allowed
+      if (line.includes(comment) || (nextLine && nextLine.includes(comment))) {
+        return null;
+      }
+      return {
+        raw: line.trim(),
+        suggestion: `${token} (add comment ${comment} to acknowledge)`,
+      };
+    }
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------------------
 // Main scan
 // ---------------------------------------------------------------------------
@@ -576,8 +604,15 @@ function scanFile(filepath: string): Violation[] {
   const violations: Violation[] = [];
 
   for (let i = 0; i < lines.length; i++) {
-    let line = lines[i] as string;
+    const rawLine = lines[i] as string;
+    const nextLine = lines[i + 1] as string | undefined;
+    let line = rawLine;
     if (excludedLines.has(i) || varBlockLines.has(i) || isSkippableLine(line)) continue;
+
+    const mqResult = checkMediaQuery(rawLine, nextLine);
+    if (mqResult) {
+      violations.push({ file: rel, line: i + 1, ...mqResult });
+    }
 
     // Strip inline comments
     line = line.replace(/\/\*.*?\*\//g, "").replace(/\/\/.*$/, "");
