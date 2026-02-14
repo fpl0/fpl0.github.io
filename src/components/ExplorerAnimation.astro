@@ -22,6 +22,7 @@
     const ctx = maybeCtx;
 
     const isMobile = window.innerWidth <= 600;
+    if (isMobile) return;
     let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function getColor(property: string): string {
@@ -142,12 +143,7 @@
 
   @media (max-width: 600px) {
     .explorer-wrapper {
-      margin-top: var(--space-8);
-      padding-top: var(--space-6);
-    }
-
-    #explorer-canvas {
-      height: 150px;
+      display: none;
     }
   }
 </style>
