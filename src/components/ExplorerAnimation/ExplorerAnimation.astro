@@ -12,6 +12,7 @@
 
 <script>
   import { onPageReady } from "../../utils/lifecycle";
+  import { BREAKPOINT_MOBILE } from "../../utils/breakpoints";
   import { createExplorerEngine } from "./explorer-engine";
 
   onPageReady((signal) => {
@@ -21,7 +22,7 @@
     if (!maybeCtx) return;
     const ctx = maybeCtx;
 
-    const isMobile = window.innerWidth <= 600;
+    const isMobile = window.innerWidth <= BREAKPOINT_MOBILE;
     let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function getColor(property: string): string {
@@ -54,12 +55,31 @@
       reducedMotion,
     });
 
-    /* --- Visibility (IntersectionObserver) --- */
+    /* --- Visibility — stops rAF entirely when off-screen --- */
     let isVisible = false;
+    let lastTime = 0;
+    let rafId = 0;
+
+    function loop(timestamp: number): void {
+      if (!isVisible) {
+        rafId = 0;
+        return;
+      }
+      rafId = requestAnimationFrame(loop);
+      const dt = lastTime === 0 ? 0.016 : (timestamp - lastTime) / 1000;
+      lastTime = timestamp;
+      engine.update(dt);
+      engine.draw();
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           isVisible = entry.isIntersecting;
+        }
+        if (isVisible && !rafId) {
+          lastTime = 0;
+          rafId = requestAnimationFrame(loop);
         }
       },
       { threshold: 0.1 },
@@ -101,27 +121,12 @@
       { signal },
     );
 
-    /* --- Animation loop --- */
-    let lastTime = 0;
-    let rafId = 0;
-
-    function loop(timestamp: number): void {
-      rafId = requestAnimationFrame(loop);
-      if (!isVisible) return;
-      const dt = lastTime === 0 ? 0.016 : (timestamp - lastTime) / 1000;
-      lastTime = timestamp;
-      engine.update(dt);
-      engine.draw();
-    }
-
     rafId = requestAnimationFrame(loop);
-
-    // Draw initial frame immediately
     engine.draw();
 
     /* --- Cleanup --- */
     signal.addEventListener("abort", () => {
-      cancelAnimationFrame(rafId);
+      if (rafId) cancelAnimationFrame(rafId);
       observer.disconnect();
       themeObserver.disconnect();
     });

@@ -42,6 +42,7 @@ const L_ARM = 5;
 const GROUND_Y = 0.8;
 const MAX_DT = 0.1;
 const FADE = 60;
+const ALPHA_BUCKETS = 5;
 
 // [type, startMultiplier, minInterval, maxInterval]
 // prettier-ignore
@@ -200,38 +201,138 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
         pebble: 10,
       };
 
-  /* --- Entity creation --- */
+  /* --- Pre-allocated buffers for star alpha bucketing --- */
+  const starBuf = new Float64Array(caps.star * 3);
+  const starAlphas = new Float64Array(caps.star);
+
+  /* --- Entity creation (with object pooling via free lists) --- */
+
+  // biome-ignore lint/suspicious/noExplicitAny: heterogeneous free-list registry
+  const freeLists: Record<SpawnType, any[]> = {
+    star: [],
+    cloud: [],
+    mountain: [],
+    bird: [],
+    ufo: [],
+    meteor: [],
+    balloon: [],
+    whale: [],
+    jellyfish: [],
+    grassTuft: [],
+    pebble: [],
+  };
 
   function createStar(wX: number) {
-    return {
-      worldX: wX,
-      y: rand(height * 0.05, height * 0.45),
-      parallax: 0.1,
-      size: 0.5 + Math.random() ** 2.5 * 2.8,
-      twinkleOffset: rand(0, Math.PI * 2),
-      twinkleSpeed: rand(0.8, 2.5),
-    };
+    const y = rand(height * 0.05, height * 0.45);
+    const size = 0.5 + Math.random() ** 2.5 * 2.8;
+    const twinkleOffset = rand(0, Math.PI * 2);
+    const twinkleSpeed = rand(0.8, 2.5);
+    const e = freeLists.star.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.size = size;
+      e.twinkleOffset = twinkleOffset;
+      e.twinkleSpeed = twinkleSpeed;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        size: number;
+        twinkleOffset: number;
+        twinkleSpeed: number;
+      };
+    }
+    return { worldX: wX, y, parallax: 0.1, size, twinkleOffset, twinkleSpeed };
   }
 
   function createCloud(wX: number) {
     const r = rand(6, 18);
-    return {
-      worldX: wX,
-      y: rand(height * 0.1, height * 0.35),
-      parallax: 0.15,
-      circles: [
-        { dx: -r * 1.1, dy: 0, r: r * rand(0.8, 0.95) },
-        { dx: 0, dy: 0, r: r * rand(0.9, 1.0) },
-        { dx: r * 1.1, dy: 0, r: r * rand(0.8, 0.95) },
-        { dx: -r * 0.5, dy: -r * 0.7, r: r * rand(0.7, 0.9) },
-        { dx: r * 0.4, dy: -r * 0.65, r: r * rand(0.65, 0.85) },
-      ],
-      driftSpeed: rand(1, 4),
-      baseOpacity: rand(0.15, 0.25),
-    };
+    const path = new Path2D();
+    const radii = [
+      r * rand(0.8, 0.95),
+      r * rand(0.9, 1.0),
+      r * rand(0.8, 0.95),
+      r * rand(0.7, 0.9),
+      r * rand(0.65, 0.85),
+    ];
+    const offsets: [number, number][] = [
+      [-r * 1.1, 0],
+      [0, 0],
+      [r * 1.1, 0],
+      [-r * 0.5, -r * 0.7],
+      [r * 0.4, -r * 0.65],
+    ];
+    for (let i = 0; i < 5; i++) {
+      const cr = radii[i] ?? 0;
+      const off = offsets[i];
+      if (!off) continue;
+      path.moveTo(off[0] + cr, off[1]);
+      path.arc(off[0], off[1], cr, 0, Math.PI * 2);
+    }
+    const y = rand(height * 0.1, height * 0.35);
+    const driftSpeed = rand(1, 4);
+    const baseOpacity = rand(0.15, 0.25);
+    const e = freeLists.cloud.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.path = path;
+      e.driftSpeed = driftSpeed;
+      e.baseOpacity = baseOpacity;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        path: Path2D;
+        driftSpeed: number;
+        baseOpacity: number;
+      };
+    }
+    return { worldX: wX, y, parallax: 0.15, path, driftSpeed, baseOpacity };
+  }
+
+  function buildMountainPath(
+    h: number,
+    wL: number,
+    wR: number,
+    cLDx: number,
+    cLDy: number,
+    cRDx: number,
+    cRDy: number,
+  ): Path2D {
+    const p = new Path2D();
+    p.moveTo(-wL, 0);
+    p.quadraticCurveTo(-wL * 0.5 + cLDx, -cLDy, 0, -h);
+    p.quadraticCurveTo(wR * 0.5 + cRDx, -cRDy, wR, 0);
+    p.closePath();
+    return p;
   }
 
   function createMountain(wX: number, h: number, wL: number, wR: number) {
+    const cLDx = rand(-0.15, 0.15) * wL;
+    const cLDy = rand(0.3, 0.6) * h;
+    const cRDx = rand(-0.15, 0.15) * wR;
+    const cRDy = rand(0.3, 0.6) * h;
+    const path = buildMountainPath(h, wL, wR, cLDx, cLDy, cRDx, cRDy);
+    const e = freeLists.mountain.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = baseGroundY;
+      e.peakHeight = h;
+      e.leftWidth = wL;
+      e.rightWidth = wR;
+      e.path = path;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        peakHeight: number;
+        leftWidth: number;
+        rightWidth: number;
+        path: Path2D;
+      };
+    }
     return {
       worldX: wX,
       y: baseGroundY,
@@ -239,10 +340,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       peakHeight: h,
       leftWidth: wL,
       rightWidth: wR,
-      ctrlLeftDx: rand(-0.15, 0.15) * wL,
-      ctrlLeftDy: rand(0.3, 0.6) * h,
-      ctrlRightDx: rand(-0.15, 0.15) * wR,
-      ctrlRightDy: rand(0.3, 0.6) * h,
+      path,
     };
   }
 
@@ -262,13 +360,37 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   }
 
   function createBird(wX: number) {
+    const y = rand(height * 0.1, height * 0.4);
+    const velocity = rand(10, 20);
+    const flapPhase = rand(0, Math.PI * 2);
+    const wingspan = rand(5, 16);
+    const e = freeLists.bird.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.velocity = velocity;
+      e.flapPhase = flapPhase;
+      e.wingspan = wingspan;
+      e.formationOffsetX = 0;
+      e.formationOffsetY = 0;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        velocity: number;
+        flapPhase: number;
+        wingspan: number;
+        formationOffsetX: number;
+        formationOffsetY: number;
+      };
+    }
     return {
       worldX: wX,
-      y: rand(height * 0.1, height * 0.4),
+      y,
       parallax: 0.5,
-      velocity: rand(10, 20),
-      flapPhase: rand(0, Math.PI * 2),
-      wingspan: rand(5, 16),
+      velocity,
+      flapPhase,
+      wingspan,
       formationOffsetX: 0,
       formationOffsetY: 0,
     };
@@ -293,82 +415,179 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   }
 
   function createUfo(wX: number) {
-    return {
-      worldX: wX,
-      y: rand(height * 0.08, height * 0.25),
-      parallax: 0.6,
-      size: rand(0.6, 1.4),
-      hoverPhase: rand(0, Math.PI * 2),
-      hasTractorBeam: Math.random() > 0.5,
-    };
+    const y = rand(height * 0.08, height * 0.25);
+    const size = rand(0.6, 1.4);
+    const hoverPhase = rand(0, Math.PI * 2);
+    const hasTractorBeam = Math.random() > 0.5;
+    const e = freeLists.ufo.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.size = size;
+      e.hoverPhase = hoverPhase;
+      e.hasTractorBeam = hasTractorBeam;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        size: number;
+        hoverPhase: number;
+        hasTractorBeam: boolean;
+      };
+    }
+    return { worldX: wX, y, parallax: 0.6, size, hoverPhase, hasTractorBeam };
   }
 
   function createMeteor(wX: number) {
-    return {
-      worldX: wX,
-      y: rand(height * 0.02, height * 0.2),
-      parallax: 0.05,
-      angle: rand(0.15, 0.4),
-      speed: rand(200, 350),
-      life: 2,
-      maxLife: 2,
-      tailLen: rand(25, 80),
-    };
+    const y = rand(height * 0.02, height * 0.2);
+    const angle = rand(0.15, 0.4);
+    const speed = rand(200, 350);
+    const tailLen = rand(25, 80);
+    const e = freeLists.meteor.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.angle = angle;
+      e.speed = speed;
+      e.life = 2;
+      e.maxLife = 2;
+      e.tailLen = tailLen;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        angle: number;
+        speed: number;
+        life: number;
+        maxLife: number;
+        tailLen: number;
+      };
+    }
+    return { worldX: wX, y, parallax: 0.05, angle, speed, life: 2, maxLife: 2, tailLen };
   }
 
   function createBalloon(wX: number) {
-    return {
-      worldX: wX,
-      y: rand(height * 0.08, height * 0.3),
-      parallax: 0.35,
-      size: rand(8, 20),
-      driftSpeed: rand(4, 12),
-      swayPhase: rand(0, Math.PI * 2),
-    };
+    const y = rand(height * 0.08, height * 0.3);
+    const size = rand(8, 20);
+    const driftSpeed = rand(4, 12);
+    const swayPhase = rand(0, Math.PI * 2);
+    const e = freeLists.balloon.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.size = size;
+      e.driftSpeed = driftSpeed;
+      e.swayPhase = swayPhase;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        size: number;
+        driftSpeed: number;
+        swayPhase: number;
+      };
+    }
+    return { worldX: wX, y, parallax: 0.35, size, driftSpeed, swayPhase };
   }
 
   function createWhale(wX: number) {
     const s = rand(40, 95);
     const minY = s * 0.42 + 4;
     const maxY = height * 0.45 - s * 0.42;
-    return {
-      worldX: wX,
-      y: rand(Math.max(minY, height * 0.12), Math.max(minY, maxY)),
-      parallax: 0.55,
-      size: s,
-      velocity: 0,
-      bobPhase: rand(0, Math.PI * 2),
-    };
+    const y = rand(Math.max(minY, height * 0.12), Math.max(minY, maxY));
+    const bobPhase = rand(0, Math.PI * 2);
+    const e = freeLists.whale.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.size = s;
+      e.velocity = 0;
+      e.bobPhase = bobPhase;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        size: number;
+        velocity: number;
+        bobPhase: number;
+      };
+    }
+    return { worldX: wX, y, parallax: 0.55, size: s, velocity: 0, bobPhase };
   }
 
   function createJellyfish(wX: number) {
     const tc = randInt(3, 5);
+    const y = rand(height * 0.1, height * 0.4);
+    const size = rand(6, 16);
+    const pulsePhase = rand(0, Math.PI * 2);
+    const driftSpeed = rand(2, 6);
+    const tentaclePhases = Array.from({ length: tc }, () => rand(0, Math.PI * 2));
+    const e = freeLists.jellyfish.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.size = size;
+      e.pulsePhase = pulsePhase;
+      e.driftSpeed = driftSpeed;
+      e.tentacleCount = tc;
+      e.tentaclePhases = tentaclePhases;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        size: number;
+        pulsePhase: number;
+        driftSpeed: number;
+        tentacleCount: number;
+        tentaclePhases: number[];
+      };
+    }
     return {
       worldX: wX,
-      y: rand(height * 0.1, height * 0.4),
+      y,
       parallax: 0.4,
-      size: rand(6, 16),
-      pulsePhase: rand(0, Math.PI * 2),
-      driftSpeed: rand(2, 6),
+      size,
+      pulsePhase,
+      driftSpeed,
       tentacleCount: tc,
-      tentaclePhases: Array.from({ length: tc }, () => rand(0, Math.PI * 2)),
+      tentaclePhases,
     };
   }
 
   function createGrassTuft(wX: number) {
     const bc = randInt(2, 3);
-    return {
-      worldX: wX,
-      y: baseGroundY,
-      parallax: 1.0,
-      bladeCount: bc,
-      bladeHeight: rand(3, 11),
-      bladeAngles: Array.from({ length: bc }, () => rand(-0.4, 0.4)),
-    };
+    const bladeHeight = rand(3, 11);
+    const bladeAngles = Array.from({ length: bc }, () => rand(-0.4, 0.4));
+    const e = freeLists.grassTuft.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = baseGroundY;
+      e.bladeCount = bc;
+      e.bladeHeight = bladeHeight;
+      e.bladeAngles = bladeAngles;
+      return e as {
+        worldX: number;
+        y: number;
+        parallax: number;
+        bladeCount: number;
+        bladeHeight: number;
+        bladeAngles: number[];
+      };
+    }
+    return { worldX: wX, y: baseGroundY, parallax: 1.0, bladeCount: bc, bladeHeight, bladeAngles };
   }
 
   function createPebble(wX: number) {
-    return { worldX: wX, y: baseGroundY + rand(1, 3), parallax: 1.0, radius: rand(0.8, 3.5) };
+    const y = baseGroundY + rand(1, 3);
+    const radius = rand(0.8, 3.5);
+    const e = freeLists.pebble.pop();
+    if (e) {
+      e.worldX = wX;
+      e.y = y;
+      e.radius = radius;
+      return e as { worldX: number; y: number; parallax: number; radius: number };
+    }
+    return { worldX: wX, y, parallax: 1.0, radius };
   }
 
   /* --- Entity arrays & pool registry --- */
@@ -455,7 +674,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     sp.next = rightEdge + rand(sp.min, sp.max);
   }
 
-  /* --- Culling (swap-and-pop) --- */
+  /* --- Culling (swap-and-pop with recycling) --- */
 
   function sX(wx: number, p: number): number {
     return wx - worldOffset * p;
@@ -463,6 +682,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
 
   function cull<T extends { worldX: number; parallax: number }>(
     arr: T[],
+    free: T[],
     alive?: (e: T) => boolean,
   ): void {
     let i = 0;
@@ -473,6 +693,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
         continue;
       }
       if (sX(e.worldX, e.parallax) < -200 || (alive !== undefined && !alive(e))) {
+        free.push(e);
         const last = arr[arr.length - 1];
         if (last !== undefined) arr[i] = last;
         arr.pop();
@@ -485,24 +706,52 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   function cullAll(): void {
     for (const t of TYPES) {
       // biome-ignore lint/suspicious/noExplicitAny: pool registry is heterogeneous
-      cull(pools[t], t === "meteor" ? (m: any) => m.life > 0 : undefined);
+      cull(pools[t], freeLists[t], t === "meteor" ? (m: any) => m.life > 0 : undefined);
     }
   }
 
   /* --- Drawing --- */
 
-  function drawStars(): void {
-    ctx.fillStyle = colors.textMuted;
+  function collectVisibleStars(): number {
+    let visCount = 0;
     for (let i = 0; i < stars.length; i++) {
       const e = stars[i];
       if (!e) continue;
       const x = sX(e.worldX, e.parallax);
       if (x < -10 || x > width + 10) continue;
       const tw = 0.4 + 0.6 * Math.abs(Math.sin(time * e.twinkleSpeed + e.twinkleOffset));
-      ctx.globalAlpha = entityAlpha(x, e.parallax, width, tw);
-      ctx.beginPath();
-      ctx.arc(x, e.y, e.size, 0, Math.PI * 2);
-      ctx.fill();
+      starBuf[visCount * 3] = x;
+      starBuf[visCount * 3 + 1] = e.y;
+      starBuf[visCount * 3 + 2] = e.size;
+      starAlphas[visCount] = entityAlpha(x, e.parallax, width, tw);
+      visCount++;
+    }
+    return visCount;
+  }
+
+  function drawStarBucket(lo: number, hi: number, isLast: boolean, visCount: number): void {
+    ctx.globalAlpha = (lo + hi) * 0.5;
+    let has = false;
+    ctx.beginPath();
+    for (let j = 0; j < visCount; j++) {
+      const a = starAlphas[j] ?? 0;
+      if (a >= lo && (isLast || a < hi)) {
+        const sx = starBuf[j * 3] ?? 0;
+        const sy = starBuf[j * 3 + 1] ?? 0;
+        const sr = starBuf[j * 3 + 2] ?? 0;
+        ctx.moveTo(sx + sr, sy);
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        has = true;
+      }
+    }
+    if (has) ctx.fill();
+  }
+
+  function drawStars(): void {
+    ctx.fillStyle = colors.textMuted;
+    const visCount = collectVisibleStars();
+    for (let b = 0; b < ALPHA_BUCKETS; b++) {
+      drawStarBucket(b / ALPHA_BUCKETS, (b + 1) / ALPHA_BUCKETS, b === ALPHA_BUCKETS - 1, visCount);
     }
     ctx.globalAlpha = 1;
   }
@@ -515,12 +764,10 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       const x = sX(e.worldX, e.parallax);
       if (x < -60 || x > width + 60) continue;
       ctx.globalAlpha = entityAlpha(x, e.parallax, width, e.baseOpacity);
-      ctx.beginPath();
-      for (const c of e.circles) {
-        ctx.moveTo(x + c.dx + c.r, e.y + c.dy);
-        ctx.arc(x + c.dx, e.y + c.dy, c.r, 0, Math.PI * 2);
-      }
-      ctx.fill();
+      ctx.save();
+      ctx.translate(x, e.y);
+      ctx.fill(e.path);
+      ctx.restore();
     }
     ctx.globalAlpha = 1;
   }
@@ -536,16 +783,20 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       const tdy = Math.sin(e.angle) * e.tailLen * 1.5;
       const alpha = entityAlpha(x, e.parallax, width, opacity);
 
-      const grad = ctx.createLinearGradient(x, e.y, x + tdx, e.y - tdy);
-      grad.addColorStop(0, colors.primary);
-      grad.addColorStop(1, "rgba(0, 0, 0, 0)"); /* token-exempt */
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 1.5 + ms;
+      ctx.strokeStyle = colors.primary;
       ctx.lineCap = "round";
-      ctx.globalAlpha = alpha;
+      ctx.lineWidth = 1.5 + ms;
+      ctx.globalAlpha = alpha * 0.4;
       ctx.beginPath();
       ctx.moveTo(x, e.y);
       ctx.lineTo(x + tdx, e.y - tdy);
+      ctx.stroke();
+
+      ctx.lineWidth = 1 + ms * 0.7;
+      ctx.globalAlpha = alpha * 0.8;
+      ctx.beginPath();
+      ctx.moveTo(x, e.y);
+      ctx.lineTo(x + tdx * 0.5, e.y - tdy * 0.5);
       ctx.stroke();
 
       ctx.fillStyle = colors.primary;
@@ -687,27 +938,15 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       if (!e) continue;
       const x = sX(e.worldX, e.parallax);
       if (x + e.rightWidth < -10 || x - e.leftWidth > width + 10) continue;
-      const gY = e.y;
-      const peakX = x;
-      const peakY = gY - e.peakHeight;
-      const lx = x - e.leftWidth;
-      const rx = x + e.rightWidth;
-      const clx = lx + e.leftWidth * 0.5 + e.ctrlLeftDx;
-      const cly = gY - e.ctrlLeftDy;
-      const crx = rx - e.rightWidth * 0.5 + e.ctrlRightDx;
-      const cry = gY - e.ctrlRightDy;
-
       ctx.globalAlpha = entityAlpha(x, e.parallax, width, 1);
-      ctx.beginPath();
-      ctx.moveTo(lx, gY);
-      ctx.quadraticCurveTo(clx, cly, peakX, peakY);
-      ctx.quadraticCurveTo(crx, cry, rx, gY);
-      ctx.closePath();
+      ctx.save();
+      ctx.translate(x, e.y);
       ctx.fillStyle = colors.border;
-      ctx.fill();
+      ctx.fill(e.path);
       ctx.strokeStyle = colors.textMuted;
       ctx.lineWidth = 1.0;
-      ctx.stroke();
+      ctx.stroke(e.path);
+      ctx.restore();
     }
     ctx.globalAlpha = 1;
   }
@@ -722,40 +961,99 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     ctx.stroke();
   }
 
-  function drawGrassTufts(): void {
-    ctx.strokeStyle = colors.textMuted;
-    ctx.lineWidth = 0.8;
-    ctx.lineCap = "round";
+  function addBlades(
+    x: number,
+    y: number,
+    bladeCount: number,
+    bladeAngles: number[],
+    bladeHeight: number,
+  ): void {
+    for (let j = 0; j < bladeCount; j++) {
+      const angle = (bladeAngles[j] ?? 0) + wind * 0.3;
+      const bx = x + (j - (bladeCount - 1) * 0.5) * 3;
+      ctx.moveTo(bx, y);
+      ctx.lineTo(bx + Math.sin(angle) * bladeHeight, y - Math.cos(angle) * bladeHeight);
+    }
+  }
+
+  function batchGrassTufts(): boolean {
+    let has = false;
     for (let i = 0; i < grassTufts.length; i++) {
       const e = grassTufts[i];
       if (!e) continue;
       const x = sX(e.worldX, e.parallax);
       if (x < -15 || x > width + 15) continue;
-      ctx.globalAlpha = entityAlpha(x, e.parallax, width, 0.45);
-      ctx.beginPath();
-      for (let j = 0; j < e.bladeCount; j++) {
-        const angle = (e.bladeAngles[j] ?? 0) + wind * 0.3;
-        const bx = x + (j - (e.bladeCount - 1) * 0.5) * 3;
-        ctx.moveTo(bx, e.y);
-        ctx.lineTo(bx + Math.sin(angle) * e.bladeHeight, e.y - Math.cos(angle) * e.bladeHeight);
+      if (width - x >= FADE) {
+        addBlades(x, e.y, e.bladeCount, e.bladeAngles, e.bladeHeight);
+        has = true;
       }
-      ctx.stroke();
     }
+    return has;
+  }
+
+  function drawFadingGrassTufts(): void {
+    for (let i = 0; i < grassTufts.length; i++) {
+      const e = grassTufts[i];
+      if (!e) continue;
+      const x = sX(e.worldX, e.parallax);
+      if (x < -15 || x > width + 15) continue;
+      if (width - x < FADE) {
+        ctx.globalAlpha = entityAlpha(x, e.parallax, width, 0.45);
+        ctx.beginPath();
+        addBlades(x, e.y, e.bladeCount, e.bladeAngles, e.bladeHeight);
+        ctx.stroke();
+      }
+    }
+  }
+
+  function drawGrassTufts(): void {
+    ctx.strokeStyle = colors.textMuted;
+    ctx.lineWidth = 0.8;
+    ctx.lineCap = "round";
+    ctx.globalAlpha = 0.45;
+    ctx.beginPath();
+    if (batchGrassTufts()) ctx.stroke();
+    drawFadingGrassTufts();
     ctx.globalAlpha = 1;
   }
 
-  function drawPebbles(): void {
-    ctx.fillStyle = colors.textMuted;
+  function batchPebbles(): boolean {
+    let has = false;
     for (let i = 0; i < pebbles.length; i++) {
       const e = pebbles[i];
       if (!e) continue;
       const x = sX(e.worldX, e.parallax);
       if (x < -5 || x > width + 5) continue;
-      ctx.globalAlpha = entityAlpha(x, e.parallax, width, 0.4);
-      ctx.beginPath();
-      ctx.arc(x, e.y, e.radius, 0, Math.PI * 2);
-      ctx.fill();
+      if (width - x >= FADE) {
+        ctx.moveTo(x + e.radius, e.y);
+        ctx.arc(x, e.y, e.radius, 0, Math.PI * 2);
+        has = true;
+      }
     }
+    return has;
+  }
+
+  function drawFadingPebbles(): void {
+    for (let i = 0; i < pebbles.length; i++) {
+      const e = pebbles[i];
+      if (!e) continue;
+      const x = sX(e.worldX, e.parallax);
+      if (x < -5 || x > width + 5) continue;
+      if (width - x < FADE) {
+        ctx.globalAlpha = entityAlpha(x, e.parallax, width, 0.4);
+        ctx.beginPath();
+        ctx.arc(x, e.y, e.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function drawPebbles(): void {
+    ctx.fillStyle = colors.textMuted;
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    if (batchPebbles()) ctx.fill();
+    drawFadingPebbles();
     ctx.globalAlpha = 1;
   }
 
@@ -959,6 +1257,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
 
   function seed(): void {
     for (const t of TYPES) pools[t].length = 0;
+    for (const t of TYPES) freeLists[t].length = 0;
     seedSky();
     seedBirds();
     seedGround();
