@@ -18,28 +18,25 @@ interface Pool<T> {
   count: number;
 }
 
-interface StarEntity {
+interface BaseEntity {
   worldX: number;
   y: number;
   parallax: number;
+}
+
+interface StarEntity extends BaseEntity {
   size: number;
   twinkleOffset: number;
   twinkleSpeed: number;
 }
 
-interface CloudEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface CloudEntity extends BaseEntity {
   circles: Array<{ dx: number; dy: number; r: number }>;
   driftSpeed: number;
   baseOpacity: number;
 }
 
-interface MountainEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface MountainEntity extends BaseEntity {
   peakHeight: number;
   leftWidth: number;
   rightWidth: number;
@@ -49,10 +46,7 @@ interface MountainEntity {
   ctrlRightDy: number;
 }
 
-interface BirdEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface BirdEntity extends BaseEntity {
   velocity: number;
   flapPhase: number;
   wingspan: number;
@@ -60,19 +54,13 @@ interface BirdEntity {
   formationOffsetY: number;
 }
 
-interface UfoEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface UfoEntity extends BaseEntity {
   size: number;
   hoverPhase: number;
   hasTractorBeam: boolean;
 }
 
-interface MeteorEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface MeteorEntity extends BaseEntity {
   angle: number;
   speed: number;
   life: number;
@@ -80,37 +68,25 @@ interface MeteorEntity {
   tailLen: number;
 }
 
-interface BalloonEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface BalloonEntity extends BaseEntity {
   size: number;
   driftSpeed: number;
   swayPhase: number;
 }
 
-interface WhaleEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface WhaleEntity extends BaseEntity {
   size: number;
   velocity: number;
   bobPhase: number;
 }
 
-interface GrassTuftEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface GrassTuftEntity extends BaseEntity {
   bladeCount: number;
   bladeHeight: number;
   bladeAngles: number[];
 }
 
-interface JellyfishEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface JellyfishEntity extends BaseEntity {
   size: number;
   pulsePhase: number;
   driftSpeed: number;
@@ -118,10 +94,7 @@ interface JellyfishEntity {
   tentaclePhases: number[];
 }
 
-interface PebbleEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
+interface PebbleEntity extends BaseEntity {
   radius: number;
 }
 
@@ -201,19 +174,7 @@ const SPAWN_TYPES: SpawnType[] = [
   "pebble",
 ];
 
-interface EntityCaps {
-  star: number;
-  cloud: number;
-  mountain: number;
-  bird: number;
-  ufo: number;
-  meteor: number;
-  balloon: number;
-  whale: number;
-  jellyfish: number;
-  grassTuft: number;
-  pebble: number;
-}
+type EntityCaps = Record<SpawnType, number>;
 
 const ENTITY_CAPS: EntityCaps = {
   star: 30,
@@ -340,6 +301,22 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   const jellyfish = createPool<JellyfishEntity>(caps.jellyfish);
   const grassTufts = createPool<GrassTuftEntity>(caps.grassTuft);
   const pebbles = createPool<PebbleEntity>(caps.pebble);
+
+  /** Type-erased pool lookup — enables generic iteration over all pools. */
+  // biome-ignore lint/suspicious/noExplicitAny: heterogeneous pool registry requires any
+  const pools: Record<SpawnType, Pool<any>> = {
+    star: stars,
+    cloud: clouds,
+    mountain: mountains,
+    bird: birds,
+    ufo: ufos,
+    meteor: meteors,
+    balloon: balloons,
+    whale: whales,
+    jellyfish,
+    grassTuft: grassTufts,
+    pebble: pebbles,
+  };
 
   /* ----- Spawners ----- */
 
@@ -608,113 +585,40 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     return screenX + worldOffset * parallax;
   }
 
-  function getPoolCount(type: SpawnType): number {
-    switch (type) {
-      case "star":
-        return stars.count;
-      case "cloud":
-        return clouds.count;
-      case "mountain":
-        return mountains.count;
-      case "bird":
-        return birds.count;
-      case "ufo":
-        return ufos.count;
-      case "meteor":
-        return meteors.count;
-      case "balloon":
-        return balloons.count;
-      case "whale":
-        return whales.count;
-      case "jellyfish":
-        return jellyfish.count;
-      case "grassTuft":
-        return grassTufts.count;
-      case "pebble":
-        return pebbles.count;
-      default:
-        return 0;
-    }
-  }
-
-  function getCap(type: SpawnType): number {
-    return caps[type];
-  }
+  /** Simple creators — entity types with identical create/set-worldX/push spawning. */
+  const simpleCreators: Partial<Record<SpawnType, (worldX: number) => BaseEntity>> = {
+    star: createStar,
+    cloud: createCloud,
+    ufo: createUfo,
+    meteor: createMeteor,
+    balloon: createBalloon,
+    whale: createWhale,
+    jellyfish: createJellyfish,
+    grassTuft: createGrassTuft,
+    pebble: createPebble,
+  };
 
   function spawnEntity(type: SpawnType, screenX: number): void {
-    switch (type) {
-      case "mountain": {
-        spawnMountainCluster(toWorldX(screenX, 0.2));
-        break;
-      }
-      case "bird": {
-        spawnBirdGroup(screenX);
-        break;
-      }
-      case "star": {
-        const s = createStar(0);
-        s.worldX = toWorldX(screenX, s.parallax);
-        poolPush(stars, s);
-        break;
-      }
-      case "cloud": {
-        const c = createCloud(0);
-        c.worldX = toWorldX(screenX, c.parallax);
-        poolPush(clouds, c);
-        break;
-      }
-      case "ufo": {
-        const u = createUfo(0);
-        u.worldX = toWorldX(screenX, u.parallax);
-        poolPush(ufos, u);
-        break;
-      }
-      case "meteor": {
-        const m = createMeteor(0);
-        m.worldX = toWorldX(screenX, m.parallax);
-        poolPush(meteors, m);
-        break;
-      }
-      case "balloon": {
-        const b = createBalloon(0);
-        b.worldX = toWorldX(screenX, b.parallax);
-        poolPush(balloons, b);
-        break;
-      }
-      case "whale": {
-        const w = createWhale(0);
-        w.worldX = toWorldX(screenX, w.parallax);
-        poolPush(whales, w);
-        break;
-      }
-      case "jellyfish": {
-        const jf = createJellyfish(0);
-        jf.worldX = toWorldX(screenX, jf.parallax);
-        poolPush(jellyfish, jf);
-        break;
-      }
-      case "grassTuft": {
-        const g = createGrassTuft(0);
-        g.worldX = toWorldX(screenX, g.parallax);
-        poolPush(grassTufts, g);
-        break;
-      }
-      case "pebble": {
-        const pb = createPebble(0);
-        pb.worldX = toWorldX(screenX, pb.parallax);
-        poolPush(pebbles, pb);
-        break;
-      }
-      default:
-        break;
+    if (type === "mountain") {
+      spawnMountainCluster(toWorldX(screenX, 0.2));
+      return;
     }
+    if (type === "bird") {
+      spawnBirdGroup(screenX);
+      return;
+    }
+    const creator = simpleCreators[type];
+    if (!creator) return;
+    const e = creator(0);
+    e.worldX = toWorldX(screenX, e.parallax);
+    poolPush(pools[type], e);
   }
 
   function trySpawn(type: SpawnType): void {
     const s = spawners[type];
     const rightEdge = worldOffset + width;
     if (rightEdge < s.nextSpawnAt) return;
-    if (getPoolCount(type) >= getCap(type)) {
+    if (pools[type].count >= caps[type]) {
       s.nextSpawnAt = rightEdge + rand(s.minInterval, s.maxInterval);
       return;
     }
@@ -724,14 +628,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
 
   /* ----- Culling (swap-and-pop) ----- */
 
-  function screenX(entityWorldX: number, parallax: number): number {
-    return entityWorldX - worldOffset * parallax;
-  }
-
-  function cullPool<T extends { worldX: number; parallax: number }>(
-    pool: Pool<T>,
-    isAlive?: (item: T) => boolean,
-  ): void {
+  function cullPool<T extends BaseEntity>(pool: Pool<T>, isAlive?: (item: T) => boolean): void {
     let i = 0;
     while (i < pool.count) {
       const item = pool.items[i];
@@ -739,8 +636,8 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
         poolSwapRemove(pool, i);
         continue;
       }
-      const sx = screenX(item.worldX, item.parallax);
-      if (sx < -200 || (isAlive !== undefined && !isAlive(item))) {
+      const sxPos = sx(item.worldX, item.parallax);
+      if (sxPos < -200 || (isAlive !== undefined && !isAlive(item))) {
         poolSwapRemove(pool, i);
       } else {
         i++;
@@ -749,17 +646,9 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   }
 
   function cullAllPools(): void {
-    cullPool(stars);
-    cullPool(clouds);
-    cullPool(mountains);
-    cullPool(birds);
-    cullPool(ufos);
-    cullPool(meteors, (m) => m.life > 0);
-    cullPool(balloons);
-    cullPool(whales);
-    cullPool(jellyfish);
-    cullPool(grassTufts);
-    cullPool(pebbles);
+    for (const type of SPAWN_TYPES) {
+      cullPool(pools[type], type === "meteor" ? (m: MeteorEntity) => m.life > 0 : undefined);
+    }
   }
 
   /* ----- Drawing helpers ----- */
@@ -1083,7 +972,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       for (let t = 0; t < e.tentacleCount; t++) {
         const tPhase = e.tentaclePhases[t] ?? 0;
         const tx = x - bellW + tentSpacing * (t + 1);
-        const tentLen = s * rand(0.8, 1.4);
+        const tentLen = s * rand(0.8, 1.4); // intentional per-frame jitter for underwater wobble
         const sway = Math.sin(tPhase + time * 1.5) * s * 0.15 + wind * 1.5;
         ctx.beginPath();
         ctx.moveTo(tx, e.y);
@@ -1488,17 +1377,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   /* ----- Initial scene ----- */
 
   function clearAllPools(): void {
-    stars.count = 0;
-    clouds.count = 0;
-    mountains.count = 0;
-    birds.count = 0;
-    ufos.count = 0;
-    meteors.count = 0;
-    balloons.count = 0;
-    whales.count = 0;
-    jellyfish.count = 0;
-    grassTufts.count = 0;
-    pebbles.count = 0;
+    for (const type of SPAWN_TYPES) pools[type].count = 0;
   }
 
   function seedSkyEntities(): void {
