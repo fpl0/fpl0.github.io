@@ -1,0 +1,40 @@
+---
+/**
+ * EntryCard - Unified preview component for blog posts and apps
+ *
+ * Mathematically derived from the 'Ledger Entry' object category.
+ * Handles conditional rendering of the 'app' tag based on collection type.
+ */
+
+import type { CollectionEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+
+interface Props {
+  entry: CollectionEntry<"blog"> | CollectionEntry<"apps">;
+}
+
+const { entry } = Astro.props;
+const collection = entry.collection;
+const url = `/${collection}/${entry.slug}/`;
+---
+
+<li class="post-item">
+  <FormattedDate date={entry.data.date} className="post-date" />
+  <div class="post-content">
+    <a href={url} class="post-title" data-astro-prefetch="hover">
+      {entry.data.title}
+    </a>
+    <p class="post-summary">{entry.data.summary}</p>
+    <div class="post-tags">
+      {collection === "apps" && (
+        <a href="/tags/app/" class="app-tag">app</a>
+      )}
+      {entry.data.tags
+        .filter((tag: string) => collection !== "apps" || tag !== "app")
+        .map((tag: string) => (
+          <a href={`/tags/${tag}/`} class="tag-link">{tag}</a>
+        ))
+      }
+    </div>
+  </div>
+</li>

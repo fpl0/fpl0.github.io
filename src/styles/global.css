@@ -99,28 +99,58 @@
 
 :root {
   /* ==========================================================================
-     TYPOGRAPHY SCALE
-     Based on a Minor Third (1.2) ratio for harmonious sizing
+     GEOMETRIC ENGINE
+     Harmonic, fluid, and mathematically derived system.
      ========================================================================== */
 
-  /* Base: 16px (1rem) -> 17px (1.0625rem)
-     Slope: 0.11vw, Intercept: 0.96rem
-     Range: 320px -> 1200px */
+  /* --- Spacing Engine (4px Grid) --- */
+  --grid: 0.25rem;
+  --space-px: 1px;
+  --space-0-375: 1.5px;
+  --space-0-5: 2px;
+  --space-0-75: 3px;
+  --space-1: var(--grid);
+  --space-1-25: 5px;
+  --space-2: calc(var(--grid) * 2);
+  --space-2-5: 10px;
+  --space-3: calc(var(--grid) * 3);
+  --space-3-5: 14px;
+  --space-4: calc(var(--grid) * 4);
+  --space-4-5: 18px;
+  --space-5: calc(var(--grid) * 5);
+  --space-6: calc(var(--grid) * 6);
+  --space-7: calc(var(--grid) * 7);
+  --space-8: calc(var(--grid) * 8);
+  --space-9: calc(var(--grid) * 9);
+  --space-10: calc(var(--grid) * 10);
+  --space-11: calc(var(--grid) * 11);
+  --space-12: calc(var(--grid) * 12);
+  --space-14: calc(var(--grid) * 14);
+  --space-16: calc(var(--grid) * 16);
+  --space-17: calc(var(--grid) * 17);
+  --space-18: calc(var(--grid) * 18);
+  --space-24: calc(var(--grid) * 24);
+  --space-32: calc(var(--grid) * 32);
+  --space-36: calc(var(--grid) * 36);
+  --space-37-5: calc(var(--grid) * 37.5);
+  --space-55: calc(var(--grid) * 55);
+  --space-80: calc(var(--grid) * 80);
+  --space-100: calc(var(--grid) * 100);
+  --space-125: calc(var(--grid) * 125);
+  --space-140: calc(var(--grid) * 140);
+
+  /* --- Fluid Type Engine (Minor Third - 1.2) --- */
+  --font-ratio: 1.2;
+  /* Base: 16px -> 17px (0.11vw slope) */
   --font-size-base: clamp(1rem, 0.11vw + 0.96rem, 1.0625rem);
+  --font-size-h3: calc(var(--font-size-base) * var(--font-ratio));
+  --font-size-h2: calc(var(--font-size-h3) * var(--font-ratio));
+  --font-size-h1: calc(var(--font-size-h2) * var(--font-ratio));
 
-  /* Heading Scale - Minor Third (1.2) */
-  /* H1: 27.65px -> 29.38px */
-  --font-size-h1: clamp(1.728rem, 0.2vw + 1.66rem, 1.836rem);
-  /* H2: 23.04px -> 24.48px */
-  --font-size-h2: clamp(1.44rem, 0.16vw + 1.39rem, 1.53rem);
-  /* H3: 19.20px -> 20.40px */
-  --font-size-h3: clamp(1.2rem, 0.14vw + 1.15rem, 1.275rem);
-
-  /* Body & Reading - Matches Base for consistency in this density model */
   --font-size-body: var(--font-size-base);
   --font-size-lead: 1.35rem;
 
-  /* UI Scale (smaller sizes) */
+  /* UI Scale */
   --font-size-sm: 0.9375rem;
   --font-size-xs: 0.875rem;
   --font-size-xxs: 0.8125rem;
@@ -132,54 +162,42 @@
   --line-height-snug: 1.25;
   --line-height-subhead: 1.4;
   --line-height-normal: 1.5;
-  --line-height-relaxed: 1.6; /* Was 1.65/1.75 - tighter for density */
-  --line-height-loose: 1.7; /* Was 1.75 */
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.7;
 
-  /* ==========================================================================
-     COLOR SYSTEM
-     Light theme (default) — warm paper-inspired palette
-     Carefully calibrated contrast ratios (WCAG AA+)
-     ========================================================================== */
+  /* --- Color Synthesis (Hue: 45 Gold/Cream) --- */
+  --hue: 45;
+  --color-bg: hsl(var(--hue), 40%, 96%);
+  --color-surface: hsl(var(--hue), 30%, 92%);
+  --color-surface-raised: hsl(var(--hue), 25%, 88%);
+  --color-highlight: hsl(var(--hue), 45%, 90%);
 
-  /* Background Layers - Warm paper tones */
-  --color-bg: hsl(45, 40%, 96%);
-  --color-surface: hsl(45, 30%, 92%);
-  --color-surface-raised: hsl(45, 25%, 88%);
-  --color-highlight: hsl(45, 45%, 90%);
-
-  /* Text Hierarchy - Rich sepia-brown tones */
+  /* Text Hierarchy (Sepia) */
   --color-text: hsl(25, 30%, 18%);
   --color-text-secondary: hsl(25, 25%, 28%);
   --color-text-muted: hsl(25, 20%, 38%);
 
-  /* Primary Accent - Rich amber/cognac */
+  /* Primary Accent */
   --color-primary: hsl(28, 80%, 38%);
   --color-primary-dim: hsl(28, 60%, 48%);
-
-  /* Cool Accent (Teal for harmony) */
   --color-accent-cool: hsl(180, 30%, 35%);
 
-  /* Semantic Status Colors */
   --color-warn: hsl(40, 80%, 42%);
   --color-error: hsl(0, 60%, 45%);
 
-  /* Borders & Dividers */
   --color-border: hsl(35, 25%, 82%);
   --color-border-subtle: hsl(35, 20%, 88%);
 
-  /* Shadows */
   --shadow-color: rgba(60, 40, 20, 0.12);
   --shadow-sm: 0 1px 2px 0 var(--shadow-color);
   --shadow-md: 0 4px 6px -1px var(--shadow-color);
   --shadow-lg: 0 10px 15px -3px var(--shadow-color);
   --shadow-xl: 0 25px 50px -12px var(--shadow-color);
 
-  /* Overlays — warm-tinted dark backgrounds for modals/lightboxes */
   --color-overlay: rgba(20, 12, 5, 0.6);
   --color-overlay-heavy: rgba(20, 12, 5, 0.9);
   --color-overlay-text: hsl(45, 40%, 96%);
 
-  /* Code block colors — light mode warm cream tones */
   --color-code-bg: hsl(40, 30%, 95%);
   --color-code-border: hsl(35, 25%, 85%);
   --color-code-header-bg: hsl(40, 25%, 92%);
@@ -187,66 +205,17 @@
   --color-code-inline-text: hsl(25, 50%, 35%);
   --color-code-inline-border: hsl(35, 25%, 80%);
 
-  /* Selection colors */
   --color-selection-bg: hsl(35, 60%, 75%);
   --color-selection-text: hsl(25, 40%, 15%);
 
-  /* Legacy alias */
   --color-muted: var(--color-text-muted);
 
-  /* Typography Stacks — custom fonts with metric-adjusted system fallbacks */
   --font-sans: "Inter Variable", "Inter Fallback", system-ui, sans-serif;
   --font-serif: "Merriweather", "Merriweather Fallback", serif;
   --font-display: var(--font-serif);
   --font-mono-brand: "Space Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* ==========================================================================
-     SPACING SCALE
-     Consistent spacing tokens for margins, padding, and gaps
-     ========================================================================== */
-  --space-px: 1px;
-  --space-0-375: 1.5px;
-  --space-0-5: 2px;
-  --space-0-75: 3px;
-  --space-1: 0.25rem; /* 4px - micro spacing */
-  --space-1-25: 5px;
-  --space-2: 0.5rem; /* 8px - strict grid unit */
-  --space-2-5: 10px;
-  --space-3: 0.75rem; /* 12px */
-  --space-3-5: 14px;
-  --space-4: 1rem; /* 16px */
-  --space-4-5: 18px;
-  --space-5: 1.25rem; /* 20px */
-  --space-6: 1.5rem; /* 24px */
-  --space-7: 1.75rem; /* 28px */
-  --space-8: 2rem; /* 32px */
-  --space-9: 2.25rem; /* 36px */
-  --space-10: 2.5rem; /* 40px */
-  --space-11: 2.75rem; /* 44px - touch targets */
-  --space-12: 3rem; /* 48px */
-  --space-14: 3.5rem; /* 56px */
-  --space-16: 4rem; /* 64px — page-level vertical padding */
-  --space-17: 4.25rem; /* 68px */
-  --space-18: 4.5rem; /* 72px */
-  --space-24: 6rem; /* 96px */
-  --space-32: 8rem; /* 128px */
-  --space-36: 9rem; /* 144px */
-  --space-37-5: 9.375rem; /* 150px */
-  --space-55: 13.75rem; /* 220px */
-  --space-80: 20rem; /* 320px */
-  --space-100: 25rem; /* 400px */
-  --space-125: 31.25rem; /* 500px */
-  --space-140: 35rem; /* 560px */
-
-  /* ==========================================================================
-     BREAKPOINTS
-     ========================================================================== */
-  --breakpoint-mobile: 600px;
-
-  /* ==========================================================================
-     BORDER RADIUS SCALE
-     ========================================================================== */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -254,9 +223,6 @@
   --radius-full: 999px;
   --radius-round: 50%;
 
-  /* ==========================================================================
-     Z-INDEX SCALE
-     ========================================================================== */
   --z-base: 1;
   --z-float: 10;
   --z-dropdown: 20;
@@ -266,27 +232,18 @@
   --z-modal: 1010;
   --z-toast: 9000;
 
-  /* ==========================================================================
-     TRANSITION TOKENS
-     ========================================================================== */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --duration-fast: 0.15s;
   --duration-normal: 0.2s;
   --duration-slow: 0.3s;
 
-  /* ==========================================================================
-     OPACITY TOKENS
-     ========================================================================== */
   --opacity-subtle: 0.35;
   --opacity-muted: 0.5;
   --opacity-recede: 0.6;
   --opacity-de-emphasize: 0.8;
   --opacity-hover: 0.9;
 
-  /* ==========================================================================
-     LETTER SPACING TOKENS
-     ========================================================================== */
   --letter-spacing-extra-tight: -0.04em;
   --letter-spacing-tight: -0.03em;
   --letter-spacing-snug: -0.02em;
@@ -297,55 +254,39 @@
   --letter-spacing-wide: 0.06em;
   --letter-spacing-extra: 0.08em;
 
-  /* ==========================================================================
-     CONTENT WIDTH TOKENS
-     ========================================================================== */
   --content-width: 72ch;
   --content-width-narrow: 60ch;
 }
 
-/* ==========================================================================
-   DARK THEME
-   Warm dark palette with rich cream/gold accent
-   ========================================================================== */
-
 [data-theme="dark"] {
-  /* Background Layers (darkest to lighter) */
-  --color-bg: hsl(20, 15%, 8%);
-  --color-surface: hsl(20, 12%, 12%);
-  --color-surface-raised: hsl(20, 10%, 16%);
+  --hue: 20;
+  --color-bg: hsl(var(--hue), 15%, 8%);
+  --color-surface: hsl(var(--hue), 12%, 12%);
+  --color-surface-raised: hsl(var(--hue), 10%, 16%);
   --color-highlight: hsl(35, 20%, 14%);
 
-  /* Text Hierarchy (brightest to dimmer) */
   --color-text: hsl(35, 12%, 87%);
   --color-text-secondary: hsl(30, 10%, 60%);
   --color-text-muted: hsl(25, 6%, 52%);
 
-  /* Primary Accent (rich cream/gold) */
   --color-primary: hsl(42, 52%, 76%);
   --color-primary-dim: hsl(42, 35%, 58%);
-
-  /* Cool Accent (Teal for harmony) */
   --color-accent-cool: hsl(180, 20%, 72%);
 
-  /* Semantic Status Colors */
   --color-warn: hsl(40, 70%, 60%);
   --color-error: hsl(0, 55%, 62%);
 
-  /* Borders & Dividers */
-  --color-border: hsl(20, 10%, 18%);
-  --color-border-subtle: hsl(20, 8%, 14%);
+  --color-border: hsl(var(--hue), 10%, 18%);
+  --color-border-subtle: hsl(var(--hue), 8%, 14%);
 
-  /* Shadows */
   --shadow-color: rgba(10, 5, 0, 0.6);
 
-  /* Code block colors — dark mode distinct tones */
-  --color-code-bg: hsl(20, 10%, 11%);
-  --color-code-border: hsl(20, 8%, 16%);
-  --color-code-header-bg: hsl(20, 8%, 14%);
-  --color-code-inline-bg: hsl(20, 10%, 14%);
+  --color-code-bg: hsl(var(--hue), 10%, 11%);
+  --color-code-border: hsl(var(--hue), 8%, 16%);
+  --color-code-header-bg: hsl(var(--hue), 8%, 14%);
+  --color-code-inline-bg: hsl(var(--hue), 10%, 14%);
   --color-code-inline-text: hsl(180, 20%, 72%);
-  --color-code-inline-border: hsl(20, 8%, 18%);
+  --color-code-inline-border: hsl(var(--hue), 8%, 18%);
 }
 
 /* ==========================================================================

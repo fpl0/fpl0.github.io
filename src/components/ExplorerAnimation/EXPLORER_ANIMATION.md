@@ -113,19 +113,19 @@ Prevents unbounded memory growth. Separate limits for desktop and mobile:
 
 ## Spawn System
 
-Distance-based interval spawning. Each entity type has a `SpawnTracker` with `nextSpawnAt` (world-space threshold), `minInterval`, and `maxInterval`.
+Distance-based interval spawning driven by a static `SPAWN_CFG` tuple array (`[SpawnType, startMultiplier, minInterval, maxInterval][]`). Each entity type has a spawner record with `next` (world-space threshold), `min`, and `max` intervals built programmatically from this config.
 
-On each frame, `trySpawn()` checks: has the world-space right edge (`worldOffset + width`) passed `nextSpawnAt`? If yes and the cap isn't full, spawn the entity at screen position `width + rand(20, 80)` (just off the right edge), then advance `nextSpawnAt` by a random interval.
+On each frame, `trySpawn()` checks: has the world-space right edge (`worldOffset + width`) passed `next`? If yes and the cap isn't full, spawn the entity at screen position `width + rand(20, 80)` (just off the right edge), then advance `next` by a random interval.
 
-A static `SPAWN_TYPES` array is iterated each frame instead of calling `Object.keys()`.
+A static `TYPES` array (derived from `SPAWN_CFG`) is iterated each frame instead of calling `Object.keys()`.
 
 ### Busy initial scene
 
 The animation starts with a fully populated scene rather than building up from empty. Three seed functions distribute entities evenly using slot-based placement (avoiding clustering):
 
-- `seedSkyEntities()`: 14–20 stars (evenly distributed across horizontal slots), 3–4 clouds (spaced in horizontal bands), 1 balloon
+- `seedSky()`: 14–20 stars (evenly distributed across horizontal slots), 3–4 clouds (spaced in horizontal bands), 1 balloon
 - `seedBirds()`: 1 solo bird (left side) + 1 small V-formation (right side)
-- `seedGroundEntities()`: 2 mountain clusters (left third + right third), 8–12 grass tufts, 4–6 pebbles (all slot-distributed with random jitter)
+- `seedGround()`: 2 mountain clusters (left third + right third), 8–12 grass tufts, 4–6 pebbles (all slot-distributed with random jitter)
 
 ### Staggered rare appearances
 
@@ -143,7 +143,7 @@ Mobile uses a 1.5x spawn interval multiplier.
 
 ### Mountains
 
-Mountains spawn as **clusters** (3–5 peaks). Peak heights follow a center-weighted distribution: peaks near the cluster center are taller (55–165px) than edge peaks, capped to 85% of ground Y so peaks stay within the visible canvas on smaller screens. Within a cluster, peaks are sorted tallest-first so shorter mountains draw in front, creating depth. Each peak stores randomized quadratic Bezier control point offsets for natural-looking ridgelines.
+Mountains spawn as **clusters** (3–5 peaks). Peak heights follow a center-weighted distribution: peaks near the cluster center are taller (55–165px) than edge peaks, capped to 85% of ground Y so peaks stay within the visible canvas on smaller screens. Within a cluster, peaks are sorted tallest-first so shorter mountains draw in front, creating depth. Each peak's shape is baked into a `Path2D` at creation time (`buildMountainPath()`), eliminating per-frame path reconstruction. Drawing uses `ctx.translate()` + `ctx.fill(path)` / `ctx.stroke(path)`.
 
 ### Birds
 
@@ -283,7 +283,9 @@ Solid fill with `--color-text-muted` at 0.7 alpha. No face (no eye, no mouth). M
 
 ## Culling
 
-Generic `cullPool()` function iterates forward through each pool. Dead entities (off-screen left or type-specific conditions like meteor `life <= 0`) are removed via swap-and-pop: the dead entity is swapped with the last active element and `count` is decremented. O(1) per removal instead of O(n) `splice()`.
+Generic `cull()` function iterates forward through each array. Dead entities (off-screen left by >200px, or type-specific conditions like meteor `life <= 0`) are removed via swap-and-pop: the dead entity is swapped with the last element and the array is `.pop()`'d. O(1) per removal instead of O(n) `splice()`.
+
+Removed entities are pushed to the corresponding free list for object recycling (see Entity System above).
 
 Entities are never culled from the right — they enter from the right edge and exit left.
 
@@ -291,15 +293,37 @@ Entities are never culled from the right — they enter from the right edge and 
 
 ## Performance
 
-- **Per-type entity pools**: O(1) count checks, O(1) swap-and-pop removal, zero type filtering in draw loops
-- **Static spawn type array**: No `Object.keys()` allocation per frame
-- **Direct switch dispatch**: `spawnEntity()` uses switch instead of allocating a `creators` record
+### Zero-cost off-screen
+
+The RAF loop **stops entirely** when the canvas is not intersecting the viewport (IntersectionObserver). No callbacks are scheduled, no CPU is consumed. When visibility resumes, the loop restarts with a fresh `lastTime` to avoid delta-time spikes.
+
+### Object pooling
+
+Culled entities are recycled via per-type free lists. `createX()` functions check `freeLists[type].pop()` before allocating, reinitialize all mutable fields on the recycled object, and return it. This eliminates all GC pressure from entity lifecycle during steady-state animation.
+
+### Cached Path2D shapes
+
+Mountains and clouds build their `Path2D` at creation time (once per entity lifetime). Drawing uses `ctx.save(); ctx.translate(x, y); ctx.fill(path); ctx.restore()` — no per-frame path reconstruction.
+
+### Batched draw calls
+
+- **Stars**: Visible stars are collected into a pre-allocated `Float64Array` buffer, then grouped into 5 alpha buckets. Each bucket is drawn as a single `beginPath` / `fill` cycle (5 draw calls instead of ~30).
+- **Pebbles**: Non-edge pebbles (identical alpha) are batched into a single `fill` call. Only the ~0-2 edge-fading pebbles are drawn individually.
+- **Grass tufts**: Same batch/individual split as pebbles, using a single `stroke` for all non-edge tufts.
+- **Stickman**: 2 draw calls (head circle + body/limbs composite path) instead of 7.
+
+### Gradient-free meteors
+
+Meteor tails use two overlapping strokes at different alpha/length (full-length at 0.4x alpha + half-length at 0.8x alpha) instead of `createLinearGradient()`. This eliminates per-frame gradient object allocation (~120 objects/sec with 2 meteors at 60fps).
+
+### General
+
+- **Per-type entity arrays**: O(1) swap-and-pop removal, zero type filtering in draw loops
+- **Static spawn config**: `SPAWN_CFG` tuple array + derived `TYPES` array, no `Object.keys()` per frame
 - **Delta-time movement**: frame-rate independent, dt capped at 100ms to prevent teleportation after tab-switch
-- **Visibility gating**: RAF loop runs continuously but `update()`/`draw()` are skipped when the canvas is not intersecting the viewport
-- **Entity caps**: bounded memory regardless of session length
+- **Entity caps**: bounded memory regardless of session length (~96 entities max on desktop, ~6KB total)
 - **Mobile adjustments**: 1.5x spawn intervals, reduced entity caps
-- **No allocations in hot path**: entity updates mutate in place, no object creation per frame
-- **Batched stickman rendering**: 2 draw calls (head + body/limbs composite path) instead of 7
+- **No allocations in hot path**: entity updates mutate in place, star bucketing uses pre-allocated `Float64Array` buffers
 - **Single canvas context**: no offscreen buffers or layered canvases
 
 ---
@@ -309,7 +333,7 @@ Entities are never culled from the right — they enter from the right edge and 
 When `prefers-reduced-motion: reduce` is active:
 
 - `update()` is a no-op (no animation, no wind)
-- `populateInitialScene()` seeds a static scenic composition with the same busy initial scene
+- `seed()` re-populates a static scenic composition with the same busy initial scene
 - `draw()` still renders for theme changes
 - Stickman stands in natural pose with slight knee bend, arms at sides
 

@@ -51,7 +51,7 @@
 ## Code Quality
 
 - **Clean & Concise**: Write minimal, efficient code.
-- **DRY**: Extract common logic and styles into reusable components or global CSS variables. Use `getPublishedPosts()` from `src/utils/posts.ts` for post fetching and `getPublishedApps()` from `src/utils/apps.ts` for app fetching — never duplicate the filter/sort logic. Use `getFeedItems()` from `src/utils/feed.ts` for the mixed chronological feed.
+- **DRY**: Extract common logic and styles into reusable components or global CSS variables. Use `getPublishedPosts()` from `src/utils/posts.ts` for post fetching and `getPublishedApps()` from `src/utils/apps.ts` for app fetching — never duplicate the filter/sort logic. Use `getFeedItems()` from `src/utils/feed.ts` for the mixed chronological feed. Render items using the unified `EntryCard.astro`.
 - **Pre-commit hook**: A git pre-commit hook runs `bun run check` automatically. CI does not run checks — it only builds and deploys.
 - **Linting**: Biome enforces consistent style. Run `bun run format` to auto-fix.
 - **CSS**: Keep it clean, organized, and specifically targeted. Prefer standard CSS features over heavy abstractions. Use global CSS variables from `src/styles/global.css` for colors, fonts, and spacing. Responsive design must work flawlessly on all devices.
@@ -62,15 +62,13 @@
 
 This is the **single source of truth** for visual identity. Every UI element, component, and page MUST adhere to these specifications. Do not deviate. Do not improvise.
 
-### Recent Refinements (2026-02-12)
+### Geometric Engine (2026-02-14)
 
-The design system underwent a comprehensive token-based refinement to ensure consistency and maintainability:
+The system now uses a mathematically derived engine for all spacing and typography to ensure perfect harmonic proportions:
 
-1. **Token Scales**: Added border-radius (6 tokens), shadows (4 tokens), z-index (8 tokens), transition easing/duration (5 tokens), and content-width (2 tokens) to eliminate hardcoded values
-2. **Color Hierarchy**: Improved perceptual distinction between `--color-text-secondary` and `--color-text-muted` in both themes
-3. **Dark Mode Code Blocks**: Added 6 dedicated code tokens to create visual distinction from page background
-4. **Typography**: Standardized Merriweather to `font-weight: 400` in both themes; fixed ordered list alignment with `list-style-position: outside`
-5. **Reduced Motion**: Replaced blanket animation/transition disabling with targeted approach that preserves color/opacity transitions while disabling motion
+1. **Modular Spacing Engine**: All spacing is derived from a base grid (`--grid: 4px`). Tokens (`--space-1` to `--space-140`) are multiples of this grid using `calc()`.
+2. **Fluid Harmonic Type Scale**: Headings are derived using a strict **Minor Third (1.2)** ratio (`--font-ratio`) against the base font size.
+3. **Color Synthesis**: Themes are built around master hues (`--hue`) with logical HSL offsets, ensuring chromatic consistency across all surfaces.
 
 ### Typography
 
@@ -239,9 +237,9 @@ Use token variables for all z-index layering:
 
 #### Margin Patterns
 
-- **Headings**: `margin-top: 3rem`, `margin-bottom: 1rem`
-- **Paragraphs**: `margin-bottom: 1.5em` (Strict Density)
-- **Code blocks / Figures**: `margin: 2.5rem 0`
+- **Headings**: `var(--space-12)` (H1), `var(--space-10)` (H2), `var(--space-8)` (H3)
+- **Paragraphs**: `margin-bottom: var(--space-6)` (Strict Density)
+- **Code blocks / Figures**: `margin: var(--space-10) 0`
 
 ### Component Patterns
 

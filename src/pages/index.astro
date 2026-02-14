@@ -7,10 +7,9 @@ import Layout from "../layouts/Layout.astro";
 import "../styles/home.css";
 import "../styles/apps.css";
 
-import AppCard from "../components/AppCard.astro";
 import ExplorerAnimation from "../components/ExplorerAnimation/ExplorerAnimation.astro";
 import PageHeader from "../components/PageHeader.astro";
-import PostCard from "../components/PostCard.astro";
+import EntryCard from "../components/EntryCard.astro";
 import { getFeedItems } from "../utils/feed";
 
 const feedItems = await getFeedItems();
@@ -26,13 +25,9 @@ const feedItems = await getFeedItems();
     {feedItems.length > 0 ? (
       <section class="archive">
         <ul class="post-list">
-          {feedItems.map((item) =>
-            item.type === "post" ? (
-              <PostCard post={item.entry} />
-            ) : (
-              <AppCard app={item.entry} />
-            )
-          )}
+          {feedItems.map((item) => (
+            <EntryCard entry={item.entry} />
+          ))}
         </ul>
       </section>
     ) : (
