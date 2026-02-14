@@ -10,9 +10,10 @@
   left: 0;
   right: 0;
   z-index: var(--z-sticky);
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(var(--space-36), 1fr) auto minmax(var(--space-36), 1fr);
+  gap: var(--space-4);
   align-items: center;
-  justify-content: space-between;
   height: var(--space-12);
   padding: 0 var(--space-5);
   background: color-mix(in srgb, var(--color-bg) 80%, transparent);
@@ -22,6 +23,7 @@
   transition:
     background var(--duration-normal) var(--ease-out),
     border-color var(--duration-normal) var(--ease-out);
+  container-type: inline-size;
 }
 
 .app-shell-nav {
@@ -31,6 +33,7 @@
   font-family: var(--font-mono-brand);
   font-size: var(--font-size-xxs);
   letter-spacing: var(--letter-spacing-loose);
+  justify-self: start;
 }
 
 .app-shell-link {
@@ -46,9 +49,7 @@
 }
 
 .app-shell-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  justify-self: center;
   font-family: var(--font-mono-brand);
   font-size: var(--font-size-xxs);
   letter-spacing: var(--letter-spacing-loose);
@@ -57,14 +58,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 50%;
-  pointer-events: none;
-  cursor: default;
+  max-width: 45cqi; /* Dynamically constrained relative to header size */
   transition: color var(--duration-normal) var(--ease-out);
+  display: inline-block;
 }
 
 .app-shell-title:hover {
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
   text-decoration: none;
   background: none;
 }
@@ -106,7 +106,7 @@
   font-size: var(--font-size-label);
   padding: var(--space-1) var(--space-2);
   background: var(--color-surface);
-  border: var(--space-px) solid var(--color-border);
+  border: var(--ui-border);
   border-radius: var(--radius-sm);
   color: var(--color-muted);
 }
@@ -117,6 +117,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  justify-self: end;
 }
 
 .app-shell-content {
@@ -134,6 +135,8 @@
   /* @breakpoint-mobile */
   .app-shell-bar {
     padding: 0 var(--space-4);
+    display: flex;
+    justify-content: space-between;
   }
 
   .app-shell-nav {
@@ -141,8 +144,7 @@
   }
 
   .app-shell-title {
-    position: static;
-    transform: none;
+    justify-self: auto;
     max-width: 60%;
     pointer-events: auto;
     cursor: pointer;
