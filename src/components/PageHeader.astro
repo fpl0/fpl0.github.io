@@ -12,6 +12,7 @@
  */
 
 import Logo from "./Logo.astro";
+import Link from "./Link.astro";
 
 const pathname = Astro.url.pathname;
 const isAbout = pathname === "/about" || pathname === "/about/";
@@ -20,13 +21,13 @@ const isTags = pathname.startsWith("/tags");
 
 <header class="site-header">
   <div class="site-header-bar">
-    <a href="/" class="site-header-brand" data-astro-prefetch="hover">
+    <Link href="/" class="site-header-brand">
       <Logo text="fpl0" as="span" />
-    </a>
+    </Link>
     <nav class="site-nav" aria-label="Main navigation">
-      <a href="/about" aria-current={isAbout ? "page" : undefined}>about</a>
+      <Link href="/about" aria-current={isAbout ? "page" : undefined} variant="muted">about</Link>
       <span class="site-nav-sep">/</span>
-      <a href="/tags/" aria-current={isTags ? "page" : undefined}>tags</a>
+      <Link href="/tags/" aria-current={isTags ? "page" : undefined} variant="muted">tags</Link>
       <span class="site-nav-sep">/</span>
       <button
         class="site-nav-search"

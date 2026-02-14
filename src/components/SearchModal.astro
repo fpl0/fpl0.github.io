@@ -9,6 +9,7 @@
  * - Debounced search for performance
  */
 import "../styles/search-modal.css";
+import Link from "./Link.astro";
 
 // Build-time cache buster so browsers fetch fresh search data after each deploy
 const searchCacheBuster = Date.now().toString(36);
@@ -51,9 +52,9 @@ const searchCacheBuster = Date.now().toString(36);
     </div>
     <div class="search-footer">
       <nav class="search-footer-nav" aria-label="Quick links">
-        <a href="/">home</a>
+        <Link href="/">home</Link>
         <span class="search-footer-sep">/</span>
-        <a href="/tags/">tags</a>
+        <Link href="/tags/">tags</Link>
       </nav>
       <div class="search-footer-hint">
         <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
@@ -190,7 +191,8 @@ const searchCacheBuster = Date.now().toString(36);
              class="search-result ${isSelected ? "is-selected" : ""}" 
              data-index="${i}" 
              role="option" 
-             aria-selected="${isSelected}">
+             aria-selected="${isSelected}"
+             data-astro-prefetch="hover">
             <div class="search-result-title">${escapeHtml(item.title)}${item.type === "app" ? '<span class="search-result-type">app</span>' : ""}</div>
             <div class="search-result-meta">
               <span class="search-result-summary">${escapeHtml(item.summary)}</span>

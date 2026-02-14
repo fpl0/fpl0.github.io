@@ -15,6 +15,7 @@ import "../styles/global.css";
 import "../styles/app-shell.css";
 
 import BaseHead from "../components/BaseHead.astro";
+import Link from "../components/Link.astro";
 import SearchModal from "../components/SearchModal.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
 
@@ -34,12 +35,12 @@ const { title, description = "An interactive app on fpl0's blog." } = Astro.prop
 	<body class="app-shell-body">
 		<header class="app-shell-bar">
 			<nav class="app-shell-nav" aria-label="App navigation">
-				<a href="/" class="app-shell-link" data-astro-prefetch="hover"><span class="app-shell-back" aria-hidden="true">&larr;</span> fpl0</a>
+				<Link href="/" class="app-shell-link"><span class="app-shell-back" aria-hidden="true">&larr;</span> fpl0</Link>
 			</nav>
-			<a href="/" class="app-shell-title" data-astro-prefetch="hover">
+			<Link href="/" class="app-shell-title">
 				<span class="app-shell-title-back" aria-hidden="true">&larr;</span>
 				{title}
-			</a>
+			</Link>
 			<div class="app-shell-right">
 				<button
 					class="app-shell-search"

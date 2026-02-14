@@ -8,6 +8,8 @@
  * - AbortController for proper cleanup
  */
 
+import Link from "./Link.astro";
+
 interface HeadingItem {
   depth: number;
   slug: string;
@@ -34,9 +36,9 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
               class={`toc-item toc-item--${heading.depth === 2 ? "h2" : "h3"}`}
               data-heading={heading.slug}
             >
-              <a href={`#${heading.slug}`} class="toc-link">
+              <Link href={`#${heading.slug}`} class="toc-link" prefetch={false}>
                 {heading.text}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

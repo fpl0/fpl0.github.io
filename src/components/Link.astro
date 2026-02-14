@@ -1,0 +1,63 @@
+---
+/**
+ * Link - Unified link component
+ *
+ * Features:
+ * - Automatic external detection (rel="noopener noreferrer")
+ * - Integrated prefetching for internal links
+ * - Semantic variant styling (default, muted, brand, back)
+ * - Physical hysteresis hover dynamics
+ */
+
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"a"> {
+  href: string;
+  variant?: "default" | "muted" | "brand" | "back" | "tag";
+  prefetch?: "hover" | "tap" | "viewport" | boolean;
+}
+
+const { href, variant = "default", class: className, prefetch = "hover", ...rest } = Astro.props;
+
+const isExternal = href.startsWith("http") || href.startsWith("//");
+const rel = isExternal ? "noopener noreferrer" : undefined;
+const target = isExternal ? "_blank" : undefined;
+
+// Map variants to CSS classes
+const variantClasses = {
+  default: "",
+  muted: "link-muted",
+  brand: "link-brand",
+  back: "back-link",
+  tag: "tag-link",
+};
+
+const classes = [variantClasses[variant], className].filter(Boolean).join(" ");
+---
+
+<a
+  href={href}
+  class={classes}
+  rel={rel}
+  target={target}
+  data-astro-prefetch={!isExternal ? prefetch : undefined}
+  {...rest}
+><slot /></a>
+
+<style>
+  /* Standard link styles are in global.css, but variants live here */
+  .link-muted {
+    color: var(--color-text-muted);
+    text-decoration-color: var(--color-border);
+  }
+
+  .link-brand {
+    color: var(--color-primary);
+    font-family: var(--font-mono-brand);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* .back-link and .tag-link styles are already in global.css or tags.css, 
+     but we ensure they behave consistently here if needed. */
+</style>

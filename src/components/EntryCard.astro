@@ -8,6 +8,7 @@
 
 import type { CollectionEntry } from "astro:content";
 import FormattedDate from "./FormattedDate.astro";
+import Link from "./Link.astro";
 
 interface Props {
   entry: CollectionEntry<"blog"> | CollectionEntry<"apps">;
@@ -21,18 +22,18 @@ const url = `/${collection}/${entry.slug}/`;
 <li class="post-item">
   <FormattedDate date={entry.data.date} className="post-date" />
   <div class="post-content">
-    <a href={url} class="post-title" data-astro-prefetch="hover">
+    <Link href={url} class="post-title">
       {entry.data.title}
-    </a>
+    </Link>
     <p class="post-summary">{entry.data.summary}</p>
     <div class="post-tags">
       {collection === "apps" && (
-        <a href="/tags/app/" class="app-tag">app</a>
+        <Link href="/tags/app/" class="app-tag">app</Link>
       )}
       {entry.data.tags
         .filter((tag: string) => collection !== "apps" || tag !== "app")
         .map((tag: string) => (
-          <a href={`/tags/${tag}/`} class="tag-link">{tag}</a>
+          <Link href={`/tags/${tag}/`} variant="tag">{tag}</Link>
         ))
       }
     </div>

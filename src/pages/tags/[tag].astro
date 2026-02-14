@@ -5,10 +5,10 @@
 
 import PageHeader from "../../components/PageHeader.astro";
 import EntryCard from "../../components/EntryCard.astro";
+import Link from "../../components/Link.astro";
 import Layout from "../../layouts/Layout.astro";
-import { getPublishedApps } from "../../utils/content";
+import { getPublishedApps, getPublishedPosts } from "../../utils/content";
 import type { FeedItem } from "../../utils/content";
-import { getPublishedPosts } from "../../utils/content";
 import "../../styles/home.css";
 import "../../styles/apps.css";
 
@@ -52,7 +52,7 @@ const { tag, items } = Astro.props;
   <PageHeader />
 
   <main id="main-content" class="home-main">
-    <a href="/tags/" class="tag-back-link">&larr; all tags</a>
+    <Link href="/tags/" class="tag-back-link" variant="muted">&larr; all tags</Link>
     <h1 class="tag-page-title">#{tag}</h1>
     <section class="archive">
       <ul class="post-list">

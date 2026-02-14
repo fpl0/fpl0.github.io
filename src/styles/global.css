@@ -170,6 +170,9 @@
   --font-size-label: 0.75rem;
   --font-size-micro: 0.7rem;
 
+  /* Typography Orchestration (Advanced OpenType) */
+  --font-settings: "cv05" 1, "kern" 1, "liga" 1, "tnum" 1;
+
   /* Line Heights (Tschichold Harmonic Inverse Scale) */
   --lh-ratio: 1.1;
   --line-height-tight: var(--lh-ratio);
@@ -179,49 +182,50 @@
   --line-height-relaxed: calc(var(--lh-ratio) + 0.5);
   --line-height-loose: calc(var(--lh-ratio) + 0.6);
 
-  /* --- Color Synthesis (Hue: 45 Gold/Cream) --- */
-  --hue: 45;
-  --color-bg: hsl(var(--hue), 40%, 96%);
-  --color-surface: hsl(var(--hue), 30%, 92%);
-  --color-surface-raised: hsl(var(--hue), 25%, 88%);
-  --color-highlight: hsl(var(--hue), 45%, 90%);
+  /* --- Color Synthesis (OKLCH Perceptual Field) --- */
+  /* Master Hue: 85 (Amber/Gold in OKLCH) */
+  --hue: 85;
+  --color-bg: oklch(0.97 0.015 var(--hue));
+  --color-surface: oklch(0.94 0.02 var(--hue));
+  --color-surface-raised: oklch(0.91 0.025 var(--hue));
+  --color-highlight: oklch(0.92 0.04 var(--hue));
 
-  /* Text Hierarchy (Derived from master hue or harmonious offsets) */
-  --text-hue: 25;
-  --color-text: hsl(var(--text-hue), 30%, 18%);
-  --color-text-secondary: hsl(var(--text-hue), 25%, 28%);
-  --color-text-muted: hsl(var(--text-hue), 20%, 38%);
+  /* Text Hierarchy (Perceptually Uniform Sepia) */
+  --text-hue: 45; /* Slightly warmer for text */
+  --color-text: oklch(0.25 0.03 var(--text-hue));
+  --color-text-secondary: oklch(0.45 0.02 var(--text-hue));
+  --color-text-muted: oklch(0.55 0.015 var(--text-hue));
 
-  /* Primary Accent */
-  --color-primary: hsl(28, 80%, 38%);
-  --color-primary-dim: hsl(28, 60%, 48%);
-  --color-accent-cool: hsl(180, 30%, 35%);
+  /* Primary Accent (Cognac) */
+  --color-primary: oklch(0.55 0.12 55);
+  --color-primary-dim: oklch(0.65 0.1 55);
+  --color-accent-cool: oklch(0.55 0.08 190);
 
-  --color-warn: hsl(40, 80%, 42%);
-  --color-error: hsl(0, 60%, 45%);
+  --color-warn: oklch(0.65 0.15 80);
+  --color-error: oklch(0.55 0.18 25);
 
-  --color-border: hsl(35, 25%, 82%);
-  --color-border-subtle: hsl(35, 20%, 88%);
+  --color-border: oklch(0.88 0.02 var(--hue));
+  --color-border-subtle: oklch(0.92 0.01 var(--hue));
 
-  --shadow-color: rgba(60, 40, 20, 0.12);
+  --shadow-color: oklch(0.1 0.05 45 / 0.08);
   --shadow-sm: 0 1px 2px 0 var(--shadow-color);
   --shadow-md: 0 4px 6px -1px var(--shadow-color);
   --shadow-lg: 0 10px 15px -3px var(--shadow-color);
   --shadow-xl: 0 25px 50px -12px var(--shadow-color);
 
-  --color-overlay: rgba(20, 12, 5, 0.6);
-  --color-overlay-heavy: rgba(20, 12, 5, 0.9);
-  --color-overlay-text: hsl(45, 40%, 96%);
+  --color-overlay: oklch(0.15 0.05 45 / 0.6);
+  --color-overlay-heavy: oklch(0.1 0.05 45 / 0.9);
+  --color-overlay-text: oklch(0.97 0.015 85);
 
-  --color-code-bg: hsl(40, 30%, 95%);
-  --color-code-border: hsl(35, 25%, 85%);
-  --color-code-header-bg: hsl(40, 25%, 92%);
-  --color-code-inline-bg: hsl(40, 30%, 90%);
-  --color-code-inline-text: hsl(25, 50%, 35%);
-  --color-code-inline-border: hsl(35, 25%, 80%);
+  --color-code-bg: oklch(0.96 0.01 85);
+  --color-code-border: oklch(0.9 0.015 85);
+  --color-code-header-bg: oklch(0.93 0.015 85);
+  --color-code-inline-bg: oklch(0.92 0.02 85);
+  --color-code-inline-text: oklch(0.45 0.1 55);
+  --color-code-inline-border: oklch(0.88 0.02 85);
 
-  --color-selection-bg: hsl(35, 60%, 75%);
-  --color-selection-text: hsl(25, 40%, 15%);
+  --color-selection-bg: oklch(0.85 0.1 85);
+  --color-selection-text: oklch(0.2 0.05 45);
 
   --color-muted: var(--color-text-muted);
 
@@ -299,35 +303,35 @@
 }
 
 [data-theme="dark"] {
-  --hue: 20;
-  --text-hue: 35;
-  --color-bg: hsl(var(--hue), 15%, 8%);
-  --color-surface: hsl(var(--hue), 12%, 12%);
-  --color-surface-raised: hsl(var(--hue), 10%, 16%);
-  --color-highlight: hsl(35, 20%, 14%);
+  --hue: 30;
+  --text-hue: 45;
+  --color-bg: oklch(0.18 0.012 var(--hue));
+  --color-surface: oklch(0.22 0.015 var(--hue));
+  --color-surface-raised: oklch(0.26 0.018 var(--hue));
+  --color-highlight: oklch(0.24 0.03 var(--hue));
 
-  --color-text: hsl(var(--text-hue), 12%, 87%);
-  --color-text-secondary: hsl(var(--text-hue), 10%, 60%);
-  --color-text-muted: hsl(var(--text-hue), 6%, 52%);
+  --color-text: oklch(0.92 0.015 var(--text-hue));
+  --color-text-secondary: oklch(0.75 0.01 var(--text-hue));
+  --color-text-muted: oklch(0.6 0.008 var(--text-hue));
 
-  --color-primary: hsl(42, 52%, 76%);
-  --color-primary-dim: hsl(42, 35%, 58%);
-  --color-accent-cool: hsl(180, 20%, 72%);
+  --color-primary: oklch(0.88 0.06 85);
+  --color-primary-dim: oklch(0.75 0.05 85);
+  --color-accent-cool: oklch(0.85 0.04 190);
 
-  --color-warn: hsl(40, 70%, 60%);
-  --color-error: hsl(0, 55%, 62%);
+  --color-warn: oklch(0.8 0.1 80);
+  --color-error: oklch(0.7 0.12 25);
 
-  --color-border: hsl(var(--hue), 10%, 18%);
-  --color-border-subtle: hsl(var(--hue), 8%, 14%);
+  --color-border: oklch(0.28 0.02 var(--hue));
+  --color-border-subtle: oklch(0.24 0.015 var(--hue));
 
-  --shadow-color: rgba(10, 5, 0, 0.6);
+  --shadow-color: oklch(0.05 0.01 30 / 0.6);
 
-  --color-code-bg: hsl(var(--hue), 10%, 11%);
-  --color-code-border: hsl(var(--hue), 8%, 16%);
-  --color-code-header-bg: hsl(var(--hue), 8%, 14%);
-  --color-code-inline-bg: hsl(var(--hue), 10%, 14%);
-  --color-code-inline-text: hsl(180, 20%, 72%);
-  --color-code-inline-border: hsl(var(--hue), 8%, 18%);
+  --color-code-bg: oklch(0.2 0.012 var(--hue));
+  --color-code-border: oklch(0.25 0.015 var(--hue));
+  --color-code-header-bg: oklch(0.23 0.015 var(--hue));
+  --color-code-inline-bg: oklch(0.24 0.015 var(--hue));
+  --color-code-inline-text: oklch(0.85 0.04 190);
+  --color-code-inline-border: oklch(0.28 0.015 var(--hue));
 }
 
 /* ==========================================================================
@@ -441,6 +445,7 @@ body {
   font-family: var(--font-sans);
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
+  font-feature-settings: var(--font-settings);
   background-color: var(--color-bg);
   color: var(--color-text);
   max-width: var(--content-width);
@@ -451,7 +456,6 @@ body {
   text-rendering: optimizeLegibility;
   font-variant-ligatures: common-ligatures contextual;
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "cv05" 1; /* Inter: disambiguated lowercase L */
 }
 
 @media (max-width: 600px) {

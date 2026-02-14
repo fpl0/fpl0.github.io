@@ -3,6 +3,7 @@
  * About Page - Personal introduction and social links
  */
 
+import Link from "../components/Link.astro";
 import PageHeader from "../components/PageHeader.astro";
 import Layout from "../layouts/Layout.astro";
 import "../styles/about.css";
@@ -31,20 +32,17 @@ const description = "Engineering lead based in Dublin, endlessly curious.";
     <section class="details">
       <h2 class="section-title">Connect</h2>
       <div class="connect-links">
-        <a
+        <Link
           href="https://github.com/fpl0"
-          target="_blank"
-          rel="me noopener noreferrer"
-          class="connect-link">GitHub</a
-        >
-        <a href="mailto:me@fpl0.io" rel="me" class="connect-link">Email</a>
+          class="connect-link">GitHub</Link>
+        <Link href="mailto:me@fpl0.io" class="connect-link">Email</Link>
       </div>
     </section>
 
     <section class="details">
       <h2 class="section-title">Explore</h2>
       <div class="connect-links">
-        <a href="/" class="connect-link">Blog</a>
+        <Link href="/" class="connect-link">Blog</Link>
       </div>
     </section>
   </main>

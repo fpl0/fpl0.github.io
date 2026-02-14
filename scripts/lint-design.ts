@@ -372,7 +372,7 @@ function checkColor(prop: string, value: string): { raw: string; suggestion: str
     return null;
 
   // Flag raw color functions
-  if (/hsla?\(/.test(v) || /rgba?\(/.test(v)) {
+  if (/oklch?\(/.test(v) || /hsla?\(/.test(v) || /rgba?\(/.test(v)) {
     return {
       raw: `${prop}: ${v}`,
       suggestion: "var(--color-*)",

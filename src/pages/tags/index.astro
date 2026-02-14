@@ -3,10 +3,10 @@
  * Tag Index Page - Lists all tags with counts from posts and apps
  */
 
+import Link from "../../components/Link.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import Layout from "../../layouts/Layout.astro";
-import { getPublishedApps } from "../../utils/content";
-import { getPublishedPosts } from "../../utils/content";
+import { getPublishedApps, getPublishedPosts } from "../../utils/content";
 import "../../styles/tags.css";
 
 const [posts, apps] = await Promise.all([getPublishedPosts(), getPublishedApps()]);
@@ -34,10 +34,10 @@ const sortedTags = [...tagCounts.entries()].sort((a, b) => a[0].localeCompare(b[
     {sortedTags.length > 0 ? (
       <div class="tags-grid">
         {sortedTags.map(([tag, count]) => (
-          <a href={`/tags/${tag}/`} class="tag-card">
+          <Link href={`/tags/${tag}/`} class="tag-card">
             <span class="tag-card-name">{tag}</span>
             <span class="tag-card-count">{count}</span>
-          </a>
+          </Link>
         ))}
       </div>
     ) : (

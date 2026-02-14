@@ -16,6 +16,7 @@ import BlogPostSchema from "../../components/BlogPostSchema.astro";
 import CodeCopyButton from "../../components/CodeCopyButton.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
 import ImageLightbox from "../../components/ImageLightbox.astro";
+import Link from "../../components/Link.astro";
 import MermaidDiagram from "../../components/MermaidDiagram.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import PostNavigation from "../../components/PostNavigation.astro";
@@ -78,7 +79,7 @@ const canonicalURL = new URL(`/blog/${post.slug}/`, Astro.site);
           {post.data.tags.length > 0 && (
             <div class="post-tags">
               {post.data.tags.map((tag: string) => (
-                <a href={`/tags/${tag}/`} class="tag-link">{tag}</a>
+                <Link href={`/tags/${tag}/`} variant="tag">{tag}</Link>
               ))}
             </div>
           )}
