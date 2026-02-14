@@ -48,7 +48,7 @@
   margin: 0;
   position: relative;
   /* Extremely subtle border */
-  border-left: 1px solid var(--color-border-subtle);
+  border-left: var(--space-px) solid var(--color-border-subtle);
 }
 
 .toc-item {
@@ -60,8 +60,8 @@
 .toc-link {
   display: block;
   text-decoration: none;
-  margin-left: -1px;
-  border-left: 2px solid transparent;
+  margin-left: calc(var(--space-px) * -1);
+  border-left: var(--space-0-5) solid transparent;
   transition: all var(--duration-normal) var(--ease-out);
 }
 

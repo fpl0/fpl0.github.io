@@ -1,130 +1,4 @@
-/**
- * Explorer Animation Engine
- *
- * Procedurally generated walking scene: a stickman traverses an ever-expanding
- * landscape of mountains, clouds, birds, stars, and rare surprises.
- * Pure TypeScript — no DOM dependencies beyond the CanvasRenderingContext2D.
- *
- * v2 — Per-type entity pools, biomechanical walk cycle, wind system,
- * atmospheric perspective, Bezier mountains, ground details.
- */
-
-/* =========================================================================
-   Types
-   ========================================================================= */
-
-interface Pool<T> {
-  items: T[];
-  count: number;
-}
-
-interface BaseEntity {
-  worldX: number;
-  y: number;
-  parallax: number;
-}
-
-interface StarEntity extends BaseEntity {
-  size: number;
-  twinkleOffset: number;
-  twinkleSpeed: number;
-}
-
-interface CloudEntity extends BaseEntity {
-  circles: Array<{ dx: number; dy: number; r: number }>;
-  driftSpeed: number;
-  baseOpacity: number;
-}
-
-interface MountainEntity extends BaseEntity {
-  peakHeight: number;
-  leftWidth: number;
-  rightWidth: number;
-  ctrlLeftDx: number;
-  ctrlLeftDy: number;
-  ctrlRightDx: number;
-  ctrlRightDy: number;
-}
-
-interface BirdEntity extends BaseEntity {
-  velocity: number;
-  flapPhase: number;
-  wingspan: number;
-  formationOffsetX: number;
-  formationOffsetY: number;
-}
-
-interface UfoEntity extends BaseEntity {
-  size: number;
-  hoverPhase: number;
-  hasTractorBeam: boolean;
-}
-
-interface MeteorEntity extends BaseEntity {
-  angle: number;
-  speed: number;
-  life: number;
-  maxLife: number;
-  tailLen: number;
-}
-
-interface BalloonEntity extends BaseEntity {
-  size: number;
-  driftSpeed: number;
-  swayPhase: number;
-}
-
-interface WhaleEntity extends BaseEntity {
-  size: number;
-  velocity: number;
-  bobPhase: number;
-}
-
-interface GrassTuftEntity extends BaseEntity {
-  bladeCount: number;
-  bladeHeight: number;
-  bladeAngles: number[];
-}
-
-interface JellyfishEntity extends BaseEntity {
-  size: number;
-  pulsePhase: number;
-  driftSpeed: number;
-  tentacleCount: number;
-  tentaclePhases: number[];
-}
-
-interface PebbleEntity extends BaseEntity {
-  radius: number;
-}
-
-type SpawnType =
-  | "star"
-  | "cloud"
-  | "mountain"
-  | "bird"
-  | "ufo"
-  | "meteor"
-  | "balloon"
-  | "whale"
-  | "jellyfish"
-  | "grassTuft"
-  | "pebble";
-
-interface SpawnTracker {
-  nextSpawnAt: number;
-  minInterval: number;
-  maxInterval: number;
-}
-
-interface CachedColors {
-  bg: string;
-  text: string;
-  textMuted: string;
-  primary: string;
-  border: string;
-  surface: string;
-}
+/** Explorer Animation Engine — procedural walking scene. */
 
 export interface ExplorerEngineOptions {
   ctx: CanvasRenderingContext2D;
@@ -143,242 +17,149 @@ export interface ExplorerEngine {
   setReducedMotion(enabled: boolean): void;
 }
 
-/* =========================================================================
-   Constants
-   ========================================================================= */
+type SpawnType =
+  | "star"
+  | "cloud"
+  | "mountain"
+  | "bird"
+  | "ufo"
+  | "meteor"
+  | "balloon"
+  | "whale"
+  | "jellyfish"
+  | "grassTuft"
+  | "pebble";
 
-const STICKMAN_SCREEN_X_RATIO = 0.35;
+const SCREEN_X = 0.35;
 const WALK_SPEED = 45;
-const HEAD_RADIUS = 5.5;
-const TORSO_LENGTH = 14;
-const NECK_LENGTH = 3;
-const UPPER_LEG = 8;
-const LOWER_LEG = 7;
-const UPPER_ARM = 6;
-const LOWER_ARM = 5;
-const GROUND_Y_RATIO = 0.8;
+const HEAD_R = 5.5;
+const TORSO = 14;
+const NECK = 3;
+const U_LEG = 8;
+const L_LEG = 7;
+const U_ARM = 6;
+const L_ARM = 5;
+const GROUND_Y = 0.8;
 const MAX_DT = 0.1;
-const FADE_IN_DISTANCE = 60;
+const FADE = 60;
 
-const SPAWN_TYPES: SpawnType[] = [
-  "star",
-  "cloud",
-  "mountain",
-  "bird",
-  "ufo",
-  "meteor",
-  "balloon",
-  "whale",
-  "jellyfish",
-  "grassTuft",
-  "pebble",
+// [type, startMultiplier, minInterval, maxInterval]
+// prettier-ignore
+const SPAWN_CFG: [SpawnType, number, number, number][] = [
+  ["star", 0, 50, 100],
+  ["cloud", 0.4, 180, 350],
+  ["mountain", 0.8, 400, 700],
+  ["bird", 0.5, 200, 400],
+  ["meteor", 0.8, 400, 800],
+  ["balloon", 2.2, 600, 1000],
+  ["ufo", 3, 900, 1800],
+  ["whale", 3.8, 1400, 2500],
+  ["jellyfish", 2.5, 800, 1400],
+  ["grassTuft", 0, 30, 70],
+  ["pebble", 0.2, 40, 90],
+];
+const TYPES = SPAWN_CFG.map((c) => c[0]);
+
+function rand(a: number, b: number): number {
+  return a + Math.random() * (b - a);
+}
+function randInt(a: number, b: number): number {
+  return Math.floor(rand(a, b + 1));
+}
+
+function entityAlpha(screenX: number, parallax: number, w: number, base: number): number {
+  const depth = 0.3 + 0.7 * parallax;
+  const edge = w - screenX;
+  return base * depth * (edge > 0 && edge < FADE ? edge / FADE : 1);
+}
+
+function footPathX(t: number, hs: number): number {
+  if (t < 0.6) return hs * (1 - t / 0.3);
+  const s = (t - 0.6) * 2.5;
+  return hs * (6 * s * s - 4 * s * s * s - 1);
+}
+
+function footLiftY(t: number, max: number): number {
+  return t < 0.6 ? 0 : Math.sin((t - 0.6) * 2.5 * Math.PI) * max;
+}
+
+function legIK(hx: number, hy: number, fx: number, fy: number): [number, number] {
+  const dx = fx - hx;
+  const dy = fy - hy;
+  const d = Math.sqrt(dx * dx + dy * dy);
+  const h = d * 0.5;
+  const b = h < U_LEG ? Math.sqrt(U_LEG ** 2 - h ** 2) : 0;
+  const inv = d > 0.1 ? b / d : 0;
+  return [(hx + fx) * 0.5 + dy * inv, (hy + fy) * 0.5 - dx * inv];
+}
+
+function armFK(
+  shX: number,
+  shY: number,
+  sign: number,
+  phase: number,
+): [number, number, number, number] {
+  const ua = sign * Math.cos(phase - 0.3) * 0.45;
+  const ex = shX + Math.sin(ua) * U_ARM;
+  const ey = shY + Math.cos(ua) * U_ARM;
+  const fa = sign * Math.cos(phase - 0.6) * 0.45 * 0.65;
+  return [ex, ey, ex + Math.sin(fa) * L_ARM, ey + Math.cos(fa) * L_ARM];
+}
+
+// Whale body: start[2] + 12 curves × [cp1x, cp1y, cp1_wag, cp2x, cp2y, cp2_wag, ex, ey, e_wag]
+// prettier-ignore
+const WHALE_BODY = [
+  -0.95, 0.02, -0.92, -0.12, 0, -0.75, -0.32, 0, -0.45, -0.36, 0, -0.15, -0.38, 0, 0.2, -0.34, 0,
+  0.45, -0.26, 0, 0.52, -0.24, 0, 0.55, -0.3, 0, 0.58, -0.24, 0, 0.72, -0.16, 0.25, 0.88, -0.06,
+  0.5, 0.98, -0.02, 0.7, 1.06, -0.04, 0.85, 1.18, -0.18, 1, 1.28, -0.26, 1, 1.3, -0.22, 1, 1.26,
+  -0.14, 0.9, 1.12, -0.04, 0.75, 1.06, 0, 0.7, 1.06, 0.02, 0.7, 1.12, 0.06, 0.75, 1.26, 0.16, 0.9,
+  1.3, 0.24, 1, 1.28, 0.28, 1, 1.18, 0.2, 1, 1.06, 0.08, 0.85, 0.98, 0.04, 0.7, 0.85, 0.1, 0.25,
+  0.65, 0.2, 0, 0.4, 0.28, 0, 0.1, 0.34, 0, -0.25, 0.36, 0, -0.55, 0.3, 0, -0.78, 0.24, 0, -0.92,
+  0.14, 0, -0.95, 0.02, 0,
 ];
 
-type EntityCaps = Record<SpawnType, number>;
+// Whale pectoral fin: start[2] + 2 curves × 9
+// prettier-ignore
+const WHALE_FIN = [
+  -0.3, 0.2, -0.38, 0.32, 0, -0.52, 0.42, 0, -0.62, 0.38, 0, -0.58, 0.32, 0, -0.44, 0.26, 0, -0.3,
+  0.2, 0,
+];
 
-const ENTITY_CAPS: EntityCaps = {
-  star: 30,
-  cloud: 6,
-  mountain: 12,
-  bird: 8,
-  ufo: 3,
-  meteor: 2,
-  balloon: 2,
-  whale: 1,
-  jellyfish: 2,
-  grassTuft: 20,
-  pebble: 10,
-};
-
-const MOBILE_ENTITY_CAPS: EntityCaps = {
-  star: 18,
-  cloud: 4,
-  mountain: 10,
-  bird: 6,
-  ufo: 2,
-  meteor: 1,
-  balloon: 1,
-  whale: 1,
-  jellyfish: 1,
-  grassTuft: 12,
-  pebble: 6,
-};
-
-/* =========================================================================
-   Helpers
-   ========================================================================= */
-
-function rand(min: number, max: number): number {
-  return min + Math.random() * (max - min);
-}
-
-function randInt(min: number, max: number): number {
-  return Math.floor(rand(min, max + 1));
-}
-
-/** Compute atmospheric + edge-fade alpha for an entity. */
-function entityAlpha(
-  screenX: number,
-  parallax: number,
-  canvasWidth: number,
-  baseAlpha: number,
-): number {
-  const depthAlpha = 0.3 + 0.7 * parallax;
-  const distFromRight = canvasWidth - screenX;
-  const edgeFade =
-    distFromRight > 0 && distFromRight < FADE_IN_DISTANCE ? distFromRight / FADE_IN_DISTANCE : 1;
-  return baseAlpha * depthAlpha * edgeFade;
-}
-
-/** Asymmetric walk: 60% stance sliding back on ground, 40% swing arcing forward via smoothstep. */
-function footPathX(t: number, halfStride: number): number {
-  if (t < 0.6) return halfStride * (1 - t / 0.3);
-  const s = (t - 0.6) * 2.5;
-  return halfStride * (6 * s * s - 4 * s * s * s - 1);
-}
-
-/** Foot lift: smooth sine arc during swing phase only, zero during stance. */
-function footLiftY(t: number, maxLift: number): number {
-  if (t < 0.6) return 0;
-  return Math.sin((t - 0.6) * 2.5 * Math.PI) * maxLift;
-}
-
-/* =========================================================================
-   Pool helpers
-   ========================================================================= */
-
-function createPool<T>(capacity: number): Pool<T> {
-  return { items: new Array<T>(capacity), count: 0 };
-}
-
-function poolPush<T>(pool: Pool<T>, item: T): void {
-  if (pool.count < pool.items.length) {
-    pool.items[pool.count] = item;
-  } else {
-    pool.items.push(item);
+function drawBzPath(
+  c: CanvasRenderingContext2D,
+  x: number,
+  cy: number,
+  s: number,
+  tw: number,
+  d: number[],
+): void {
+  const v = (j: number) => d[j] ?? 0;
+  c.beginPath();
+  c.moveTo(x + s * v(0), cy + s * v(1));
+  for (let i = 2; i < d.length; i += 9) {
+    c.bezierCurveTo(
+      x + s * v(i),
+      cy + s * v(i + 1) + tw * v(i + 2),
+      x + s * v(i + 3),
+      cy + s * v(i + 4) + tw * v(i + 5),
+      x + s * v(i + 6),
+      cy + s * v(i + 7) + tw * v(i + 8),
+    );
   }
-  pool.count++;
+  c.closePath();
 }
-
-function poolSwapRemove<T>(pool: Pool<T>, index: number): void {
-  pool.count--;
-  if (index < pool.count) {
-    const last = pool.items[pool.count];
-    if (last !== undefined) {
-      pool.items[index] = last;
-    }
-  }
-}
-
-/* =========================================================================
-   Factory
-   ========================================================================= */
 
 export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEngine {
   const { ctx, getColor, isMobile } = options;
   let { width, height, reducedMotion } = options;
-
-  let baseGroundY = height * GROUND_Y_RATIO;
+  let baseGroundY = height * GROUND_Y;
   let worldOffset = 0;
   let walkPhase = 0;
   let time = 0;
   let wind = 0;
-
-  let colors: CachedColors = readColors();
-  const caps: EntityCaps = isMobile ? MOBILE_ENTITY_CAPS : ENTITY_CAPS;
   const sm = isMobile ? 1.5 : 1;
 
-  /* ----- Entity pools ----- */
-
-  const stars = createPool<StarEntity>(caps.star);
-  const clouds = createPool<CloudEntity>(caps.cloud);
-  const mountains = createPool<MountainEntity>(caps.mountain);
-  const birds = createPool<BirdEntity>(caps.bird);
-  const ufos = createPool<UfoEntity>(caps.ufo);
-  const meteors = createPool<MeteorEntity>(caps.meteor);
-  const balloons = createPool<BalloonEntity>(caps.balloon);
-  const whales = createPool<WhaleEntity>(caps.whale);
-  const jellyfish = createPool<JellyfishEntity>(caps.jellyfish);
-  const grassTufts = createPool<GrassTuftEntity>(caps.grassTuft);
-  const pebbles = createPool<PebbleEntity>(caps.pebble);
-
-  /** Type-erased pool lookup — enables generic iteration over all pools. */
-  // biome-ignore lint/suspicious/noExplicitAny: heterogeneous pool registry requires any
-  const pools: Record<SpawnType, Pool<any>> = {
-    star: stars,
-    cloud: clouds,
-    mountain: mountains,
-    bird: birds,
-    ufo: ufos,
-    meteor: meteors,
-    balloon: balloons,
-    whale: whales,
-    jellyfish,
-    grassTuft: grassTufts,
-    pebble: pebbles,
-  };
-
-  /* ----- Spawners ----- */
-
-  const spawners: Record<SpawnType, SpawnTracker> = {
-    star: {
-      nextSpawnAt: 0,
-      minInterval: 50 * sm,
-      maxInterval: 100 * sm,
-    },
-    cloud: {
-      nextSpawnAt: width * 0.4,
-      minInterval: 180 * sm,
-      maxInterval: 350 * sm,
-    },
-    mountain: {
-      nextSpawnAt: width * 0.8,
-      minInterval: 400 * sm,
-      maxInterval: 700 * sm,
-    },
-    bird: {
-      nextSpawnAt: width * 0.5,
-      minInterval: 200 * sm,
-      maxInterval: 400 * sm,
-    },
-    meteor: {
-      nextSpawnAt: width * 0.8,
-      minInterval: 400 * sm,
-      maxInterval: 800 * sm,
-    },
-    balloon: {
-      nextSpawnAt: width * 2.2,
-      minInterval: 600 * sm,
-      maxInterval: 1000 * sm,
-    },
-    ufo: {
-      nextSpawnAt: width * 3,
-      minInterval: 900 * sm,
-      maxInterval: 1800 * sm,
-    },
-    whale: {
-      nextSpawnAt: width * 3.8,
-      minInterval: 1400 * sm,
-      maxInterval: 2500 * sm,
-    },
-    jellyfish: {
-      nextSpawnAt: width * 2.5,
-      minInterval: 800 * sm,
-      maxInterval: 1400 * sm,
-    },
-    grassTuft: {
-      nextSpawnAt: 0,
-      minInterval: 30 * sm,
-      maxInterval: 70 * sm,
-    },
-    pebble: {
-      nextSpawnAt: width * 0.2,
-      minInterval: 40 * sm,
-      maxInterval: 90 * sm,
-    },
-  };
-
-  function readColors(): CachedColors {
+  function readColors() {
     return {
       bg: getColor("--color-bg"),
       text: getColor("--color-text"),
@@ -388,12 +169,42 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       surface: getColor("--color-surface"),
     };
   }
+  let colors = readColors();
 
-  /* ----- Entity creation ----- */
+  // prettier-ignore
+  const caps: Record<SpawnType, number> = isMobile
+    ? {
+        star: 18,
+        cloud: 4,
+        mountain: 10,
+        bird: 6,
+        ufo: 2,
+        meteor: 1,
+        balloon: 1,
+        whale: 1,
+        jellyfish: 1,
+        grassTuft: 12,
+        pebble: 6,
+      }
+    : {
+        star: 30,
+        cloud: 6,
+        mountain: 12,
+        bird: 8,
+        ufo: 3,
+        meteor: 2,
+        balloon: 2,
+        whale: 1,
+        jellyfish: 2,
+        grassTuft: 20,
+        pebble: 10,
+      };
 
-  function createStar(worldX: number): StarEntity {
+  /* --- Entity creation --- */
+
+  function createStar(wX: number) {
     return {
-      worldX,
+      worldX: wX,
       y: rand(height * 0.05, height * 0.45),
       parallax: 0.1,
       size: 0.5 + Math.random() ** 2.5 * 2.8,
@@ -402,10 +213,10 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     };
   }
 
-  function createCloud(worldX: number): CloudEntity {
+  function createCloud(wX: number) {
     const r = rand(6, 18);
     return {
-      worldX,
+      worldX: wX,
       y: rand(height * 0.1, height * 0.35),
       parallax: 0.15,
       circles: [
@@ -420,9 +231,9 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     };
   }
 
-  function createMountain(worldX: number, h: number, wL: number, wR: number): MountainEntity {
+  function createMountain(wX: number, h: number, wL: number, wR: number) {
     return {
-      worldX,
+      worldX: wX,
       y: baseGroundY,
       parallax: 0.2,
       peakHeight: h,
@@ -435,26 +246,24 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     };
   }
 
-  function spawnMountainCluster(centerWorldX: number): void {
-    const count = randInt(3, 5);
-    const tempPeaks: MountainEntity[] = [];
-    for (let i = 0; i < count; i++) {
-      if (mountains.count + tempPeaks.length >= caps.mountain) break;
-      const c = 1 - Math.abs(i - (count - 1) / 2) / ((count - 1) / 2 + 0.5);
-      const maxH = baseGroundY * 0.85;
-      const h = Math.min(rand(55, 115) + c * rand(20, 50), maxH);
-      const spread = (i - (count - 1) / 2) * rand(30, 55);
-      tempPeaks.push(createMountain(centerWorldX + spread, h, rand(25, 65), rand(25, 65)));
+  function spawnMountainCluster(cX: number): void {
+    const n = randInt(3, 5);
+    const tmp: ReturnType<typeof createMountain>[] = [];
+    for (let i = 0; i < n; i++) {
+      if (mountains.length + tmp.length >= caps.mountain) break;
+      const c = 1 - Math.abs(i - (n - 1) / 2) / ((n - 1) / 2 + 0.5);
+      const h = Math.min(rand(55, 115) + c * rand(20, 50), baseGroundY * 0.85);
+      tmp.push(
+        createMountain(cX + (i - (n - 1) / 2) * rand(30, 55), h, rand(25, 65), rand(25, 65)),
+      );
     }
-    tempPeaks.sort((a, b) => b.peakHeight - a.peakHeight);
-    for (const p of tempPeaks) {
-      poolPush(mountains, p);
-    }
+    tmp.sort((a, b) => b.peakHeight - a.peakHeight);
+    for (const p of tmp) mountains.push(p);
   }
 
-  function createBird(worldX: number): BirdEntity {
+  function createBird(wX: number) {
     return {
-      worldX,
+      worldX: wX,
       y: rand(height * 0.1, height * 0.4),
       parallax: 0.5,
       velocity: rand(10, 20),
@@ -467,27 +276,25 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
 
   function spawnBirdGroup(screenX: number): void {
     const wX = toWorldX(screenX, 0.5);
-    const isFormation = Math.random() < 0.3;
-    const groupSize = isFormation ? randInt(2, 3) : 1;
+    const groupSize = Math.random() < 0.3 ? randInt(2, 3) : 1;
     const leader = createBird(wX);
     leader.worldX = wX;
-    poolPush(birds, leader);
-
+    birds.push(leader);
     for (let i = 1; i < groupSize; i++) {
-      if (birds.count >= caps.bird) break;
-      const follower = createBird(wX);
-      follower.worldX = wX;
-      follower.y = leader.y;
-      follower.velocity = leader.velocity;
-      follower.formationOffsetX = -rand(12, 20) * i;
-      follower.formationOffsetY = (i % 2 === 0 ? -1 : 1) * rand(6, 12) * i;
-      poolPush(birds, follower);
+      if (birds.length >= caps.bird) break;
+      const f = createBird(wX);
+      f.worldX = wX;
+      f.y = leader.y;
+      f.velocity = leader.velocity;
+      f.formationOffsetX = -rand(12, 20) * i;
+      f.formationOffsetY = (i % 2 === 0 ? -1 : 1) * rand(6, 12) * i;
+      birds.push(f);
     }
   }
 
-  function createUfo(worldX: number): UfoEntity {
+  function createUfo(wX: number) {
     return {
-      worldX,
+      worldX: wX,
       y: rand(height * 0.08, height * 0.25),
       parallax: 0.6,
       size: rand(0.6, 1.4),
@@ -496,9 +303,9 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     };
   }
 
-  function createMeteor(worldX: number): MeteorEntity {
+  function createMeteor(wX: number) {
     return {
-      worldX,
+      worldX: wX,
       y: rand(height * 0.02, height * 0.2),
       parallax: 0.05,
       angle: rand(0.15, 0.4),
@@ -509,9 +316,9 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     };
   }
 
-  function createBalloon(worldX: number): BalloonEntity {
+  function createBalloon(wX: number) {
     return {
-      worldX,
+      worldX: wX,
       y: rand(height * 0.08, height * 0.3),
       parallax: 0.35,
       size: rand(8, 20),
@@ -520,14 +327,12 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     };
   }
 
-  function createWhale(worldX: number): WhaleEntity {
+  function createWhale(wX: number) {
     const s = rand(40, 95);
-    // Keep whale vertically within frame: top of body is cy - s*0.38,
-    // bottom of fin is cy + s*0.42. Clamp y so both fit.
     const minY = s * 0.42 + 4;
     const maxY = height * 0.45 - s * 0.42;
     return {
-      worldX,
+      worldX: wX,
       y: rand(Math.max(minY, height * 0.12), Math.max(minY, maxY)),
       parallax: 0.55,
       size: s,
@@ -536,67 +341,91 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     };
   }
 
-  function createJellyfish(worldX: number): JellyfishEntity {
+  function createJellyfish(wX: number) {
     const tc = randInt(3, 5);
-    const phases: number[] = [];
-    for (let i = 0; i < tc; i++) {
-      phases.push(rand(0, Math.PI * 2));
-    }
     return {
-      worldX,
+      worldX: wX,
       y: rand(height * 0.1, height * 0.4),
       parallax: 0.4,
       size: rand(6, 16),
       pulsePhase: rand(0, Math.PI * 2),
       driftSpeed: rand(2, 6),
       tentacleCount: tc,
-      tentaclePhases: phases,
+      tentaclePhases: Array.from({ length: tc }, () => rand(0, Math.PI * 2)),
     };
   }
 
-  function createGrassTuft(worldX: number): GrassTuftEntity {
+  function createGrassTuft(wX: number) {
     const bc = randInt(2, 3);
-    const angles: number[] = [];
-    for (let i = 0; i < bc; i++) {
-      angles.push(rand(-0.4, 0.4));
-    }
     return {
-      worldX,
+      worldX: wX,
       y: baseGroundY,
       parallax: 1.0,
       bladeCount: bc,
       bladeHeight: rand(3, 11),
-      bladeAngles: angles,
+      bladeAngles: Array.from({ length: bc }, () => rand(-0.4, 0.4)),
     };
   }
 
-  function createPebble(worldX: number): PebbleEntity {
-    return {
-      worldX,
-      y: baseGroundY + rand(1, 3),
-      parallax: 1.0,
-      radius: rand(0.8, 3.5),
-    };
+  function createPebble(wX: number) {
+    return { worldX: wX, y: baseGroundY + rand(1, 3), parallax: 1.0, radius: rand(0.8, 3.5) };
   }
 
-  /* ----- Spawn logic ----- */
+  /* --- Entity arrays & pool registry --- */
+
+  const stars: ReturnType<typeof createStar>[] = [];
+  const clouds: ReturnType<typeof createCloud>[] = [];
+  const mountains: ReturnType<typeof createMountain>[] = [];
+  const birds: ReturnType<typeof createBird>[] = [];
+  const ufos: ReturnType<typeof createUfo>[] = [];
+  const meteors: ReturnType<typeof createMeteor>[] = [];
+  const balloons: ReturnType<typeof createBalloon>[] = [];
+  const whales: ReturnType<typeof createWhale>[] = [];
+  const jfish: ReturnType<typeof createJellyfish>[] = [];
+  const grassTufts: ReturnType<typeof createGrassTuft>[] = [];
+  const pebbles: ReturnType<typeof createPebble>[] = [];
+
+  // biome-ignore lint/suspicious/noExplicitAny: heterogeneous pool registry
+  const pools: Record<SpawnType, any[]> = {
+    star: stars,
+    cloud: clouds,
+    mountain: mountains,
+    bird: birds,
+    ufo: ufos,
+    meteor: meteors,
+    balloon: balloons,
+    whale: whales,
+    jellyfish: jfish,
+    grassTuft: grassTufts,
+    pebble: pebbles,
+  };
+
+  /* --- Spawn logic --- */
+
+  const spawners: Record<SpawnType, { next: number; min: number; max: number }> = {} as Record<
+    SpawnType,
+    { next: number; min: number; max: number }
+  >;
+  for (const [type, start, min, max] of SPAWN_CFG) {
+    spawners[type] = { next: width * start, min: min * sm, max: max * sm };
+  }
+
+  const creators: Partial<Record<SpawnType, (wX: number) => { worldX: number; parallax: number }>> =
+    {
+      star: createStar,
+      cloud: createCloud,
+      ufo: createUfo,
+      meteor: createMeteor,
+      balloon: createBalloon,
+      whale: createWhale,
+      jellyfish: createJellyfish,
+      grassTuft: createGrassTuft,
+      pebble: createPebble,
+    };
 
   function toWorldX(screenX: number, parallax: number): number {
     return screenX + worldOffset * parallax;
   }
-
-  /** Simple creators — entity types with identical create/set-worldX/push spawning. */
-  const simpleCreators: Partial<Record<SpawnType, (worldX: number) => BaseEntity>> = {
-    star: createStar,
-    cloud: createCloud,
-    ufo: createUfo,
-    meteor: createMeteor,
-    balloon: createBalloon,
-    whale: createWhale,
-    jellyfish: createJellyfish,
-    grassTuft: createGrassTuft,
-    pebble: createPebble,
-  };
 
   function spawnEntity(type: SpawnType, screenX: number): void {
     if (type === "mountain") {
@@ -607,65 +436,70 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       spawnBirdGroup(screenX);
       return;
     }
-    const creator = simpleCreators[type];
+    const creator = creators[type];
     if (!creator) return;
     const e = creator(0);
     e.worldX = toWorldX(screenX, e.parallax);
-    poolPush(pools[type], e);
+    pools[type].push(e);
   }
 
   function trySpawn(type: SpawnType): void {
-    const s = spawners[type];
+    const sp = spawners[type];
     const rightEdge = worldOffset + width;
-    if (rightEdge < s.nextSpawnAt) return;
-    if (pools[type].count >= caps[type]) {
-      s.nextSpawnAt = rightEdge + rand(s.minInterval, s.maxInterval);
+    if (rightEdge < sp.next) return;
+    if (pools[type].length >= caps[type]) {
+      sp.next = rightEdge + rand(sp.min, sp.max);
       return;
     }
     spawnEntity(type, width + rand(20, 80));
-    s.nextSpawnAt = rightEdge + rand(s.minInterval, s.maxInterval);
+    sp.next = rightEdge + rand(sp.min, sp.max);
   }
 
-  /* ----- Culling (swap-and-pop) ----- */
+  /* --- Culling (swap-and-pop) --- */
 
-  function cullPool<T extends BaseEntity>(pool: Pool<T>, isAlive?: (item: T) => boolean): void {
+  function sX(wx: number, p: number): number {
+    return wx - worldOffset * p;
+  }
+
+  function cull<T extends { worldX: number; parallax: number }>(
+    arr: T[],
+    alive?: (e: T) => boolean,
+  ): void {
     let i = 0;
-    while (i < pool.count) {
-      const item = pool.items[i];
-      if (item === undefined) {
-        poolSwapRemove(pool, i);
+    while (i < arr.length) {
+      const e = arr[i];
+      if (!e) {
+        i++;
         continue;
       }
-      const sxPos = sx(item.worldX, item.parallax);
-      if (sxPos < -200 || (isAlive !== undefined && !isAlive(item))) {
-        poolSwapRemove(pool, i);
+      if (sX(e.worldX, e.parallax) < -200 || (alive !== undefined && !alive(e))) {
+        const last = arr[arr.length - 1];
+        if (last !== undefined) arr[i] = last;
+        arr.pop();
       } else {
         i++;
       }
     }
   }
 
-  function cullAllPools(): void {
-    for (const type of SPAWN_TYPES) {
-      cullPool(pools[type], type === "meteor" ? (m: MeteorEntity) => m.life > 0 : undefined);
+  function cullAll(): void {
+    for (const t of TYPES) {
+      // biome-ignore lint/suspicious/noExplicitAny: pool registry is heterogeneous
+      cull(pools[t], t === "meteor" ? (m: any) => m.life > 0 : undefined);
     }
   }
 
-  /* ----- Drawing helpers ----- */
-
-  function sx(entityWorldX: number, parallax: number): number {
-    return entityWorldX - worldOffset * parallax;
-  }
+  /* --- Drawing --- */
 
   function drawStars(): void {
     ctx.fillStyle = colors.textMuted;
-    for (let i = 0; i < stars.count; i++) {
-      const e = stars.items[i];
+    for (let i = 0; i < stars.length; i++) {
+      const e = stars[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x < -10 || x > width + 10) continue;
-      const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(time * e.twinkleSpeed + e.twinkleOffset));
-      ctx.globalAlpha = entityAlpha(x, e.parallax, width, twinkle);
+      const tw = 0.4 + 0.6 * Math.abs(Math.sin(time * e.twinkleSpeed + e.twinkleOffset));
+      ctx.globalAlpha = entityAlpha(x, e.parallax, width, tw);
       ctx.beginPath();
       ctx.arc(x, e.y, e.size, 0, Math.PI * 2);
       ctx.fill();
@@ -675,10 +509,10 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
 
   function drawClouds(): void {
     ctx.fillStyle = colors.textMuted;
-    for (let i = 0; i < clouds.count; i++) {
-      const e = clouds.items[i];
+    for (let i = 0; i < clouds.length; i++) {
+      const e = clouds[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x < -60 || x > width + 60) continue;
       ctx.globalAlpha = entityAlpha(x, e.parallax, width, e.baseOpacity);
       ctx.beginPath();
@@ -692,243 +526,74 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   }
 
   function drawMeteors(): void {
-    for (let i = 0; i < meteors.count; i++) {
-      const e = meteors.items[i];
+    for (let i = 0; i < meteors.length; i++) {
+      const e = meteors[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       const opacity = e.life / e.maxLife;
-      const dx = Math.cos(e.angle) * e.tailLen;
-      const dy = Math.sin(e.angle) * e.tailLen;
-      const headX = x;
-      const headY = e.y;
-      // Trail behind the head (upper-right, since meteor moves left+down)
-      const tailX = x + dx * 1.5;
-      const tailY = e.y - dy * 1.5;
-
+      const ms = e.tailLen / 50;
+      const tdx = Math.cos(e.angle) * e.tailLen * 1.5;
+      const tdy = Math.sin(e.angle) * e.tailLen * 1.5;
       const alpha = entityAlpha(x, e.parallax, width, opacity);
 
-      // Scale stroke and head with tail length (25-80 range)
-      const mScale = e.tailLen / 50;
-
-      // Gradient trail
-      const grad = ctx.createLinearGradient(headX, headY, tailX, tailY);
+      const grad = ctx.createLinearGradient(x, e.y, x + tdx, e.y - tdy);
       grad.addColorStop(0, colors.primary);
-      grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      grad.addColorStop(1, "rgba(0, 0, 0, 0)"); /* token-exempt */
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 1.5 + mScale;
+      ctx.lineWidth = 1.5 + ms;
       ctx.lineCap = "round";
       ctx.globalAlpha = alpha;
       ctx.beginPath();
-      ctx.moveTo(headX, headY);
-      ctx.lineTo(tailX, tailY);
+      ctx.moveTo(x, e.y);
+      ctx.lineTo(x + tdx, e.y - tdy);
       ctx.stroke();
 
-      // Glowing head
-      ctx.globalAlpha = alpha * 0.4;
       ctx.fillStyle = colors.primary;
+      ctx.globalAlpha = alpha * 0.4;
       ctx.beginPath();
-      ctx.arc(headX, headY, 2 + mScale * 2, 0, Math.PI * 2);
+      ctx.arc(x, e.y, 2 + ms * 2, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = alpha;
       ctx.beginPath();
-      ctx.arc(headX, headY, 1 + mScale, 0, Math.PI * 2);
+      ctx.arc(x, e.y, 1 + ms, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
   }
 
-  function drawWhaleBody(x: number, cy: number, s: number, tw: number): void {
-    // Full silhouette — continuous closed path
-    // tw = tail wag offset (vertical displacement at fluke tips)
-    ctx.beginPath();
-
-    // Snout — broad, blunt rostrum
-    ctx.moveTo(x - s * 0.95, cy + s * 0.02);
-
-    // Forehead — steep rise into a wide cranium
-    ctx.bezierCurveTo(
-      x - s * 0.92,
-      cy - s * 0.12,
-      x - s * 0.75,
-      cy - s * 0.32,
-      x - s * 0.45,
-      cy - s * 0.36,
-    );
-
-    // Crown to mid-back — long, smooth dorsal line
-    ctx.bezierCurveTo(
-      x - s * 0.15,
-      cy - s * 0.38,
-      x + s * 0.2,
-      cy - s * 0.34,
-      x + s * 0.45,
-      cy - s * 0.26,
-    );
-
-    // Dorsal fin — small triangular ridge
-    ctx.bezierCurveTo(
-      x + s * 0.52,
-      cy - s * 0.24,
-      x + s * 0.55,
-      cy - s * 0.3,
-      x + s * 0.58,
-      cy - s * 0.24,
-    );
-
-    // Rear back tapering into the peduncle — wag starts here (25% influence)
-    ctx.bezierCurveTo(
-      x + s * 0.72,
-      cy - s * 0.16 + tw * 0.25,
-      x + s * 0.88,
-      cy - s * 0.06 + tw * 0.5,
-      x + s * 0.98,
-      cy - s * 0.02 + tw * 0.7,
-    );
-
-    // Upper tail fluke — full wag influence
-    ctx.bezierCurveTo(
-      x + s * 1.06,
-      cy - s * 0.04 + tw * 0.85,
-      x + s * 1.18,
-      cy - s * 0.18 + tw,
-      x + s * 1.28,
-      cy - s * 0.26 + tw,
-    );
-
-    // Fluke tip curves back
-    ctx.bezierCurveTo(
-      x + s * 1.3,
-      cy - s * 0.22 + tw,
-      x + s * 1.26,
-      cy - s * 0.14 + tw * 0.9,
-      x + s * 1.12,
-      cy - s * 0.04 + tw * 0.75,
-    );
-
-    // Notch between flukes
-    ctx.bezierCurveTo(
-      x + s * 1.06,
-      cy + tw * 0.7,
-      x + s * 1.06,
-      cy + s * 0.02 + tw * 0.7,
-      x + s * 1.12,
-      cy + s * 0.06 + tw * 0.75,
-    );
-
-    // Lower tail fluke — full wag influence
-    ctx.bezierCurveTo(
-      x + s * 1.26,
-      cy + s * 0.16 + tw * 0.9,
-      x + s * 1.3,
-      cy + s * 0.24 + tw,
-      x + s * 1.28,
-      cy + s * 0.28 + tw,
-    );
-
-    // Lower fluke tip curves back
-    ctx.bezierCurveTo(
-      x + s * 1.18,
-      cy + s * 0.2 + tw,
-      x + s * 1.06,
-      cy + s * 0.08 + tw * 0.85,
-      x + s * 0.98,
-      cy + s * 0.04 + tw * 0.7,
-    );
-
-    // Peduncle underside back along belly — wag fades out
-    ctx.bezierCurveTo(
-      x + s * 0.85,
-      cy + s * 0.1 + tw * 0.25,
-      x + s * 0.65,
-      cy + s * 0.2,
-      x + s * 0.4,
-      cy + s * 0.28,
-    );
-
-    // Belly — full, rounded underside
-    ctx.bezierCurveTo(
-      x + s * 0.1,
-      cy + s * 0.34,
-      x - s * 0.25,
-      cy + s * 0.36,
-      x - s * 0.55,
-      cy + s * 0.3,
-    );
-
-    // Lower jaw curves back to snout
-    ctx.bezierCurveTo(
-      x - s * 0.78,
-      cy + s * 0.24,
-      x - s * 0.92,
-      cy + s * 0.14,
-      x - s * 0.95,
-      cy + s * 0.02,
-    );
-
-    ctx.closePath();
-  }
-
-  function drawWhaleFin(x: number, cy: number, s: number): void {
-    // Pectoral fin — long, elegant, sweeps downward from the chest
-    ctx.beginPath();
-    ctx.moveTo(x - s * 0.3, cy + s * 0.2);
-    ctx.bezierCurveTo(
-      x - s * 0.38,
-      cy + s * 0.32,
-      x - s * 0.52,
-      cy + s * 0.42,
-      x - s * 0.62,
-      cy + s * 0.38,
-    );
-    ctx.bezierCurveTo(
-      x - s * 0.58,
-      cy + s * 0.32,
-      x - s * 0.44,
-      cy + s * 0.26,
-      x - s * 0.3,
-      cy + s * 0.2,
-    );
-    ctx.closePath();
-  }
-
   function drawWhales(): void {
-    for (let i = 0; i < whales.count; i++) {
-      const e = whales.items[i];
+    for (let i = 0; i < whales.length; i++) {
+      const e = whales[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x < -120 || x > width + 120) continue;
       const bob = Math.sin(e.bobPhase) * 4;
       const cy = e.y + bob;
       const s = e.size;
-      // Gentle tail wag — sinusoidal, slightly faster than bob
       const tailWag = Math.sin(e.bobPhase * 1.6) * s * 0.08;
-
       const alpha = entityAlpha(x, e.parallax, width, 1);
+
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-
-      // Solid filled body
       ctx.fillStyle = colors.textMuted;
       ctx.globalAlpha = alpha * 0.7;
-      drawWhaleBody(x, cy, s, tailWag);
+      drawBzPath(ctx, x, cy, s, tailWag, WHALE_BODY);
       ctx.fill();
 
-      // Pectoral fin — solid fill
       ctx.globalAlpha = alpha * 0.55;
-      drawWhaleFin(x, cy, s);
+      drawBzPath(ctx, x, cy, s, 0, WHALE_FIN);
       ctx.fill();
 
-      // Ventral grooves — lighter lines over the solid body
       ctx.strokeStyle = colors.surface;
       ctx.globalAlpha = alpha * 0.3;
       ctx.lineWidth = 0.7;
       ctx.beginPath();
       for (let g = 0; g < 3; g++) {
         const gy = cy + s * (0.12 + g * 0.06);
-        const gxStart = x - s * (0.55 - g * 0.1);
-        const gxEnd = x + s * (0.1 - g * 0.04);
-        ctx.moveTo(gxStart, gy);
-        ctx.quadraticCurveTo((gxStart + gxEnd) * 0.5, gy + s * 0.03, gxEnd, gy);
+        const gs = x - s * (0.55 - g * 0.1);
+        const ge = x + s * (0.1 - g * 0.04);
+        ctx.moveTo(gs, gy);
+        ctx.quadraticCurveTo((gs + ge) * 0.5, gy + s * 0.03, ge, gy);
       }
       ctx.stroke();
     }
@@ -936,26 +601,23 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   }
 
   function drawJellyfish(): void {
-    for (let i = 0; i < jellyfish.count; i++) {
-      const e = jellyfish.items[i];
+    for (let i = 0; i < jfish.length; i++) {
+      const e = jfish[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x < -30 || x > width + 30) continue;
-
       const s = e.size;
       const pulse = Math.sin(e.pulsePhase) * 0.15;
       const bellW = s * (0.7 + pulse);
       const bellH = s * (0.55 - pulse * 0.3);
       const alpha = entityAlpha(x, e.parallax, width, 0.55);
 
-      // Bell dome
       ctx.fillStyle = colors.primary;
       ctx.globalAlpha = alpha * 0.5;
       ctx.beginPath();
       ctx.ellipse(x, e.y, bellW, bellH, 0, Math.PI, 0);
       ctx.fill();
 
-      // Bell rim — slightly wider, thin stroke
       ctx.strokeStyle = colors.primary;
       ctx.lineWidth = 0.8;
       ctx.globalAlpha = alpha * 0.7;
@@ -963,7 +625,6 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       ctx.ellipse(x, e.y, bellW * 1.02, bellH * 0.3, 0, 0, Math.PI);
       ctx.stroke();
 
-      // Tentacles — wavy quadratic curves
       ctx.strokeStyle = colors.textMuted;
       ctx.lineWidth = 0.6;
       ctx.lineCap = "round";
@@ -972,7 +633,7 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       for (let t = 0; t < e.tentacleCount; t++) {
         const tPhase = e.tentaclePhases[t] ?? 0;
         const tx = x - bellW + tentSpacing * (t + 1);
-        const tentLen = s * rand(0.8, 1.4); // intentional per-frame jitter for underwater wobble
+        const tentLen = s * rand(0.8, 1.4);
         const sway = Math.sin(tPhase + time * 1.5) * s * 0.15 + wind * 1.5;
         ctx.beginPath();
         ctx.moveTo(tx, e.y);
@@ -984,19 +645,20 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   }
 
   function drawBalloons(): void {
-    for (let i = 0; i < balloons.count; i++) {
-      const e = balloons.items[i];
+    for (let i = 0; i < balloons.length; i++) {
+      const e = balloons[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x < -30 || x > width + 30) continue;
       const sway = Math.sin(e.swayPhase) * 3 + wind * 2;
       const s = e.size;
       const alpha = entityAlpha(x, e.parallax, width, 0.6);
+      const bx = x + sway;
 
       ctx.fillStyle = colors.primary;
       ctx.globalAlpha = alpha;
       ctx.beginPath();
-      ctx.ellipse(x + sway, e.y, s * 0.6, s * 0.75, 0, 0, Math.PI * 2);
+      ctx.ellipse(bx, e.y, s * 0.6, s * 0.75, 0, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.strokeStyle = colors.textMuted;
@@ -1004,46 +666,42 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       ctx.globalAlpha = alpha * 0.83;
       const basketY = e.y + s;
       ctx.beginPath();
-      ctx.moveTo(x + sway - s * 0.3, e.y + s * 0.6);
-      ctx.lineTo(x + sway - 3, basketY);
-      ctx.moveTo(x + sway + s * 0.3, e.y + s * 0.6);
-      ctx.lineTo(x + sway + 3, basketY);
+      ctx.moveTo(bx - s * 0.3, e.y + s * 0.6);
+      ctx.lineTo(bx - 3, basketY);
+      ctx.moveTo(bx + s * 0.3, e.y + s * 0.6);
+      ctx.lineTo(bx + 3, basketY);
       ctx.stroke();
 
       ctx.strokeStyle = colors.textMuted;
       ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.rect(x + sway - 4, basketY, 8, 5);
+      ctx.rect(bx - 4, basketY, 8, 5);
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
   }
 
   function drawMountains(): void {
-    for (let i = 0; i < mountains.count; i++) {
-      const e = mountains.items[i];
+    for (let i = 0; i < mountains.length; i++) {
+      const e = mountains[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x + e.rightWidth < -10 || x - e.leftWidth > width + 10) continue;
-
       const gY = e.y;
       const peakX = x;
       const peakY = gY - e.peakHeight;
-      const leftBaseX = x - e.leftWidth;
-      const rightBaseX = x + e.rightWidth;
+      const lx = x - e.leftWidth;
+      const rx = x + e.rightWidth;
+      const clx = lx + e.leftWidth * 0.5 + e.ctrlLeftDx;
+      const cly = gY - e.ctrlLeftDy;
+      const crx = rx - e.rightWidth * 0.5 + e.ctrlRightDx;
+      const cry = gY - e.ctrlRightDy;
 
-      const ctrlLeftX = leftBaseX + e.leftWidth * 0.5 + e.ctrlLeftDx;
-      const ctrlLeftY = gY - e.ctrlLeftDy;
-      const ctrlRightX = rightBaseX - e.rightWidth * 0.5 + e.ctrlRightDx;
-      const ctrlRightY = gY - e.ctrlRightDy;
-
-      const alpha = entityAlpha(x, e.parallax, width, 1);
-      ctx.globalAlpha = alpha;
-
+      ctx.globalAlpha = entityAlpha(x, e.parallax, width, 1);
       ctx.beginPath();
-      ctx.moveTo(leftBaseX, gY);
-      ctx.quadraticCurveTo(ctrlLeftX, ctrlLeftY, peakX, peakY);
-      ctx.quadraticCurveTo(ctrlRightX, ctrlRightY, rightBaseX, gY);
+      ctx.moveTo(lx, gY);
+      ctx.quadraticCurveTo(clx, cly, peakX, peakY);
+      ctx.quadraticCurveTo(crx, cry, rx, gY);
       ctx.closePath();
       ctx.fillStyle = colors.border;
       ctx.fill();
@@ -1068,13 +726,12 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     ctx.strokeStyle = colors.textMuted;
     ctx.lineWidth = 0.8;
     ctx.lineCap = "round";
-    for (let i = 0; i < grassTufts.count; i++) {
-      const e = grassTufts.items[i];
+    for (let i = 0; i < grassTufts.length; i++) {
+      const e = grassTufts[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x < -15 || x > width + 15) continue;
-      const alpha = entityAlpha(x, e.parallax, width, 0.45);
-      ctx.globalAlpha = alpha;
+      ctx.globalAlpha = entityAlpha(x, e.parallax, width, 0.45);
       ctx.beginPath();
       for (let j = 0; j < e.bladeCount; j++) {
         const angle = (e.bladeAngles[j] ?? 0) + wind * 0.3;
@@ -1089,13 +746,12 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
 
   function drawPebbles(): void {
     ctx.fillStyle = colors.textMuted;
-    for (let i = 0; i < pebbles.count; i++) {
-      const e = pebbles.items[i];
+    for (let i = 0; i < pebbles.length; i++) {
+      const e = pebbles[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x < -5 || x > width + 5) continue;
-      const alpha = entityAlpha(x, e.parallax, width, 0.4);
-      ctx.globalAlpha = alpha;
+      ctx.globalAlpha = entityAlpha(x, e.parallax, width, 0.4);
       ctx.beginPath();
       ctx.arc(x, e.y, e.radius, 0, Math.PI * 2);
       ctx.fill();
@@ -1104,26 +760,21 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   }
 
   function drawBirds(): void {
-    for (let i = 0; i < birds.count; i++) {
-      const e = birds.items[i];
+    for (let i = 0; i < birds.length; i++) {
+      const e = birds[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax) + e.formationOffsetX;
+      const x = sX(e.worldX, e.parallax) + e.formationOffsetX;
       const y = e.y + e.formationOffsetY;
       if (x < -20 || x > width + 20) continue;
-
-      // Asymmetric flap: fast downstroke, slow upstroke
       const sinPhase = Math.sin(e.flapPhase);
       const flap = Math.sign(sinPhase) * Math.abs(sinPhase) ** 0.7 * 0.6;
       const ws = e.wingspan;
-
-      // Body rise on downstroke
       const bodyRise = Math.max(0, -sinPhase) * 1.5;
 
-      const alpha = entityAlpha(x, e.parallax, width, 0.7);
       ctx.strokeStyle = colors.textMuted;
       ctx.lineWidth = 0.8 + ws * 0.06;
       ctx.lineCap = "round";
-      ctx.globalAlpha = alpha;
+      ctx.globalAlpha = entityAlpha(x, e.parallax, width, 0.7);
       ctx.beginPath();
       ctx.moveTo(x - ws, y - bodyRise - flap * ws * 0.5);
       ctx.lineTo(x, y - bodyRise);
@@ -1134,15 +785,15 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
   }
 
   function drawUfos(): void {
-    for (let i = 0; i < ufos.count; i++) {
-      const e = ufos.items[i];
+    for (let i = 0; i < ufos.length; i++) {
+      const e = ufos[i];
       if (!e) continue;
-      const x = sx(e.worldX, e.parallax);
+      const x = sX(e.worldX, e.parallax);
       if (x < -40 || x > width + 40) continue;
       const s = e.size;
       const hoverY = e.y + Math.sin(e.hoverPhase) * 4 * s;
-
       const alpha = entityAlpha(x, e.parallax, width, 1);
+
       ctx.globalAlpha = alpha;
       ctx.fillStyle = colors.primary;
       ctx.beginPath();
@@ -1166,173 +817,70 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     ctx.globalAlpha = 1;
   }
 
-  /* ----- Stickman ----- */
+  /* --- Stickman --- */
 
-  interface StickmanPose {
-    headX: number;
-    headY: number;
-    neckX: number;
-    neckY: number;
-    shoulderX: number;
-    shoulderY: number;
-    hipX: number;
-    hipY: number;
-    leftHandX: number;
-    leftHandY: number;
-    rightHandX: number;
-    rightHandY: number;
-    leftElbowX: number;
-    leftElbowY: number;
-    rightElbowX: number;
-    rightElbowY: number;
-    leftFootX: number;
-    leftFootY: number;
-    rightFootX: number;
-    rightFootY: number;
-    leftKneeX: number;
-    leftKneeY: number;
-    rightKneeX: number;
-    rightKneeY: number;
-  }
-
-  function computeStickmanPose(): StickmanPose {
-    const stickX = width * STICKMAN_SCREEN_X_RATIO;
+  function drawStickman(): void {
+    const stickX = width * SCREEN_X;
     const feetY = baseGroundY - 1;
-    const legRoom = UPPER_LEG + LOWER_LEG - 2;
+    const legRoom = U_LEG + L_LEG - 2;
+    let hipX: number;
+    let hipY: number;
+    let shX: number;
+    let shY: number;
+    let nkX: number;
+    let nkY: number;
+    let hdX: number;
+    let hdY: number;
+    let lk: [number, number];
+    let rk: [number, number];
+    let lf: [number, number];
+    let rf: [number, number];
+    let la: [number, number, number, number];
+    let ra: [number, number, number, number];
 
     if (reducedMotion) {
-      const hipY = feetY - legRoom;
-      const shoulderY = hipY - TORSO_LENGTH;
-      const neckY = shoulderY - NECK_LENGTH;
-      const headY = neckY - HEAD_RADIUS;
-      const kneeY = hipY + UPPER_LEG - 1;
-      const armY = shoulderY + UPPER_ARM + LOWER_ARM * 0.5;
+      hipX = stickX;
+      hipY = feetY - legRoom;
+      shY = hipY - TORSO;
+      nkY = shY - NECK;
+      hdY = nkY - HEAD_R;
+      shX = nkX = hdX = stickX;
+      const knY = hipY + U_LEG - 1;
+      const armY = shY + U_ARM + L_ARM * 0.5;
+      lf = [stickX - 2, feetY];
+      rf = [stickX + 2, feetY];
+      lk = [stickX - 1.5, knY];
+      rk = [stickX + 1.5, knY];
+      la = [stickX - 1.5, shY + U_ARM, stickX - 2, armY];
+      ra = [stickX + 1.5, shY + U_ARM, stickX + 2, armY];
+    } else {
+      const leftT = (walkPhase % (Math.PI * 2)) / (Math.PI * 2);
+      const rightT = (leftT + 0.5) % 1;
+      const bob = Math.abs(Math.sin(walkPhase * 2)) * 1.2;
+      const twist = Math.sin(walkPhase) * 1.0;
+      const lean = Math.sin(0.03);
 
-      return {
-        headX: stickX,
-        headY,
-        neckX: stickX,
-        neckY,
-        shoulderX: stickX,
-        shoulderY,
-        hipX: stickX,
-        hipY,
-        leftHandX: stickX - 2,
-        leftHandY: armY,
-        rightHandX: stickX + 2,
-        rightHandY: armY,
-        leftElbowX: stickX - 1.5,
-        leftElbowY: shoulderY + UPPER_ARM,
-        rightElbowX: stickX + 1.5,
-        rightElbowY: shoulderY + UPPER_ARM,
-        leftFootX: stickX - 2,
-        leftFootY: feetY,
-        rightFootX: stickX + 2,
-        rightFootY: feetY,
-        leftKneeX: stickX - 1.5,
-        leftKneeY: kneeY,
-        rightKneeX: stickX + 1.5,
-        rightKneeY: kneeY,
-      };
+      hipX = stickX;
+      hipY = feetY - legRoom - bob;
+      shY = hipY - TORSO;
+      nkY = shY - NECK;
+      hdY = nkY - HEAD_R - bob * 0.15;
+      shX = stickX + lean * TORSO + twist;
+      nkX = stickX + lean * (TORSO + NECK) + twist * 0.5;
+      hdX = stickX + lean * (TORSO + NECK + HEAD_R) + twist * 0.25;
+
+      const lfx = hipX + footPathX(leftT, 6);
+      const lfy = feetY - footLiftY(leftT, 6);
+      const rfx = hipX + footPathX(rightT, 6);
+      const rfy = feetY - footLiftY(rightT, 6);
+      lf = [lfx, lfy];
+      rf = [rfx, rfy];
+      lk = legIK(hipX, hipY, lfx, lfy);
+      rk = legIK(hipX, hipY, rfx, rfy);
+      la = armFK(shX, shY, -1, walkPhase);
+      ra = armFK(shX, shY, 1, walkPhase);
     }
 
-    // Walk tuning
-    const HALF_STRIDE = 6;
-    const FOOT_LIFT = 6;
-    const ARM_SWING = 0.45;
-    const ARM_LAG = 0.3;
-    const FOREARM_LAG = 0.6;
-    const FOREARM_RATIO = 0.65;
-
-    // Walk cycle progress [0, 1) for each leg — right leg offset by half cycle
-    const leftT = (walkPhase % (Math.PI * 2)) / (Math.PI * 2);
-    const rightT = (leftT + 0.5) % 1;
-
-    // Body dynamics
-    const bob = Math.abs(Math.sin(walkPhase * 2)) * 1.2;
-    const lean = 0.03;
-    const shoulderTwist = Math.sin(walkPhase) * 1.0;
-
-    const hipX = stickX;
-    const hipY = feetY - legRoom - bob;
-    const shoulderY = hipY - TORSO_LENGTH;
-    const neckY = shoulderY - NECK_LENGTH;
-    const headY = neckY - HEAD_RADIUS - bob * 0.15;
-
-    // Spine with forward lean + counter-rotation (twist diminishes shoulder → head)
-    const spineLen = TORSO_LENGTH + NECK_LENGTH;
-    const leanX = Math.sin(lean);
-    const shoulderX = stickX + leanX * TORSO_LENGTH + shoulderTwist;
-    const neckX = stickX + leanX * spineLen + shoulderTwist * 0.5;
-    const headX = stickX + leanX * (spineLen + HEAD_RADIUS) + shoulderTwist * 0.25;
-
-    // ---- LEGS: asymmetric D-path (60% stance, 40% swing) with geometric knee ----
-    const leftFootX = hipX + footPathX(leftT, HALF_STRIDE);
-    const leftFootY = feetY - footLiftY(leftT, FOOT_LIFT);
-    const lDx = leftFootX - hipX;
-    const lDy = leftFootY - hipY;
-    const lDist = Math.sqrt(lDx * lDx + lDy * lDy);
-    const lHalf = lDist * 0.5;
-    const lBend = lHalf < UPPER_LEG ? Math.sqrt(UPPER_LEG ** 2 - lHalf ** 2) : 0;
-    const lInv = lDist > 0.1 ? lBend / lDist : 0;
-    const leftKneeX = (hipX + leftFootX) * 0.5 + lDy * lInv;
-    const leftKneeY = (hipY + leftFootY) * 0.5 - lDx * lInv;
-
-    const rightFootX = hipX + footPathX(rightT, HALF_STRIDE);
-    const rightFootY = feetY - footLiftY(rightT, FOOT_LIFT);
-    const rDx = rightFootX - hipX;
-    const rDy = rightFootY - hipY;
-    const rDist = Math.sqrt(rDx * rDx + rDy * rDy);
-    const rHalf = rDist * 0.5;
-    const rBend = rHalf < UPPER_LEG ? Math.sqrt(UPPER_LEG ** 2 - rHalf ** 2) : 0;
-    const rInv = rDist > 0.1 ? rBend / rDist : 0;
-    const rightKneeX = (hipX + rightFootX) * 0.5 + rDy * rInv;
-    const rightKneeY = (hipY + rightFootY) * 0.5 - rDx * rInv;
-
-    // ---- ARMS: contralateral with phase lag (forearm trails behind upper arm) ----
-    const leftUpperAngle = -Math.cos(walkPhase - ARM_LAG) * ARM_SWING;
-    const leftElbowX = shoulderX + Math.sin(leftUpperAngle) * UPPER_ARM;
-    const leftElbowY = shoulderY + Math.cos(leftUpperAngle) * UPPER_ARM;
-    const leftForeAngle = -Math.cos(walkPhase - FOREARM_LAG) * ARM_SWING * FOREARM_RATIO;
-    const leftHandX = leftElbowX + Math.sin(leftForeAngle) * LOWER_ARM;
-    const leftHandY = leftElbowY + Math.cos(leftForeAngle) * LOWER_ARM;
-
-    const rightUpperAngle = Math.cos(walkPhase - ARM_LAG) * ARM_SWING;
-    const rightElbowX = shoulderX + Math.sin(rightUpperAngle) * UPPER_ARM;
-    const rightElbowY = shoulderY + Math.cos(rightUpperAngle) * UPPER_ARM;
-    const rightForeAngle = Math.cos(walkPhase - FOREARM_LAG) * ARM_SWING * FOREARM_RATIO;
-    const rightHandX = rightElbowX + Math.sin(rightForeAngle) * LOWER_ARM;
-    const rightHandY = rightElbowY + Math.cos(rightForeAngle) * LOWER_ARM;
-
-    return {
-      headX,
-      headY,
-      neckX,
-      neckY,
-      shoulderX,
-      shoulderY,
-      hipX,
-      hipY,
-      leftHandX,
-      leftHandY,
-      rightHandX,
-      rightHandY,
-      leftElbowX,
-      leftElbowY,
-      rightElbowX,
-      rightElbowY,
-      leftFootX,
-      leftFootY,
-      rightFootX,
-      rightFootY,
-      leftKneeX,
-      leftKneeY,
-      rightKneeX,
-      rightKneeY,
-    };
-  }
-
-  function renderStickman(pose: StickmanPose): void {
     ctx.strokeStyle = colors.text;
     ctx.fillStyle = colors.text;
     ctx.lineWidth = 1.8;
@@ -1340,228 +888,169 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
     ctx.lineJoin = "round";
     ctx.globalAlpha = 1;
 
-    // Head
     ctx.beginPath();
-    ctx.arc(pose.headX, pose.headY, HEAD_RADIUS, 0, Math.PI * 2);
+    ctx.arc(hdX, hdY, HEAD_R, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Body + limbs in batched path
     ctx.beginPath();
-    // Spine
-    ctx.moveTo(pose.neckX, pose.neckY);
-    ctx.lineTo(pose.hipX, pose.hipY);
-    // Left arm: shoulder -> elbow -> hand
-    ctx.moveTo(pose.shoulderX, pose.shoulderY);
-    ctx.lineTo(pose.leftElbowX, pose.leftElbowY);
-    ctx.lineTo(pose.leftHandX, pose.leftHandY);
-    // Right arm: shoulder -> elbow -> hand
-    ctx.moveTo(pose.shoulderX, pose.shoulderY);
-    ctx.lineTo(pose.rightElbowX, pose.rightElbowY);
-    ctx.lineTo(pose.rightHandX, pose.rightHandY);
-    // Left leg: hip -> knee -> foot
-    ctx.moveTo(pose.hipX, pose.hipY);
-    ctx.lineTo(pose.leftKneeX, pose.leftKneeY);
-    ctx.lineTo(pose.leftFootX, pose.leftFootY);
-    // Right leg: hip -> knee -> foot
-    ctx.moveTo(pose.hipX, pose.hipY);
-    ctx.lineTo(pose.rightKneeX, pose.rightKneeY);
-    ctx.lineTo(pose.rightFootX, pose.rightFootY);
+    ctx.moveTo(nkX, nkY);
+    ctx.lineTo(hipX, hipY);
+    ctx.moveTo(shX, shY);
+    ctx.lineTo(la[0], la[1]);
+    ctx.lineTo(la[2], la[3]);
+    ctx.moveTo(shX, shY);
+    ctx.lineTo(ra[0], ra[1]);
+    ctx.lineTo(ra[2], ra[3]);
+    ctx.moveTo(hipX, hipY);
+    ctx.lineTo(lk[0], lk[1]);
+    ctx.lineTo(lf[0], lf[1]);
+    ctx.moveTo(hipX, hipY);
+    ctx.lineTo(rk[0], rk[1]);
+    ctx.lineTo(rf[0], rf[1]);
     ctx.stroke();
   }
 
-  function drawStickman(): void {
-    const pose = computeStickmanPose();
-    renderStickman(pose);
-  }
+  /* --- Initial scene --- */
 
-  /* ----- Initial scene ----- */
-
-  function clearAllPools(): void {
-    for (const type of SPAWN_TYPES) pools[type].count = 0;
-  }
-
-  function seedSkyEntities(): void {
-    // Stars evenly distributed across the sky
+  function seedSky(): void {
     const starCount = isMobile ? 14 : 20;
     for (let i = 0; i < starCount; i++) {
-      poolPush(stars, createStar(width * (i / starCount) + rand(0, width / starCount)));
+      stars.push(createStar(width * (i / starCount) + rand(0, width / starCount)));
     }
-
-    // Clouds spaced across horizontal thirds to avoid clustering
     const cloudCount = isMobile ? 3 : 4;
     for (let i = 0; i < cloudCount; i++) {
-      const slotStart = i / cloudCount;
-      const slotEnd = (i + 0.7) / cloudCount;
-      poolPush(clouds, createCloud(width * rand(slotStart, slotEnd)));
+      clouds.push(createCloud(width * rand(i / cloudCount, (i + 0.7) / cloudCount)));
     }
-
-    // A balloon in the right half of the scene
-    poolPush(balloons, createBalloon(width * rand(0.55, 0.8)));
+    balloons.push(createBalloon(width * rand(0.55, 0.8)));
   }
 
   function seedBirds(): void {
-    // Solo bird on the left
     const b1 = createBird(width * rand(0.25, 0.4));
     b1.flapPhase = rand(0, Math.PI * 2);
-    poolPush(birds, b1);
-
-    // Small formation on the right, spaced apart from the solo bird
+    birds.push(b1);
     const leader = createBird(width * rand(0.65, 0.85));
     leader.flapPhase = rand(0, Math.PI * 2);
-    poolPush(birds, leader);
-    if (birds.count < caps.bird) {
-      const follower = createBird(leader.worldX);
-      follower.flapPhase = rand(0, Math.PI * 2);
-      follower.y = leader.y;
-      follower.velocity = leader.velocity;
-      follower.formationOffsetX = -rand(12, 18);
-      follower.formationOffsetY = rand(6, 10);
-      poolPush(birds, follower);
+    birds.push(leader);
+    if (birds.length < caps.bird) {
+      const f = createBird(leader.worldX);
+      f.flapPhase = rand(0, Math.PI * 2);
+      f.y = leader.y;
+      f.velocity = leader.velocity;
+      f.formationOffsetX = -rand(12, 18);
+      f.formationOffsetY = rand(6, 10);
+      birds.push(f);
     }
   }
 
-  function seedGroundEntities(): void {
-    // Mountains in two distinct clusters: left and right
+  function seedGround(): void {
     spawnMountainCluster(width * rand(0.2, 0.35));
     spawnMountainCluster(width * rand(0.7, 0.9));
-
-    // Grass and pebbles evenly spaced so they don't clump
     const grassCount = isMobile ? 8 : 12;
     for (let i = 0; i < grassCount; i++) {
-      const x = width * (i / grassCount) + rand(0, (width / grassCount) * 0.8);
-      poolPush(grassTufts, createGrassTuft(x));
+      grassTufts.push(
+        createGrassTuft(width * (i / grassCount) + rand(0, (width / grassCount) * 0.8)),
+      );
     }
     const pebbleCount = isMobile ? 4 : 6;
     for (let i = 0; i < pebbleCount; i++) {
-      const x = width * (i / pebbleCount) + rand(0, (width / pebbleCount) * 0.8);
-      poolPush(pebbles, createPebble(x));
+      pebbles.push(createPebble(width * (i / pebbleCount) + rand(0, (width / pebbleCount) * 0.8)));
     }
   }
 
-  function populateInitialScene(): void {
-    clearAllPools();
-    seedSkyEntities();
+  function seed(): void {
+    for (const t of TYPES) pools[t].length = 0;
+    seedSky();
     seedBirds();
-    seedGroundEntities();
+    seedGround();
   }
 
-  /* ----- Entity tick ----- */
+  /* --- Update --- */
 
-  function updateBirds(d: number): void {
-    for (let i = 0; i < birds.count; i++) {
-      const e = birds.items[i];
+  function tickFlyers(d: number): void {
+    for (let i = 0; i < birds.length; i++) {
+      const e = birds[i];
       if (!e) continue;
       e.worldX += (e.velocity + wind * 5) * d;
       e.flapPhase += d * 6;
     }
-  }
-
-  function updateUfos(d: number): void {
-    for (let i = 0; i < ufos.count; i++) {
-      const e = ufos.items[i];
-      if (!e) continue;
-      e.hoverPhase += d * 2;
+    for (let i = 0; i < ufos.length; i++) {
+      const e = ufos[i];
+      if (e) e.hoverPhase += d * 2;
     }
-  }
-
-  function updateMeteors(d: number): void {
-    for (let i = 0; i < meteors.count; i++) {
-      const e = meteors.items[i];
+    for (let i = 0; i < meteors.length; i++) {
+      const e = meteors[i];
       if (!e) continue;
-      // Streak leftward and downward across the sky
       e.worldX -= Math.cos(e.angle) * e.speed * d;
       e.y += Math.sin(e.angle) * e.speed * d;
       e.life -= d * 1.5;
     }
   }
 
-  function updateBalloonsAndWhales(d: number): void {
-    for (let i = 0; i < balloons.count; i++) {
-      const e = balloons.items[i];
+  function tickBalloonsAndWhales(d: number): void {
+    for (let i = 0; i < balloons.length; i++) {
+      const e = balloons[i];
       if (!e) continue;
       e.worldX += (e.driftSpeed + wind * 3) * d;
       e.swayPhase += d * 1.5;
     }
-    for (let i = 0; i < whales.count; i++) {
-      const e = whales.items[i];
+    for (let i = 0; i < whales.length; i++) {
+      const e = whales[i];
       if (!e) continue;
       e.worldX += e.velocity * d;
       e.bobPhase += d * 1.2;
     }
   }
 
-  function updateJellyfish(d: number): void {
-    for (let i = 0; i < jellyfish.count; i++) {
-      const e = jellyfish.items[i];
+  function tickSeaAndClouds(d: number): void {
+    for (let i = 0; i < jfish.length; i++) {
+      const e = jfish[i];
       if (!e) continue;
       e.worldX += (e.driftSpeed + wind * 2) * d;
       e.pulsePhase += d * 2.5;
     }
-  }
-
-  function updateClouds(d: number): void {
-    for (let i = 0; i < clouds.count; i++) {
-      const e = clouds.items[i];
+    for (let i = 0; i < clouds.length; i++) {
+      const e = clouds[i];
       if (!e) continue;
       e.worldX += (e.driftSpeed + wind * 2) * d;
     }
   }
 
-  /* ----- Public API ----- */
-
   function update(dt: number): void {
     if (reducedMotion) return;
-
     const d = Math.min(dt, MAX_DT);
     time += d;
     worldOffset += WALK_SPEED * d;
     walkPhase += d * 5.0;
-
-    // Wind: two incommensurate frequencies for non-repeating oscillation
     wind = Math.sin(time * 0.2) * 0.3 + Math.sin(time * 0.07) * 0.2;
-
-    updateBirds(d);
-    updateUfos(d);
-    updateMeteors(d);
-    updateBalloonsAndWhales(d);
-    updateJellyfish(d);
-    updateClouds(d);
-    for (const t of SPAWN_TYPES) {
-      trySpawn(t);
-    }
-    cullAllPools();
+    tickFlyers(d);
+    tickBalloonsAndWhales(d);
+    tickSeaAndClouds(d);
+    for (const t of TYPES) trySpawn(t);
+    cullAll();
   }
 
   function draw(): void {
     ctx.fillStyle = colors.bg;
     ctx.fillRect(0, 0, width, height);
-
-    // Sky (back to front)
     drawStars();
     drawMeteors();
     drawClouds();
     drawWhales();
     drawJellyfish();
     drawBalloons();
-
-    // Terrain
     drawMountains();
     drawGroundLine();
     drawPebbles();
     drawGrassTufts();
-
-    // Foreground sky
     drawBirds();
     drawUfos();
-
-    // Protagonist
     drawStickman();
   }
 
   function resize(w: number, h: number): void {
     width = w;
     height = h;
-    baseGroundY = height * GROUND_Y_RATIO;
+    baseGroundY = height * GROUND_Y;
   }
 
   function onThemeChange(): void {
@@ -1575,11 +1064,11 @@ export function createExplorerEngine(options: ExplorerEngineOptions): ExplorerEn
       walkPhase = 0;
       time = 0;
       wind = 0;
-      populateInitialScene();
+      seed();
     }
   }
 
-  populateInitialScene();
+  seed();
 
   return { update, draw, resize, onThemeChange, setReducedMotion };
 }

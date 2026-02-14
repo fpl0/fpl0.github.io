@@ -9,7 +9,7 @@
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   /* Ensure border is on the wrapper, not pre, for clean edges */
-  border: 1px solid var(--color-border);
+  border: var(--space-px) solid var(--color-border);
   overflow: hidden; /* For border-radius */
 }
 
@@ -22,7 +22,7 @@
   font-size: var(--font-size-micro);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--letter-spacing-extra);
   color: var(--color-text-muted);
   user-select: none;
   pointer-events: none;
@@ -41,7 +41,7 @@
   align-items: center;
   justify-content: center;
   background: var(--color-surface); /* solid bg to hide code behind */
-  border: 1px solid var(--color-border);
+  border: var(--space-px) solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-muted);
   cursor: pointer;
@@ -94,7 +94,7 @@
 }
 
 .code-copy:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: var(--space-0-5) solid var(--color-primary);
   outline-offset: 2px;
   background: var(--color-highlight);
   color: var(--color-primary);

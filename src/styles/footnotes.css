@@ -29,7 +29,7 @@
   -webkit-appearance: none;
   width: 1.35em;
   height: 1.35em;
-  border: 1px solid var(--color-muted);
+  border: var(--space-px) solid var(--color-muted);
   border-radius: var(--radius-sm);
   background-color: transparent;
   display: grid;
@@ -78,7 +78,7 @@
 .content .footnotes {
   margin-top: var(--space-12);
   padding-top: var(--space-6);
-  border-top: 1px solid var(--color-border);
+  border-top: var(--space-px) solid var(--color-border);
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-relaxed);
@@ -147,7 +147,7 @@
   margin-left: var(--space-1);
   color: var(--color-primary);
   font-size: 0.85em;
-  opacity: 0.6;
+  opacity: var(--opacity-recede);
   transition: opacity var(--duration-normal) var(--ease-out);
   /* Hide the original ↩ which renders as emoji on iOS */
   overflow: hidden;
@@ -184,7 +184,7 @@ sup {
 /* --- Definition Lists --- */
 .content dl {
   margin: var(--space-8) 0;
-  border-left: 1px solid var(--color-border);
+  border-left: var(--space-px) solid var(--color-border);
   padding-left: var(--space-6);
 }
 

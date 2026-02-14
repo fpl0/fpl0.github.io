@@ -183,7 +183,7 @@ Ordered lists use `list-style-position: outside` with `padding-left: 1.5em` to a
 - **Content max-width**: `var(--content-width)` (72ch), narrow variant: `var(--content-width-narrow)` (60ch)
 - **Padding**: `4rem 1.5rem` (desktop), `1.5rem 1rem` (mobile < 600px)
 - **Mobile breakpoint**: `600px`, TOC sidebar: `1440px+`
-- **Spacing**: strict 4px/8px grid — all spacing MUST be integer multiples of `0.25rem` (4px). Use `--space-1` through `--space-16` variables.
+- **Spacing**: strict 4px/8px grid — all spacing MUST be integer multiples of `0.25rem` (4px). Use `--space-1` through `--space-16` variables. Use `--space-px` (1px) and `--space-0-5` (2px) ONLY for borders and outlines.
 
 #### Border Radius Scale
 
@@ -204,6 +204,25 @@ Use token variables for all elevation:
 - `--shadow-md`: medium
 - `--shadow-lg`: large (cards, floating bars)
 - `--shadow-xl`: extra large (modals, lightboxes)
+
+#### Opacity Scale
+
+- `--opacity-subtle: 0.35`
+- `--opacity-muted: 0.5`
+- `--opacity-recede: 0.6`
+- `--opacity-de-emphasize: 0.8`
+- `--opacity-hover: 0.9`
+
+#### Letter Spacing Scale
+
+- `--letter-spacing-extra-tight: -0.04em`
+- `--letter-spacing-tight: -0.03em`
+- `--letter-spacing-snug: -0.02em`
+- `--letter-spacing-normal: 0`
+- `--letter-spacing-slight: 0.02em`
+- `--letter-spacing-loose: 0.04em`
+- `--letter-spacing-wide: 0.06em`
+- `--letter-spacing-extra: 0.08em`
 
 #### Z-Index Scale
 

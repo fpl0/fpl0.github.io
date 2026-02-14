@@ -17,6 +17,8 @@ const ROOT = join(import.meta.dirname, "..", "src");
 // ---------------------------------------------------------------------------
 
 const SPACE_MAP: Record<string, string> = {
+  "1px": "var(--space-px)",
+  "2px": "var(--space-0-5)",
   "0.25rem": "var(--space-1)",
   "4px": "var(--space-1)",
   "0.5rem": "var(--space-2)",
@@ -89,6 +91,26 @@ const LINE_HEIGHT_MAP: Record<string, string> = {
   "1.5": "var(--line-height-normal)",
   "1.6": "var(--line-height-relaxed)",
   "1.7": "var(--line-height-loose)",
+};
+
+const OPACITY_MAP: Record<string, string> = {
+  "0.35": "var(--opacity-subtle)",
+  "0.5": "var(--opacity-muted)",
+  "0.6": "var(--opacity-recede)",
+  "0.8": "var(--opacity-de-emphasize)",
+  "0.9": "var(--opacity-hover)",
+};
+
+const LETTER_SPACING_MAP: Record<string, string> = {
+  "-0.04em": "var(--letter-spacing-extra-tight)",
+  "-0.03em": "var(--letter-spacing-tight)",
+  "-0.02em": "var(--letter-spacing-snug)",
+  "0": "var(--letter-spacing-normal)",
+  "0.02em": "var(--letter-spacing-slight)",
+  "0.04em": "var(--letter-spacing-loose)",
+  "0.05em": "var(--letter-spacing-loose) (closest match)",
+  "0.06em": "var(--letter-spacing-wide)",
+  "0.08em": "var(--letter-spacing-extra)",
 };
 
 // ---------------------------------------------------------------------------
@@ -202,10 +224,9 @@ const COLOR_PROPS = new Set([
 // ---------------------------------------------------------------------------
 
 const SPACING_PROPS =
-  /^\s*(?:margin|padding|gap|top|right|bottom|left|margin-top|margin-right|margin-bottom|margin-left|padding-top|padding-right|padding-bottom|padding-left|row-gap|column-gap|width|height|max-width|max-height|min-width|min-height|backdrop-filter)\s*:/;
+  /^\s*(?:margin|padding|gap|top|right|bottom|left|margin-top|margin-right|margin-bottom|margin-left|padding-top|padding-right|padding-bottom|padding-left|row-gap|column-gap|width|height|max-width|max-height|min-width|min-height|backdrop-filter|border-width|border|border-top|border-right|border-bottom|border-left|outline)\s*:/;
 
 function checkSpacing(prop: string, value: string): { raw: string; suggestion: string } | null {
-  if (/var\(/.test(value)) return null;
   if (/^[\s]*(0|auto|none|inherit|initial|unset)[\s;]*$/.test(value)) return null;
 
   // Search for standalone token-matching values (rem or px)
@@ -404,6 +425,32 @@ function checkLineHeight(value: string): { raw: string; suggestion: string } | n
   return null;
 }
 
+function checkOpacity(value: string): { raw: string; suggestion: string } | null {
+  if (/var\(--opacity/.test(value)) return null;
+  const v = value.replace(/;$/, "").trim();
+  if (v === "0" || v === "1" || v === "inherit" || v === "initial" || v === "unset") return null;
+  if (OPACITY_MAP[v]) {
+    return {
+      raw: `opacity: ${v}`,
+      suggestion: OPACITY_MAP[v],
+    };
+  }
+  return null;
+}
+
+function checkLetterSpacing(value: string): { raw: string; suggestion: string } | null {
+  if (/var\(--letter-spacing/.test(value)) return null;
+  const v = value.replace(/;$/, "").trim();
+  if (v === "normal" || v === "inherit" || v === "initial" || v === "unset") return null;
+  if (LETTER_SPACING_MAP[v]) {
+    return {
+      raw: `letter-spacing: ${v}`,
+      suggestion: LETTER_SPACING_MAP[v],
+    };
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------------------
 // Main scan
 // ---------------------------------------------------------------------------
@@ -467,6 +514,8 @@ const TOKEN_CHECKERS: TokenChecker[] = [
   (prop, value) => (prop === "font-size" ? [checkFontSize(value)] : []),
   (prop, value) => (prop === "box-shadow" ? [checkShadow(value)] : []),
   (prop, value) => (prop === "line-height" ? [checkLineHeight(value)] : []),
+  (prop, value) => (prop === "opacity" ? [checkOpacity(value)] : []),
+  (prop, value) => (prop === "letter-spacing" ? [checkLetterSpacing(value)] : []),
 ];
 
 /** Run all token checks against a single property declaration. */
@@ -495,8 +544,11 @@ function scanFile(filepath: string): Violation[] {
   const violations: Violation[] = [];
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i] as string;
+    let line = lines[i] as string;
     if (excludedLines.has(i) || varBlockLines.has(i) || isSkippableLine(line)) continue;
+
+    // Strip inline comments
+    line = line.replace(/\/\*.*?\*\//g, "").replace(/\/\/.*$/, "");
 
     const propMatch = line.match(/^\s*([\w-]+)\s*:\s*(.+)/);
     if (!(propMatch?.[1] && propMatch[2])) continue;

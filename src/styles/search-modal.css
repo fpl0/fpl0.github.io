@@ -26,7 +26,7 @@
   width: 90%;
   max-width: 560px;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: var(--space-px) solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   z-index: var(--z-modal);
@@ -51,7 +51,7 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-5);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: var(--space-px) solid var(--color-border);
 }
 
 .search-icon {
@@ -86,7 +86,7 @@
 .search-kbd kbd {
   padding: var(--space-1) var(--space-2);
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  border: var(--space-px) solid var(--color-border);
   border-radius: var(--radius-sm);
 }
 
@@ -136,7 +136,7 @@
   display: inline-block;
   font-family: var(--font-mono-brand);
   font-size: var(--font-size-micro);
-  letter-spacing: 0.06em;
+  letter-spacing: var(--letter-spacing-wide);
   text-transform: uppercase;
   color: var(--color-primary);
   margin-left: var(--space-2);
@@ -173,13 +173,13 @@
   background: var(--color-bg);
   padding: 0.1rem 0.4rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-subtle);
+  border: var(--space-px) solid var(--color-border-subtle);
   white-space: nowrap;
 }
 
 /* Focus styles for keyboard navigation */
 .search-result:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: var(--space-0-5) solid var(--color-primary);
   outline-offset: 2px;
   background-color: var(--color-highlight);
 }
@@ -190,7 +190,7 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--space-3) var(--space-4);
-  border-top: 1px solid var(--color-border);
+  border-top: var(--space-px) solid var(--color-border);
   font-family: var(--font-sans);
   font-size: var(--font-size-label);
   color: var(--color-muted);
@@ -202,7 +202,7 @@
   gap: var(--space-2);
   font-family: var(--font-mono-brand);
   font-size: var(--font-size-label);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-loose);
 }
 
 .search-footer-nav a {
@@ -235,7 +235,7 @@
 .search-footer kbd {
   padding: var(--space-1) var(--space-2);
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  border: var(--space-px) solid var(--color-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: var(--font-size-micro);

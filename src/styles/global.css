@@ -205,6 +205,8 @@
      SPACING SCALE
      Consistent spacing tokens for margins, padding, and gaps
      ========================================================================== */
+  --space-px: 1px;
+  --space-0-5: 2px;
   --space-1: 0.25rem; /* 4px - micro spacing */
   --space-2: 0.5rem; /* 8px - strict grid unit */
   --space-3: 0.75rem; /* 12px */
@@ -249,6 +251,27 @@
   --duration-fast: 0.15s;
   --duration-normal: 0.2s;
   --duration-slow: 0.3s;
+
+  /* ==========================================================================
+     OPACITY TOKENS
+     ========================================================================== */
+  --opacity-subtle: 0.35;
+  --opacity-muted: 0.5;
+  --opacity-recede: 0.6;
+  --opacity-de-emphasize: 0.8;
+  --opacity-hover: 0.9;
+
+  /* ==========================================================================
+     LETTER SPACING TOKENS
+     ========================================================================== */
+  --letter-spacing-extra-tight: -0.04em;
+  --letter-spacing-tight: -0.03em;
+  --letter-spacing-snug: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-slight: 0.02em;
+  --letter-spacing-loose: 0.04em;
+  --letter-spacing-wide: 0.06em;
+  --letter-spacing-extra: 0.08em;
 
   /* ==========================================================================
      CONTENT WIDTH TOKENS
@@ -457,7 +480,7 @@ body {
 
 /* Global focus styles for keyboard navigation */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: var(--space-0-5) solid var(--color-primary);
   outline-offset: 2px;
 }
 
@@ -477,19 +500,19 @@ h3 {
 }
 
 h1 {
-  letter-spacing: -0.03em;
+  letter-spacing: var(--letter-spacing-tight);
   font-size: var(--font-size-h1);
   line-height: var(--line-height-tight);
   margin-top: var(--space-12);
 }
 h2 {
-  letter-spacing: -0.02em;
+  letter-spacing: var(--letter-spacing-snug);
   font-size: var(--font-size-h2);
   line-height: var(--line-height-snug);
   margin-top: var(--space-10);
 }
 h3 {
-  letter-spacing: 0;
+  letter-spacing: var(--letter-spacing-normal);
   font-size: var(--font-size-h3);
   line-height: var(--line-height-subhead);
   margin-top: var(--space-8);
@@ -517,7 +540,7 @@ a:hover {
   margin-bottom: var(--space-8);
   font-size: var(--font-size-xxs);
   font-family: var(--font-mono-brand);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-loose);
   color: var(--color-muted);
   text-decoration: none;
   border-bottom: none;
@@ -534,7 +557,7 @@ a:hover {
 blockquote {
   margin: var(--space-10) 0;
   padding-left: var(--space-6);
-  border-left: 2px solid var(--color-primary);
+  border-left: var(--space-0-5) solid var(--color-primary);
   font-family: var(--font-serif);
   font-size: var(--font-size-sm);
   font-style: italic;
@@ -546,7 +569,7 @@ blockquote cite {
   display: block;
   font-family: var(--font-mono-brand);
   font-size: var(--font-size-label);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-loose);
   font-weight: 400;
   color: var(--color-muted);
   margin-top: var(--space-1);

@@ -10,7 +10,7 @@
 .bio-quote {
   margin: 0 0 var(--space-12) 0;
   max-width: 100%;
-  border-left: 2px solid var(--color-primary);
+  border-left: var(--space-0-5) solid var(--color-primary);
   padding-left: var(--space-6);
 }
 
@@ -28,7 +28,7 @@
   display: block;
   font-family: var(--font-mono-brand);
   font-size: var(--font-size-label);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--letter-spacing-loose);
   font-weight: 400;
   color: var(--color-muted);
   margin-top: var(--space-1);
