@@ -25,6 +25,7 @@
 - **Biome** for linting and formatting (`bun run lint` / `bun run format`)
 - **Fonts**: `@fontsource` packages with `font-display: block` and metric-override fallbacks
 - **Syntax highlighting**: Shiki with CSS variables, dual themes (OKLCH-compatible)
+- **Mermaid diagrams**: Pre-rendered at build time via `rehype-mermaid-dual.mjs` (Playwright + `mermaid-isomorphic`)
 
 ## Commands
 
@@ -76,7 +77,7 @@ This is the **mathematical single source of truth**. Every element MUST adhere t
 - **Entropy Synthesis**: Procedural SVG grain (`feTurbulence`) applied as a fixed overlay (`html::before`) to provide typographic "tooth."
 - **Chromatic Elevation**: Shadows derived from the master hue (`--hue`) to simulate real-world light occlusion on parchment.
 - **Material Inset**: Inset shadows (`--ui-inset`) and microscopic borders make media feel "embedded" into the substrate.
-- **Soft Focus Attention**: Body content blurs and recedes (`filter: blur(...) grayscale(...)`) when modals (Search, Lightbox) are active.
+- **Soft Focus Attention**: Body content blurs and recedes (`filter: blur(...) grayscale(...)`) when the Search modal is active.
 
 ### Typography
 
@@ -113,6 +114,22 @@ All pages must utilize the `<BaseHead>` component to ensure consistent:
 
 Orchestrate the following root-level classes for global state transitions:
 - `.is-searching`: Content blurs and recedes for the search ledger.
+
+### Mermaid Diagrams
+
+Diagrams in ` ```mermaid ` code blocks are **pre-rendered at build time** by `src/plugins/rehype-mermaid-dual.mjs`:
+- Renders **both** light and dark SVGs via `mermaid-isomorphic` (Playwright/Chromium).
+- Injects them as `.mermaid-light` / `.mermaid-dark` inside a `.mermaid-container`.
+- CSS in `prose.css` toggles visibility via `[data-theme]` — zero client-side Mermaid JS.
+- SVGs get explicit `width`/`height` from their `viewBox` to prevent CLS.
+- `MermaidDiagram.astro` only handles the "source" toggle button interaction.
+- Build requires Playwright Chromium (`npx playwright install chromium`).
+
+### Images (CLS Prevention)
+
+- `Figure.astro` **requires** `width` and `height` props — TypeScript enforces this at build time.
+- CSS (`.content img { width: 100%; height: auto; }`) uses these attributes for aspect ratio reservation.
+- There is **no image lightbox** — do not add one.
 
 ### Content Logic
 
