@@ -17,7 +17,6 @@ import FormattedDate from "../../components/FormattedDate.astro";
 import Link from "../../components/Link.astro";
 import MermaidDiagram from "../../components/MermaidDiagram.astro";
 import PageHeader from "../../components/PageHeader.astro";
-import PostNavigation from "../../components/PostNavigation.astro";
 import TableOfContents from "../../components/TableOfContents.astro";
 import TableWrapper from "../../components/TableWrapper.astro";
 import Layout from "../../layouts/Layout.astro";
@@ -29,27 +28,17 @@ import "../../styles/code-block.css";
 
 interface Props {
   post: CollectionEntry<"blog">;
-  prevPost: { slug: string; title: string } | null;
-  nextPost: { slug: string; title: string } | null;
 }
 
 export async function getStaticPaths() {
   const sorted = await getPublishedPosts();
-  return sorted.map((post, i) => {
-    const prev = sorted[i - 1];
-    const next = sorted[i + 1];
-    return {
-      params: { slug: post.slug },
-      props: {
-        post,
-        prevPost: prev ? { slug: prev.slug, title: prev.data.title } : null,
-        nextPost: next ? { slug: next.slug, title: next.data.title } : null,
-      },
-    };
-  });
+  return sorted.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
 }
 
-const { post, prevPost, nextPost } = Astro.props;
+const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const readingTime = getReadingTime(post.body ?? "");
 const displayDate = post.data.publicationDate ?? post.data.createdDate;
@@ -87,7 +76,7 @@ const canonicalURL = new URL(`/blog/${post.slug}/`, Astro.site);
         <Content />
       </div>
       <footer class="post-endmatter">
-        <PostNavigation prevPost={prevPost} nextPost={nextPost} />
+        <Link href="/" variant="back" class="post-home-link">← All posts</Link>
       </footer>
     </article>
   </main>
