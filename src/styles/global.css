@@ -586,6 +586,7 @@ h3 {
 
 /* Links */
 a {
+  position: relative;
   color: var(--color-text);
   text-decoration: underline;
   text-decoration-color: var(--color-muted);
@@ -594,6 +595,15 @@ a {
   transition: all var(--duration-out) var(--ease-out);
   /* Ensure transform doesn't clip expanded hit-box */
   display: inline-block;
+}
+
+/* Hit-box expansion (Fitts's Law) — Invisible Reach */
+a::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--space-2) * -1);
+  pointer-events: auto;
+  z-index: 0;
 }
 
 a:hover {

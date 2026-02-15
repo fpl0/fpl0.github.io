@@ -352,7 +352,7 @@ a.anchor-link {
   border: var(--ui-border);
   border-radius: var(--ui-radius);
   overflow: hidden;
-  background: var(--color-surface);
+  background: var(--color-code-bg);
 }
 
 .mermaid-rendered {
@@ -378,6 +378,17 @@ a.anchor-link {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-variant-ligatures: common-ligatures contextual;
+}
+
+/* Ensure text labels (edge labels, notes, alt blocks) blend seamlessly without unwanted borders */
+.mermaid-rendered svg .edgeLabel rect,
+.mermaid-rendered svg .label rect,
+.mermaid-rendered svg .note rect,
+.mermaid-rendered svg .loop rect,
+.mermaid-rendered svg .alt rect {
+  stroke: none !important;
+  fill: var(--color-code-bg) !important;
+  fill-opacity: 1 !important;
 }
 
 /* Edge/arrow labels — use label scale for hierarchy */

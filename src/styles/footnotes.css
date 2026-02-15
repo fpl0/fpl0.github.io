@@ -76,8 +76,8 @@
 
 .content section[data-footnotes],
 .content .footnotes {
-  margin-top: var(--space-12);
-  padding-top: var(--space-6);
+  margin-top: var(--space-y-xl);
+  padding-top: var(--space-y-md);
   border-top: var(--space-px) solid var(--color-border);
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
@@ -131,7 +131,7 @@
   text-decoration: none;
   color: var(--color-primary);
   font-weight: 600;
-  font-size: 0.75em;
+  font-size: calc(1em / var(--font-ratio));
 }
 
 .content a[data-footnote-ref]:hover,
@@ -147,7 +147,7 @@
   border: none;
   margin-left: var(--space-1);
   color: var(--color-primary);
-  font-size: 0.85em;
+  font-size: calc(1em / var(--font-ratio));
   opacity: var(--opacity-recede);
   transition: opacity var(--duration-normal) var(--ease-out);
   /* Hide the original ↩ which renders as emoji on iOS */
