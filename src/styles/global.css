@@ -471,8 +471,7 @@ p {
 }
 
 /* Soft Focus Interaction Decay */
-html.is-searching body > *:not(.search-backdrop),
-html.is-viewing-image body > *:not(.lightbox) {
+html.is-searching body > *:not(.search-backdrop) {
   filter: blur(var(--space-px)) grayscale(0.2);
   opacity: var(--opacity-recede);
   pointer-events: none;

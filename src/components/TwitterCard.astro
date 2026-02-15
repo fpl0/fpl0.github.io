@@ -118,7 +118,7 @@ const videoPoster = tweet?.video?.poster;
         >
           <div class={`tweet-media grid-${Math.min(photos.length, 4)}`}>
             {photos.map((photo: TweetPhoto) => (
-              <img src={photo.url} alt="Tweet media" />
+              <img src={photo.url} alt="Tweet media" width={photo.width} height={photo.height} />
             ))}
           </div>
         </a>

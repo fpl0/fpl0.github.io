@@ -113,7 +113,6 @@ All pages must utilize the `<BaseHead>` component to ensure consistent:
 
 Orchestrate the following root-level classes for global state transitions:
 - `.is-searching`: Content blurs and recedes for the search ledger.
-- `.is-viewing-image`: Content blurs and recedes for the lightbox.
 
 ### Content Logic
 

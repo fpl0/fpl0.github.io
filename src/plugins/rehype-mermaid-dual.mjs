@@ -104,6 +104,18 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
+/** Ensure SVG has explicit width/height from its viewBox for CLS prevention. */
+function ensureSvgDimensions(svg) {
+  const vb = svg.match(/viewBox="\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*"/);
+  if (!vb) return svg;
+  const w = vb[3];
+  const h = vb[4];
+  return svg.replace(/<svg([^>]*)>/, (_match, attrs) => {
+    const cleaned = attrs.replace(/\s*(?:width|height)="[^"]*"/g, "");
+    return `<svg${cleaned} width="${w}" height="${h}">`;
+  });
+}
+
 /** Lazy singleton — Chromium is launched once and reused across all pages. */
 let rendererPromise = null;
 
@@ -183,6 +195,8 @@ export default function rehypeMermaidDual() {
       const darkId = darkSvg.match(/id="(mermaid-\d+)"/)?.[1];
       if (lightId) lightSvg = lightSvg.replaceAll(lightId, `${lightId}-light`);
       if (darkId) darkSvg = darkSvg.replaceAll(darkId, `${darkId}-dark`);
+      lightSvg = ensureSvgDimensions(lightSvg);
+      darkSvg = ensureSvgDimensions(darkSvg);
 
       const html = [
         '<div class="mermaid-container">',

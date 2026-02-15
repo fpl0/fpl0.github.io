@@ -5,7 +5,6 @@
  * Features:
  * - Table of contents with active heading tracking
  * - Code syntax highlighting with copy button
- * - Image lightbox for zooming
  * - Reading time estimation
  * - Lazy YouTube embeds
  */
@@ -15,7 +14,6 @@ import AnchorLinks from "../../components/AnchorLinks.astro";
 import BlogPostSchema from "../../components/BlogPostSchema.astro";
 import CodeCopyButton from "../../components/CodeCopyButton.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
-import ImageLightbox from "../../components/ImageLightbox.astro";
 import Link from "../../components/Link.astro";
 import MermaidDiagram from "../../components/MermaidDiagram.astro";
 import PageHeader from "../../components/PageHeader.astro";
@@ -95,7 +93,6 @@ const canonicalURL = new URL(`/blog/${post.slug}/`, Astro.site);
   </main>
   <MermaidDiagram />
   <CodeCopyButton />
-  <ImageLightbox />
   <TableWrapper />
   <AnchorLinks />
 </Layout>
