@@ -18,7 +18,8 @@
   font-family: var(--font-serif);
   font-style: italic;
   font-size: var(--font-size-sm);
-  line-height: var(--line-height-relaxed);
+  line-height: var(--line-height-loose);
+  letter-spacing: var(--letter-spacing-slight);
   color: var(--color-text-secondary);
   font-weight: 400;
   margin: 0;

@@ -104,6 +104,8 @@
 /* Blockquotes */
 .content blockquote {
   margin: var(--space-y-md) 0;
+  line-height: var(--line-height-loose);
+  letter-spacing: var(--letter-spacing-slight);
 }
 
 .content blockquote p:last-of-type {
