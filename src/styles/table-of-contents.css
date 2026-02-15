@@ -75,7 +75,7 @@
   font-weight: 500;
   color: var(--color-text-secondary);
   line-height: var(--line-height-subhead);
-  padding: 2px 0 2px var(--space-4); /* token-exempt */
+  padding: var(--space-0-5) 0 var(--space-0-5) var(--space-4);
   margin-top: var(--space-2); /* 8px */
 }
 
@@ -85,7 +85,7 @@
   font-weight: 400;
   color: var(--color-text-muted);
   line-height: var(--line-height-subhead);
-  padding: 2px 0 2px var(--space-6); /* token-exempt */
+  padding: var(--space-0-5) 0 var(--space-0-5) var(--space-6);
   opacity: 0.8; /* Recede visually */
 }
 
